@@ -1,0 +1,62 @@
+# =============================================================================
+# EditorConfig - https://editorconfig.org
+# Top-level config for consistent formatting across editors and platforms.
+# =============================================================================
+
+root = true
+
+# -----------------------------------------------------------------------------
+# Defaults for every file
+# -----------------------------------------------------------------------------
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# -----------------------------------------------------------------------------
+# C# / .NET
+# -----------------------------------------------------------------------------
+[*.{cs,csx,vb,vbx}]
+indent_size = 4
+
+# Project / solution / build files use 2-space indent for readability
+[*.{csproj,vbproj,fsproj,vcxproj,proj,props,targets}]
+indent_size = 2
+
+# Solution files traditionally use CRLF on Windows
+[*.sln]
+end_of_line = crlf
+indent_style = tab
+
+# -----------------------------------------------------------------------------
+# Frontend (Angular / TypeScript / web assets)
+# -----------------------------------------------------------------------------
+[*.{ts,tsx,js,jsx,mjs,cjs,html,htm,css,scss,sass,less,json,jsonc,yml,yaml}]
+indent_size = 2
+
+# -----------------------------------------------------------------------------
+# Markdown - preserve trailing whitespace (used for hard line breaks)
+# -----------------------------------------------------------------------------
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# -----------------------------------------------------------------------------
+# Shell / batch scripts
+# -----------------------------------------------------------------------------
+[*.{sh,bash,zsh}]
+end_of_line = lf
+indent_size = 2
+
+[*.{bat,cmd,ps1}]
+end_of_line = crlf
+indent_size = 2
+
+# -----------------------------------------------------------------------------
+# Makefiles require tab indentation
+# -----------------------------------------------------------------------------
+[Makefile]
+indent_style = tab
