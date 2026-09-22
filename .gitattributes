@@ -1,0 +1,117 @@
+# =============================================================================
+# .gitattributes
+# Normalize line endings and mark binaries so cross-platform (Windows/macOS/Linux)
+# checkouts stay consistent.
+# =============================================================================
+
+# Default: auto-detect text files and normalize to LF in the repo
+* text=auto eol=lf
+
+# -----------------------------------------------------------------------------
+# Text files (explicit)
+# -----------------------------------------------------------------------------
+
+*.cs        text
+*.csx       text
+*.vb        text
+*.fs        text
+*.fsx       text
+
+*.csproj    text
+*.vbproj    text
+*.fsproj    text
+*.props     text
+*.targets   text
+*.config    text
+
+# Solution files are traditionally CRLF on Windows and some tooling assumes it
+*.sln       text eol=crlf
+
+*.ts        text
+*.tsx       text
+*.js        text
+*.jsx       text
+*.mjs       text
+*.cjs       text
+*.json      text
+*.jsonc     text
+
+*.html      text
+*.htm       text
+*.css       text
+*.scss      text
+*.sass      text
+*.less      text
+
+*.yml       text
+*.yaml      text
+*.toml      text
+*.xml       text
+*.xsd       text
+*.md        text
+*.txt       text
+
+# Shell scripts must be LF regardless of platform
+*.sh        text eol=lf
+
+# Windows scripts must be CRLF
+*.ps1       text eol=crlf
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+
+# Dotfiles
+.gitignore      text
+.gitattributes  text
+.editorconfig   text
+.env.example    text
+
+# Docker
+Dockerfile      text
+Dockerfile.*    text
+*.dockerfile    text
+
+# Licenses
+LICENSE         text
+
+# -----------------------------------------------------------------------------
+# Binary files (never diff, never normalize)
+# -----------------------------------------------------------------------------
+
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.bmp   binary
+*.tif   binary
+*.tiff  binary
+
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.otf   binary
+
+*.pdf   binary
+*.zip   binary
+*.tar   binary
+*.tar.gz binary
+*.tgz   binary
+*.gz    binary
+*.7z    binary
+*.rar   binary
+
+*.dll   binary
+*.exe   binary
+*.pdb   binary
+*.snk   binary
+*.so    binary
+*.dylib binary
+
+# -----------------------------------------------------------------------------
+# GitHub Linguist hints
+# -----------------------------------------------------------------------------
+
+*.md          linguist-documentation
+docs/**       linguist-documentation

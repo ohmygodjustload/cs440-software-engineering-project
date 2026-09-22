@@ -1,0 +1,22 @@
+# =============================================================================
+# CODEOWNERS
+# Defines who must review changes to specific paths. Owners listed here are
+# automatically requested for review on any PR touching a matching path, and
+# their approval is required to merge (enforced by branch protection).
+#
+# Syntax: <path-pattern>  <owner1> <owner2> ...
+# Owners must be GitHub users or teams with write access to this repo.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositories-settings-and-security/customizing-your-repository/about-code-owners
+# =============================================================================
+
+# TODO(BAAAM-18): replace @ohmygodjustload with real team member handles once
+# collected. When the codebase grows, consider splitting ownership by area,
+# for example:
+#
+#   /src/backend/    @teammate-a @teammate-b
+#   /src/frontend/   @teammate-c @teammate-d
+#   /.github/        @ohmygodjustload
+#   *.md             @ohmygodjustload
+
+*  @ohmygodjustload
