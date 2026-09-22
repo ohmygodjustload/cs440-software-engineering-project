@@ -1,52 +1,40 @@
-## Summary
+## Jira ticket
 
-<!-- One or two sentences describing what this PR does and why. -->
+<!-- Paste the full URL to the Jira ticket. -->
 
-## Related Jira ticket
+https://
 
-<!-- Use "Closes BAAAM-XX" so Jira auto-transitions the ticket on merge. -->
+## Description
 
-Closes BAAAM-
+<!-- Short description of what this pull request does. -->
 
-## Type of change
 
-<!-- Check all that apply. The type here must match the Conventional Commit prefix on the PR title. -->
 
-- [ ] `feat` - new feature
-- [ ] `fix` - bug fix
-- [ ] `docs` - documentation only
-- [ ] `style` - formatting / whitespace, no code change
-- [ ] `refactor` - code change that neither fixes a bug nor adds a feature
-- [ ] `perf` - performance improvement
-- [ ] `test` - adding or updating tests
-- [ ] `build` - build system or dependency changes
-- [ ] `ci` - CI configuration changes
-- [ ] `chore` - repo housekeeping / tooling
-- [ ] `revert` - reverting a previous commit
+## Acceptance criteria
 
-## What changed
+<!-- Copy the ticket's acceptance criteria here as checkboxes. Check each one that this PR satisfies. -->
 
-<!-- Bullet list of the concrete changes in this PR. Reviewers read this first. -->
+- [ ]
+- [ ]
+- [ ]
 
--
+## Tests added
 
-## How to test
+<!-- Check all that apply. Leave unchecked if none. -->
 
-<!-- Numbered steps a reviewer can follow to verify the change locally. -->
+- [ ] Unit
+- [ ] Integration
+- [ ] End-to-end (e2e)
+- [ ] Manual / exploratory
+- [ ] None (explain in Notes if so)
 
-1.
+## Screenshots (optional)
 
-## Screenshots
+<!-- Attach before/after images if this change is user-facing. -->
 
-<!-- Delete this section if the change is not user-facing. Otherwise attach before/after images. -->
 
-## Checklist
 
-- [ ] PR title follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) (used verbatim as the squash-merge commit subject)
-- [ ] Branch is named `<JIRA-KEY>/<kebab-slug>` (e.g. `BAAAM-42/add-login`)
-- [ ] `Closes BAAAM-XX` is present in the description above
-- [ ] Tests have been added or updated where appropriate
-- [ ] Documentation ([README.md](../README.md), [CONTRIBUTING.md](../CONTRIBUTING.md), inline) has been updated where appropriate
-- [ ] No direct commits to `main` - all work went through this PR
-- [ ] All review conversations resolved before merging
-- [ ] Merging with **Squash and merge** only (the only option available)
+## Notes (optional)
+
+<!-- Anything else reviewers should know. -->
+
