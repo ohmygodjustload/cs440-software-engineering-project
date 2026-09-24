@@ -1,0 +1,37 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    // TypeScript 6+ reports TS5011 when outDir is set without an explicit rootDir, because the
+    // emitted layout would then follow the common source directory and shift as files are added.
+    // The source root is ./src for all three configs, so set it here and let them inherit it.
+    "rootDir": "./src",
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "bundler",
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    // VS Code resolves *.spec.ts against this base config rather than tsconfig.spec.json
+    // (see angular/angular-cli#29239), so the test-runner globals must be visible here too or
+    // the editor reports TS2593 "Cannot find name 'describe'" in every spec file.
+    // tsconfig.app.json overrides this with "types": [] so the app build stays free of test
+    // globals, and tsconfig.spec.json keeps the same list for Karma.
+    "types": ["jasmine"]
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
+}

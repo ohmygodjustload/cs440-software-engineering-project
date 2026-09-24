@@ -1,0 +1,7 @@
+@AppointmentScheduler.Api_HostAddress = http://localhost:5100
+
+### Liveness probe shown on the Angular home page.
+GET {{AppointmentScheduler.Api_HostAddress}}/api/health
+Accept: application/json
+
+###

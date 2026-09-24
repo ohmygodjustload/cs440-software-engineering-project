@@ -1,0 +1,9 @@
+{
+  // Compile with the TypeScript that lives in the frontend workspace (the version the Angular
+  // CLI uses) instead of the version bundled with VS Code, so editor errors/warnings match
+  // `ng build` and `ng test` exactly.
+  // If VS Code does not pick it up automatically, run "TypeScript: Select TypeScript Version"
+  // and choose "Use Workspace Version" (requires `npm install` in src/frontend).
+  "typescript.tsdk": "src/frontend/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

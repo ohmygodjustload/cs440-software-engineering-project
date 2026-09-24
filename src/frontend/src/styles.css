@@ -1,0 +1,30 @@
+/* ==========================================================================
+   styles.css — the global stylesheet for the whole application.
+
+   Purpose: holds only the rules that genuinely apply everywhere: the CSS custom
+   properties ("design tokens", e.g. --color-brand) that components reuse, a
+   minimal reset, and the default page colours and font.
+   
+   ========================================================================== */
+
+:root {
+  --color-brand: #1f6feb;
+  --color-ink: #1f2933;
+  --color-ink-muted: #52606d;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f7fb;
+  --color-border: #d9e2ec;
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--color-ink);
+  background-color: var(--color-surface-muted);
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+}

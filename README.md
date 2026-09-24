@@ -29,9 +29,9 @@ The product provides a graphical user interface for managing appointments, remin
 
 ## Tech stack
 
-- **Backend:** C# / .NET
-- **Database:** MongoDB
-- **Frontend:** Angular (tentative)
+- **Backend:** ASP.NET Core 9 (C#) Web API — `src/backend`
+- **Frontend:** Angular 19 (TypeScript) single-page app — `src/frontend`
+- **Database:** MongoDB (not wired up yet)
 - **Version control:** Git + GitHub
 - **Project management:** Jira (`BAAAM`)
 
@@ -40,27 +40,58 @@ The product provides a graphical user interface for managing appointments, remin
 ```text
 .
 ├── .github/                       # GitHub-specific config (PR template, CODEOWNERS)
+├── .vscode/                       # Shared tasks / launch configs for both halves
+├── scripts/                       # Helper scripts (dev.sh runs the whole stack)
 ├── src/
-│   ├── backend/                   # C# / .NET solution (added in a follow-up ticket)
-│   └── frontend/                  # Angular app (added in a follow-up ticket)
+│   ├── backend/
+│   │   ├── AppointmentScheduler.Api/     # ASP.NET Core Web API
+│   │   └── AppointmentScheduler.sln      # Solution (API + tests)
+│   └── frontend/                  # Angular workspace
+│       ├── src/app/               # Application code (see below)
+│       ├── proxy.conf.json        # Dev-server proxy: /api → http://localhost:5100
+│       ├── angular.json           # Workspace/project configuration
+│       └── package.json           # Frontend scripts and dependencies
 ├── tests/
-│   ├── backend/                   # .NET test projects (mirrors src/backend)
-│   └── frontend/                  # Angular tests / e2e (mirrors src/frontend)
+│   ├── backend/
+│   │   └── AppointmentScheduler.Api.Tests/   # xUnit tests (mirrors src/backend)
+│   └── frontend/                  # Reserved for e2e tests (unit specs live beside the code)
 ├── .editorconfig                  # Editor-wide formatting rules
 ├── .gitattributes                 # Line-ending normalization
 ├── .gitignore                     # Ignored files (.NET, Node/Angular, OS, IDE)
-├── CONTRIBUTING.md                # Branching, commits, PR process
+├── .nvmrc                         # Node version for the frontend (22 LTS)
+├── global.json                    # .NET SDK version
 └── README.md                      # This file
 ```
 
-`tests/` mirrors `src/` so each area’s tests live in the parallel path.
+The Angular application itself is organized like this:
+
+```text
+src/frontend/src/app/
+├── core/                          # Cross-cutting code shared by all pages
+│   ├── models/health-status.ts    # TypeScript mirror of a backend DTO
+│   └── services/health.service.ts # Talks to GET /api/health
+├── pages/                         # Routable pages, one folder each
+│   ├── home/
+│   ├── calendar/
+│   ├── appointments/
+│   └── statistics/
+├── app.component.ts|html|css      # Shell: header, main navigation, router outlet
+├── app.config.ts                  # App-wide providers (router, HttpClient)
+└── app.routes.ts                  # Routes for the pages above
+```
+
+Unit tests sit next to the code they cover (`*.component.spec.ts`, `*.service.spec.ts`), which is
+what the Angular CLI expects. `tests/backend/` mirrors `src/backend/` for C# tests, and
+`tests/frontend/` is reserved for end-to-end tests.
 
 ## Prerequisites
 
 - [Git](https://git-scm.com/downloads)
-- [.NET SDK](https://dotnet.microsoft.com/download) (exact version confirmed when the backend is scaffolded)
-- [Node.js](https://nodejs.org/) LTS (for Angular)
-- [MongoDB Community Server](https://www.mongodb.com/try/download/community) or Docker to run MongoDB locally
+- [.NET SDK 9](https://dotnet.microsoft.com/download) — the version band is pinned in `global.json`
+- [Node.js 22 LTS](https://nodejs.org/) — run `nvm use` (reads `.nvmrc`). Angular 19 does not
+  support the odd-numbered Node releases.
+- [MongoDB Community Server](https://www.mongodb.com/try/download/community) or Docker — not needed
+  until the database ticket lands
 
 ## Getting started
 
@@ -69,14 +100,59 @@ git clone https://github.com/ohmygodjustload/cs440-software-engineering-project.
 cd cs440-software-engineering-project
 ```
 
-Backend and frontend run instructions will be added when each project is scaffolded.
+### Run the whole stack with one command
 
-## Contributing
+```bash
+./scripts/dev.sh
+```
 
-All contributions must follow [CONTRIBUTING.md](CONTRIBUTING.md). Conventions are enforced at the GitHub level (branch protection, squash-merge only).
+Starts the C# API (<http://localhost:5100>) and the Angular dev server (<http://localhost:4200>)
+together, then stops both when you press Ctrl+C. Open <http://localhost:4200> to see the site.
+In VS Code, the `dev: full stack` task (`.vscode/tasks.json`) does the same thing.
+
+If you would rather run the two halves separately, use the commands below.
+
+### Backend (ASP.NET Core API)
+
+```bash
+dotnet run --project src/backend/AppointmentScheduler.Api
+```
+
+The API listens on <http://localhost:5100>. Confirm it is up:
+
+```bash
+curl http://localhost:5100/api/health
+# {"status":"ok","service":"AppointmentScheduler.Api","timestamp":"..."}
+```
+
+Settings come from `appsettings.json`; `Cors:AllowedOrigins` lists the frontend origins allowed to
+call the API. `appsettings.Development.json` is git-ignored, so put machine-specific settings there.
+
+### Frontend (Angular)
+
+```bash
+cd src/frontend
+npm install   # first time only
+npm start     # ng serve → http://localhost:4200
+```
+
+Open <http://localhost:4200>. The UI is deliberately a bare skeleton for now: a top bar with one link
+per page, and each page rendering `<Page> Here!`. `ng serve` proxies `/api` to the backend through
+`src/frontend/proxy.conf.json`, ready for the first real screens. `npm run build` writes a static
+bundle to `src/frontend/dist/`.
+
+### Tests
+
+```bash
+dotnet test src/backend/AppointmentScheduler.sln                          # C# / xUnit
+cd src/frontend && npm test -- --watch=false --browsers=ChromeHeadless    # Angular / Karma
+```
+
+In VS Code, the `dev: full stack` task starts the API and the dev server together; see
+`.vscode/tasks.json` for the other tasks (`api: build`, `web: test`, …).
 
 ## Jira
 
 <!-- TODO: replace with the real Jira board URL -->
 
-Project board: `https://<your-jira-host>/jira/software/projects/BAAAM/board`
+Project board: https://baaa.atlassian.net/jira/software/projects/BAAAM/boards/3/backlog

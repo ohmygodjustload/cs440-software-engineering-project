@@ -1,0 +1,83 @@
+{
+  // Shared VS Code tasks for the whole monorepo: see CONTRIBUTING.md for the
+  // conventions and README.md for how the two halves fit together.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "api: build",
+      "detail": "Build the C# solution (src/backend/AppointmentScheduler.sln).",
+      "type": "shell",
+      "command": "dotnet build",
+      "args": ["src/backend/AppointmentScheduler.sln"],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "api: test",
+      "detail": "Run the xUnit tests (tests/backend).",
+      "type": "shell",
+      "command": "dotnet test",
+      "args": ["src/backend/AppointmentScheduler.sln"],
+      "problemMatcher": "$msCompile",
+      "group": "test"
+    },
+    {
+      "label": "api: run",
+      "detail": "Start the API on http://localhost:5100.",
+      "type": "shell",
+      "command": "dotnet run --project src/backend/AppointmentScheduler.Api",
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "group": "dev",
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "web: start",
+      "detail": "Start the Angular dev server on http://localhost:4200.",
+      "type": "npm",
+      "script": "start",
+      "path": "src/frontend",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "(.*?)",
+          "endsPattern": "bundle generation complete"
+        }
+      },
+      "presentation": {
+        "group": "dev",
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "web: build",
+      "detail": "Produce a production build in src/frontend/dist.",
+      "type": "npm",
+      "script": "build",
+      "path": "src/frontend",
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "web: test",
+      "detail": "Run the Angular unit tests (Karma, headless).",
+      "type": "npm",
+      "script": "test",
+      "path": "src/frontend",
+      "args": ["--", "--watch=false", "--browsers=ChromeHeadless"],
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "dev: full stack",
+      "detail": "Run the API and the Angular dev server together.",
+      "dependsOn": ["api: run", "web: start"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}

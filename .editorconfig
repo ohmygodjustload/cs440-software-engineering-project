@@ -37,6 +37,10 @@ indent_style = tab
 [*.{ts,tsx,js,jsx,mjs,cjs,html,htm,css,scss,sass,less,json,jsonc,yml,yaml}]
 indent_size = 2
 
+# Angular/TypeScript style: single quotes, matching the CLI-generated code
+[*.ts]
+quote_type = single
+
 # -----------------------------------------------------------------------------
 # Markdown - preserve trailing whitespace (used for hard line breaks)
 # -----------------------------------------------------------------------------
