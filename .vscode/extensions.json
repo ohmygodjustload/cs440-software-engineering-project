@@ -1,0 +1,11 @@
+{
+  // Extensions every contributor should have while working in this repository.
+  "recommendations": [
+    // Angular templates, inline styles, and signal-aware IntelliSense.
+    "angular.ng-template",
+    // C# / .NET editing, debugging, and test explorer.
+    "ms-dotnettools.csdevkit",
+    // Applies the rules in .editorconfig.
+    "editorconfig.editorconfig"
+  ]
+}

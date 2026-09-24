@@ -1,0 +1,14 @@
+{
+  // Start the "web: start" task first (the Angular dev server serves the app), then run this
+  // configuration to debug the front end in Chrome with source maps.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "web: debug in Chrome",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/src/frontend"
+    }
+  ]
+}

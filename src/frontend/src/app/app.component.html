@@ -1,0 +1,31 @@
+<!--
+  app.component.html — the AppComponent template (the page frame shared by every route).
+
+  Purpose: draws the top bar and marks where pages appear. Everything outside <router-outlet />
+  stays on screen while the routed page changes.
+
+-->
+
+<header class="app-header">
+  <span class="app-brand">{{ title }}</span>
+
+  <nav class="app-nav" aria-label="Main">
+    <ul class="app-nav__list">
+      @for (link of navLinks; track link.path) {
+        <li>
+          <a
+            class="app-nav__link"
+            [routerLink]="link.path"
+            routerLinkActive="app-nav__link--active"
+            [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+            >{{ link.label }}</a
+          >
+        </li>
+      }
+    </ul>
+  </nav>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>
