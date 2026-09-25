@@ -21,11 +21,12 @@ The product provides a graphical user interface for managing appointments, remin
 - A **user** may only access and modify their own information.
 - An **admin** may add, modify, or delete any user’s information or account.
 
-## Team
+## Team Members
 
 <!-- TODO: list all team members with their GitHub handles, then mirror them into .github/CODEOWNERS -->
 
 - [@ohmygodjustload](https://github.com/ohmygodjustload)
+- [@BlambrechtCodes](https://github.com/BlambrechtCodes)
 
 ## Tech stack
 
