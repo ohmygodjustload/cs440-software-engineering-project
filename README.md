@@ -23,10 +23,13 @@ The product provides a graphical user interface for managing appointments, remin
 
 ## Team Members
 
-<!-- TODO: list all team members with their GitHub handles, then mirror them into .github/CODEOWNERS -->
+<!-- TODO: Mirror these names into .github/CODEOWNERS -->
 
 - [@ohmygodjustload](https://github.com/ohmygodjustload)
 - [@BlambrechtCodes](https://github.com/BlambrechtCodes)
+- [@andreelinyx](https://github.com/andreelinyx)
+- [@ojkdk-codes](https://github.com/ojkdk-codes) 
+- [@koch5388](https://github.com/koch5388)
 
 ## Tech stack
 
