@@ -1,0 +1,17 @@
+{
+  // COPY this file to appsettings.Development.json (git-ignored, never commit secrets).
+  // Then replace the placeholder with your Atlas connection string from:
+  //   Atlas -> Database -> Connect -> Drivers -> C# -> copy the mongodb+srv:// string.
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "MongoDb": {
+    "ConnectionString": "mongodb+srv://<db-user>:<db-password>@<cluster-host>/<database>?retryWrites=true&w=majority",
+    "DatabaseName": "appointment_scheduler",
+    "AppointmentsCollection": "appointments",
+    "ProvidersCollection": "providers"
+  }
+}
