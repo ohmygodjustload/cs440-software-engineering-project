@@ -18,10 +18,10 @@ public sealed class Appointment
 
     public AppointmentCategory Category { get; set; }
 
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    /// <summary>Stored as BSON date (UTC) by the driver's DateTimeOffsetSerializer.</summary>
     public DateTimeOffset Start { get; set; }
 
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    /// <summary>Stored as BSON date (UTC) by the driver's DateTimeOffsetSerializer.</summary>
     public DateTimeOffset End { get; set; }
 
     /// <summary>Service provider (doctor, stylist, trainer, ...). Free-form id for now.</summary>
