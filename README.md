@@ -273,7 +273,7 @@ cd src/frontend && npm install && cd ../..
 ```
 
 ```bash
-# 3. Start everything:
+# 3. Start everything (RUN THIS IN A BASH TERMINAL, NOT POWERSHELL!):
 ./scripts/dev.sh
 ```
 
