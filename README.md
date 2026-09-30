@@ -27,8 +27,10 @@ The product provides a graphical user interface for managing appointments, remin
 
 - [@ohmygodjustload](https://github.com/ohmygodjustload)
 - [@BlambrechtCodes](https://github.com/BlambrechtCodes)
+  <<<<<<<<< Temporary merge branch 1
+- # [@andreelin0] (https://github.com/andreelin0)
 - [@ojkdk-codes](https://github.com/ojkdk-codes)
-- [@andreelin0](https://github.com/andreelin0)
+  > > > > > > > > > Temporary merge branch 2
 
 ## Tech stack
 
