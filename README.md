@@ -27,6 +27,7 @@ The product provides a graphical user interface for managing appointments, remin
 
 - [@ohmygodjustload](https://github.com/ohmygodjustload)
 - [@BlambrechtCodes](https://github.com/BlambrechtCodes)
+- [@ojkdk-codes](https://github.com/ojkdk-codes)
 - [@andreelin0](https://github.com/andreelin0)
 
 ## Tech stack
