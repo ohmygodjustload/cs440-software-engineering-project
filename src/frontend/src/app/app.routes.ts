@@ -31,10 +31,22 @@ export const routes: Routes = [
       import('./pages/appointments/appointments.component').then((m) => m.AppointmentsComponent)
   },
   {
+    path: 'notifications',
+    loadComponent: () =>
+      import('./pages/notifications/notifications.component')
+        .then(m => m.NotificationsComponent)
+  },
+  {
     path: 'statistics',
     title: 'Statistics · BAAAM Scheduling System',
     loadComponent: () =>
       import('./pages/statistics/statistics.component').then((m) => m.StatisticsComponent)
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./pages/settings/settings.component')
+        .then(m => m.SettingsComponent)
   },
   { path: '**', redirectTo: '' }
 ];

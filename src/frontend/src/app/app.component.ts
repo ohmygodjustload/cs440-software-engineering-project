@@ -29,6 +29,8 @@ export class AppComponent {
     { label: 'Home', path: '/' },
     { label: 'Calendar', path: '/calendar' },
     { label: 'Appointments', path: '/appointments' },
-    { label: 'Statistics', path: '/statistics' }
+    { label: 'Notifications', path: '/notifications' },
+    { label: 'Statistics', path: '/statistics' },
+    { label: 'Settings', path: '/settings' }
   ];
 }

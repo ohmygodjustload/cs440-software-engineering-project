@@ -1,7 +1,248 @@
-/*
-  home.component.css — styles for the Home page only.
+/* Main page container */
 
-  Purpose: reserved for rules used by this page alone. It is intentionally empty while the page is a
-  placeholder.
+.home-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 52px 24px 80px;
+  color: #344b48;
+}
 
-*/
+
+/* --------------------------------
+   Greeting
+-------------------------------- */
+
+.greeting h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+}
+
+.greeting p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: #526460;
+}
+
+
+/* --------------------------------
+   Summary cards
+-------------------------------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+
+  margin-top: 24px;
+}
+
+.stat-card {
+  min-height: 112px;
+  padding: 20px;
+
+  border-radius: 20px;
+
+  box-sizing: border-box;
+}
+
+.today-card {
+  background: #dedbd2;
+}
+
+.week-card {
+  background: #d4e4ea;
+}
+
+.reminder-card {
+  background: #ebe8b8;
+}
+
+.stat-title {
+  margin: 0;
+
+  font-size: 14px;
+  color: #526460;
+}
+
+.stat-info {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+
+  margin-top: 8px;
+}
+
+.stat-number {
+  font-size: 38px;
+  line-height: 1;
+
+  color: #344b48;
+}
+
+.stat-description {
+  margin-bottom: 4px;
+
+  font-size: 11px;
+  color: #526460;
+}
+
+
+/* --------------------------------
+   Section headings
+-------------------------------- */
+
+.next-appointment,
+.recent-activity {
+  margin-top: 40px;
+}
+
+.next-appointment h2,
+.recent-activity h2 {
+  margin: 0 0 18px;
+
+  font-size: 14px;
+  font-weight: 400;
+
+  color: #344b48;
+}
+
+
+/* --------------------------------
+   Appointment card
+-------------------------------- */
+
+.appointment-card {
+  min-height: 156px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 24px;
+
+  background: #dedbd2;
+
+  border-radius: 20px;
+
+  box-sizing: border-box;
+}
+
+.appointment-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.appointment-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 11px;
+  color: #344b48;
+}
+
+.appointment-card h3 {
+  margin: 24px 0 6px;
+
+  font-size: 23px;
+  font-weight: 500;
+
+  color: #344b48;
+}
+
+.appointment-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 13px;
+  color: #526460;
+}
+
+.dot {
+  font-size: 11px;
+}
+
+.details-button {
+  min-width: 180px;
+
+  padding: 13px 28px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #344f4b;
+  color: white;
+
+  font-size: 12px;
+
+  cursor: pointer;
+}
+
+.details-button:hover {
+  background: #283f3b;
+}
+
+
+/* --------------------------------
+   Recent activity
+-------------------------------- */
+
+.activity-table {
+  width: 100%;
+
+  padding: 8px 20px;
+
+  box-sizing: border-box;
+}
+
+.activity-row {
+  display: grid;
+
+  grid-template-columns:
+    70px
+    140px
+    1fr;
+
+  align-items: center;
+
+  min-height: 52px;
+
+  font-size: 13px;
+}
+
+.activity-date {
+  color: #526460;
+}
+
+.activity-name {
+  color: #344b48;
+}
+
+.activity-status {
+  color: #526460;
+}
+
+
+/* --------------------------------
+   Smaller screens
+-------------------------------- */
+
+@media (max-width: 800px) {
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .details-button {
+    width: 100%;
+  }
+
+}

@@ -10,48 +10,96 @@
 }
 
 .app-header {
+  height: 86px;
+
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-surface);
+
+  padding: 0 40px;
+
+  position: relative;
+
+  background: #faf9f6;
 }
 
+
+/* BAAAM text */
+
 .app-brand {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 400;
+  color: #344b48;
 }
+
+
+/* Centers navigation in header */
+
+.app-nav {
+  position: absolute;
+
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+/* Outer navigation pill */
 
 .app-nav__list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
+  align-items: center;
+
+  gap: 8px;
+
   margin: 0;
-  padding: 0;
+  padding: 6px 8px;
+
   list-style: none;
+
+  border: 1px solid #dedbd2;
+  border-radius: 999px;
+
+  background: #faf9f6;
 }
+
+
+/* Individual links */
 
 .app-nav__link {
-  display: inline-block;
-  padding: 0.4rem 0.75rem;
-  border-radius: var(--radius);
-  color: var(--color-ink-muted);
+  display: block;
+
+  padding: 10px 16px;
+
+  border-radius: 999px;
+
+  color: #344b48;
   text-decoration: none;
+
+  font-size: 13px;
 }
+
+
+/* Hover */
 
 .app-nav__link:hover {
-  background-color: var(--color-surface-muted);
-  color: var(--color-ink);
+  background: #f0efea;
 }
 
-.app-nav__link--active,
-.app-nav__link--active:hover {
-  background-color: var(--color-brand);
-  color: #ffffff;
+
+/* Current page */
+
+.app-nav__link--active {
+  background: #dce9ed;
 }
+
+
+/* Keep active page light blue on hover */
+
+.app-nav__link--active:hover {
+  background: #dce9ed;
+}
+
+
+/* Main page */
 
 .app-main {
   padding: 1.5rem;
