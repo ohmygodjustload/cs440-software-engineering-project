@@ -31,6 +31,7 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString))
     builder.Services.AddSingleton<AppointmentScheduler.Api.Data.MongoDbContext>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IAppointmentStore, AppointmentScheduler.Api.Stores.MongoAppointmentStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderStore, AppointmentScheduler.Api.Stores.MongoProviderStore>();
+    builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.MongoUserStore>();
 }
 else
 {
@@ -38,6 +39,7 @@ else
     // They are singletons so data survives across requests while the API runs.
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IAppointmentStore, AppointmentScheduler.Api.Stores.InMemoryAppointmentStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderStore, AppointmentScheduler.Api.Stores.InMemoryProviderStore>();
+    builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.InMemoryUserStore>();
 }
 
 // The Angular dev server (http://localhost:4200) is a different origin than the API, so browser
