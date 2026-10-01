@@ -23,12 +23,12 @@ The product provides a graphical user interface for managing appointments, remin
 
 ## Team Members
 
-<!-- TODO: list all team members with their GitHub handles, then mirror them into .github/CODEOWNERS -->
-
 - [@ohmygodjustload](https://github.com/ohmygodjustload)
 - [@BlambrechtCodes](https://github.com/BlambrechtCodes)
+- [@andreelin0](https://github.com/andreelin0)
 - [@koch5388](https://github.com/koch5388)
 - [@ojkdk-codes](https://github.com/ojkdk-codes)
+
 
 ## Tech stack
 
@@ -91,13 +91,13 @@ what the Angular CLI expects. `tests/backend/` mirrors `src/backend/` for C# tes
 
 You need one toolchain per half of the stack. Install everything below before running the site:
 
-| Tool | Version | Why / notes |
-|---|---|---|
-| [Git](https://git-scm.com/downloads) | any recent | Cloning the repo |
-| [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0) | 10.0.100+ | Builds and runs the API. The exact band is pinned in `global.json` — anything older refuses to build |
-| [Node.js 22 LTS](https://nodejs.org/) | 22.x (see `.nvmrc`) | Runs the Angular dev server. Angular 19 does not support odd-numbered Node releases (23, …) |
-| [Google Chrome](https://www.google.com/chrome/) | any recent | Only needed for `npm test` (Karma runs headless Chrome) |
-| [MongoDB Community Server](https://www.mongodb.com/try/download/community) or Docker | — | **Not needed yet** — the database ticket hasn't landed |
+| Tool                                                                                 | Version             | Why / notes                                                                                          |
+| ------------------------------------------------------------------------------------ | ------------------- | ---------------------------------------------------------------------------------------------------- |
+| [Git](https://git-scm.com/downloads)                                                 | any recent          | Cloning the repo                                                                                     |
+| [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0)                     | 10.0.100+           | Builds and runs the API. The exact band is pinned in `global.json` — anything older refuses to build |
+| [Node.js 22 LTS](https://nodejs.org/)                                                | 22.x (see `.nvmrc`) | Runs the Angular dev server. Angular 19 does not support odd-numbered Node releases (23, …)          |
+| [Google Chrome](https://www.google.com/chrome/)                                      | any recent          | Only needed for `npm test` (Karma runs headless Chrome)                                              |
+| [MongoDB Community Server](https://www.mongodb.com/try/download/community) or Docker | —                   | **Not needed yet** — the database ticket hasn't landed                                               |
 
 > **VS Code (recommended):** install the extensions in `.vscode/extensions.json` when
 > prompted (Angular Language Service, C# Dev Kit, EditorConfig). `.vscode/tasks.json`
@@ -275,7 +275,7 @@ cd src/frontend && npm install && cd ../..
 ```
 
 ```bash
-# 3. Start everything (RUN THIS IN A BASH TERMINAL, NOT POWERSHELL!):
+# 3. Start everything:
 ./scripts/dev.sh
 ```
 
@@ -284,11 +284,11 @@ together, then stops both when you press Ctrl+C.
 
 Open <http://localhost:4200> to see the site:
 
-| URL | What it is |
-|---|---|
-| <http://localhost:4200> | Angular app. `/api/*` requests are proxied to the backend via `src/frontend/proxy.conf.json` |
-| <http://localhost:5100/api/health> | API health check — expect `{"status":"ok","service":"AppointmentScheduler.Api",...}` |
-| <http://localhost:5100/openapi/v1.json> | Generated OpenAPI document (v3.1, Development only) |
+| URL                                     | What it is                                                                                   |
+| --------------------------------------- | -------------------------------------------------------------------------------------------- |
+| <http://localhost:4200>                 | Angular app. `/api/*` requests are proxied to the backend via `src/frontend/proxy.conf.json` |
+| <http://localhost:5100/api/health>      | API health check — expect `{"status":"ok","service":"AppointmentScheduler.Api",...}`         |
+| <http://localhost:5100/openapi/v1.json> | Generated OpenAPI document (v3.1, Development only)                                          |
 
 In VS Code, the `dev: full stack` task (`.vscode/tasks.json`) does the same thing — run it
 from the Command Palette (**Tasks: Run Task** → `dev: full stack`).
