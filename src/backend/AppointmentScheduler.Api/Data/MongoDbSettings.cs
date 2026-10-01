@@ -12,11 +12,15 @@ public sealed class MongoDbSettings
     /// <summary>Atlas SRV string, e.g. mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net</summary>
     public string ConnectionString { get; set; } = string.Empty;
 
-    /// <summary>Database name, e.g. appointment_scheduler.</summary>
-    public string DatabaseName { get; set; } = "appointment_scheduler";
+    /// <summary>Database name. Team database is "BAAAM" (Atlas Browse Collections).</summary>
+    public string DatabaseName { get; set; } = "BAAAM";
 
-    /// <summary>Collection names. Keep defaults unless you have a reason to change them.</summary>
-    public string AppointmentsCollection { get; set; } = "appointments";
+    /// <summary>
+    /// Collection names. Team collections are the existing BAAAM ones:
+    /// "Appointment" and "ServiceProvider". Never create new collections;
+    /// point at these.
+    /// </summary>
+    public string AppointmentsCollection { get; set; } = "Appointment";
 
-    public string ProvidersCollection { get; set; } = "providers";
+    public string ProvidersCollection { get; set; } = "ServiceProvider";
 }

@@ -20,13 +20,15 @@ public sealed class MongoDbContext
 
         var clientSettings = MongoClientSettings.FromConnectionString(settings.ConnectionString);
 
-        // Atlas requires TLS; the driver enables it automatically for +srv strings,
-        // but be explicit so a non-SRV string can't silently downgrade.
-        clientSettings.UseTls = true;
+        // Do NOT force UseTls here: the driver already enables TLS for +srv (Atlas)
+        // strings and respects ?tls= options for plain mongodb:// strings.
+        // Forcing it on unconditionally breaks non-TLS local connections and can
+        // mask handshake misconfigurations.
 
         // Fail fast at startup instead of hanging a request for 30s.
         clientSettings.ServerSelectionTimeout = TimeSpan.FromSeconds(5);
         clientSettings.ConnectTimeout = TimeSpan.FromSeconds(5);
+        clientSettings.SocketTimeout = TimeSpan.FromSeconds(10);
 
         Client = new MongoClient(clientSettings);
         Database = Client.GetDatabase(settings.DatabaseName);
