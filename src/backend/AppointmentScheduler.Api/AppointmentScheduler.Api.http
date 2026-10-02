@@ -1,7 +1,73 @@
-@AppointmentScheduler.Api_HostAddress = http://localhost:5100
+@host = http://localhost:5100
 
 ### Liveness probe shown on the Angular home page.
-GET {{AppointmentScheduler.Api_HostAddress}}/api/health
+GET {{host}}/api/health
 Accept: application/json
 
-###
+### Database health - tells you if you are on in-memory or Atlas.
+GET {{host}}/api/dbhealth
+Accept: application/json
+
+### List providers for scheduler dropdowns.
+GET {{host}}/api/providers
+Accept: application/json
+
+### Create an appointment (scheduler page).
+POST {{host}}/api/appointments
+Content-Type: application/json
+
+{
+  "title": "Dental checkup",
+  "category": 0,
+  "startDateTime": "2026-10-05T09:00:00Z",
+  "endDateTime": "2026-10-05T10:00:00Z",
+  "providerId": "provider-1",
+  "providerName": "Dr. Smith",
+  "location": "Clinic A",
+  "notes": "Bring insurance card"
+}
+
+### List appointments with filters (scheduler + home dashboard).
+GET {{host}}/api/appointments?from=2026-10-01T00:00:00Z&to=2026-11-01T00:00:00Z&page=1&pageSize=20
+Accept: application/json
+
+### Calendar feed for a month (calendar page). Category: 0=Medical, 1=Beauty, 2=Fitness.
+GET {{host}}/api/calendar?from=2026-10-01T00:00:00Z&to=2026-11-01T00:00:00Z
+Accept: application/json
+
+### Get one appointment - replace the id with the id from POST.
+GET {{host}}/api/appointments/REPLACE_WITH_ID
+Accept: application/json
+
+### Update / reschedule - replace the id.
+PUT {{host}}/api/appointments/REPLACE_WITH_ID
+Content-Type: application/json
+
+{
+  "title": "Dental checkup (rescheduled)",
+  "startDateTime": "2026-10-06T09:00:00Z",
+  "endDateTime": "2026-10-06T10:00:00Z",
+  "location": "Clinic B"
+}
+
+### Cancel via status - replace the id.
+PUT {{host}}/api/appointments/REPLACE_WITH_ID
+Content-Type: application/json
+
+{
+  "status": 1
+}
+
+### Delete an appointment - replace the id.
+DELETE {{host}}/api/appointments/REPLACE_WITH_ID
+
+### Create a provider.
+POST {{host}}/api/providers
+Content-Type: application/json
+
+{
+  "name": "Downtown Physio",
+  "specialty": "Fitness",
+  "email": "physio@example.com"
+}
+
