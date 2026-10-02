@@ -9,7 +9,7 @@ public sealed class InMemoryAppointmentStore : IAppointmentStore
     private readonly ConcurrentDictionary<string, Appointment> _items = new();
 
     public IReadOnlyList<Appointment> GetAll() =>
-        _items.Values.OrderBy(a => a.Start).ToList();
+        _items.Values.OrderBy(a => a.StartDateTime).ToList();
 
     public Appointment? GetById(string id) =>
         _items.TryGetValue(id, out var item) ? item : null;

@@ -5,6 +5,6 @@ public sealed record CalendarItem(
     string Id,
     string Title,
     AppointmentCategory Category,
-    DateTimeOffset Start,
-    DateTimeOffset End,
+    DateTimeOffset StartDateTime,
+    DateTimeOffset EndDateTime,
     AppointmentStatus Status);

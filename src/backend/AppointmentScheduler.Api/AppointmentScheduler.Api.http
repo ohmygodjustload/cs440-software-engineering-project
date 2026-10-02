@@ -19,8 +19,8 @@ Content-Type: application/json
 {
   "title": "Dental checkup",
   "category": 0,
-  "start": "2026-10-05T09:00:00Z",
-  "end": "2026-10-05T10:00:00Z",
+  "startDateTime": "2026-10-05T09:00:00Z",
+  "endDateTime": "2026-10-05T10:00:00Z",
   "providerId": "provider-1",
   "providerName": "Dr. Smith",
   "location": "Clinic A",
@@ -45,8 +45,8 @@ Content-Type: application/json
 
 {
   "title": "Dental checkup (rescheduled)",
-  "start": "2026-10-06T09:00:00Z",
-  "end": "2026-10-06T10:00:00Z",
+  "startDateTime": "2026-10-06T09:00:00Z",
+  "endDateTime": "2026-10-06T10:00:00Z",
   "location": "Clinic B"
 }
 

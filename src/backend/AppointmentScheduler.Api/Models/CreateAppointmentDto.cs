@@ -13,10 +13,10 @@ public sealed class CreateAppointmentDto
     public AppointmentCategory? Category { get; set; }
 
     [Required]
-    public DateTimeOffset? Start { get; set; }
+    public DateTimeOffset? StartDateTime { get; set; }
 
     [Required]
-    public DateTimeOffset? End { get; set; }
+    public DateTimeOffset? EndDateTime { get; set; }
 
     [Required, MinLength(1), MaxLength(100)]
     public string ProviderId { get; set; } = string.Empty;

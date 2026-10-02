@@ -33,12 +33,12 @@ public sealed class AppointmentsController : ControllerBase
 
         if (from.HasValue)
         {
-            query = query.Where(a => a.End >= from.Value);
+            query = query.Where(a => a.EndDateTime >= from.Value);
         }
 
         if (to.HasValue)
         {
-            query = query.Where(a => a.Start <= to.Value);
+            query = query.Where(a => a.StartDateTime <= to.Value);
         }
 
         if (category.HasValue)
@@ -56,7 +56,7 @@ public sealed class AppointmentsController : ControllerBase
             query = query.Where(a => a.ProviderId == providerId);
         }
 
-        var ordered = query.OrderBy(a => a.Start).ToList();
+        var ordered = query.OrderBy(a => a.StartDateTime).ToList();
         var items = ordered.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
         return Ok(new PagedResult<Appointment>(items, ordered.Count, page, pageSize));
@@ -76,22 +76,22 @@ public sealed class AppointmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult<Appointment> Create([FromBody] CreateAppointmentDto dto)
     {
-        if (!dto.Start.HasValue || !dto.End.HasValue)
+        if (!dto.StartDateTime.HasValue || !dto.EndDateTime.HasValue)
         {
-            return BadRequest("Start and End are required.");
+            return BadRequest("StartDateTime and EndDateTime are required.");
         }
 
-        if (dto.End.Value <= dto.Start.Value)
+        if (dto.EndDateTime.Value <= dto.StartDateTime.Value)
         {
-            return BadRequest("End must be after Start.");
+            return BadRequest("EndDateTime must be after StartDateTime.");
         }
 
         var appointment = new Appointment
         {
             Title = dto.Title.Trim(),
             Category = dto.Category!.Value,
-            Start = dto.Start.Value,
-            End = dto.End.Value,
+            StartDateTime = dto.StartDateTime.Value,
+            EndDateTime = dto.EndDateTime.Value,
             ProviderId = dto.ProviderId.Trim(),
             ProviderName = string.IsNullOrWhiteSpace(dto.ProviderName) ? null : dto.ProviderName.Trim(),
             UserId = string.IsNullOrWhiteSpace(dto.UserId) ? "demo-user" : dto.UserId.Trim(),
@@ -117,11 +117,11 @@ public sealed class AppointmentsController : ControllerBase
             return NotFound();
         }
 
-        var start = dto.Start ?? existing.Start;
-        var end = dto.End ?? existing.End;
-        if (end <= start)
+        var startDateTime = dto.StartDateTime ?? existing.StartDateTime;
+        var endDateTime = dto.EndDateTime ?? existing.EndDateTime;
+        if (endDateTime <= startDateTime)
         {
-            return BadRequest("End must be after Start.");
+            return BadRequest("EndDateTime must be after StartDateTime.");
         }
 
         if (dto.Title is not null)
@@ -139,8 +139,8 @@ public sealed class AppointmentsController : ControllerBase
             existing.Category = dto.Category.Value;
         }
 
-        existing.Start = start;
-        existing.End = end;
+        existing.StartDateTime = startDateTime;
+        existing.EndDateTime = endDateTime;
 
         if (dto.ProviderId is not null)
         {

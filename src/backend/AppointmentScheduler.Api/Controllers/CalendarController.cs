@@ -28,15 +28,15 @@ public sealed class CalendarController : ControllerBase
         [FromQuery] AppointmentCategory? category)
     {
         var now = DateTimeOffset.UtcNow;
-        var start = from ?? new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
-        var end = to ?? start.AddMonths(1);
+        var startDateTime = from ?? new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
+        var endDateTime = to ?? startDateTime.AddMonths(1);
 
         var items = _store.GetAll()
-            .Where(a => a.End >= start && a.Start <= end)
+            .Where(a => a.EndDateTime >= startDateTime && a.StartDateTime <= endDateTime)
             .Where(a => !category.HasValue || a.Category == category.Value)
             .Where(a => a.Status != AppointmentStatus.Cancelled)
-            .OrderBy(a => a.Start)
-            .Select(a => new CalendarItem(a.Id, a.Title, a.Category, a.Start, a.End, a.Status))
+            .OrderBy(a => a.StartDateTime)
+            .Select(a => new CalendarItem(a.Id, a.Title, a.Category, a.StartDateTime, a.EndDateTime, a.Status))
             .ToList();
 
         return Ok(items);

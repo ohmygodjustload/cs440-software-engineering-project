@@ -11,9 +11,9 @@ public sealed class UpdateAppointmentDto
 
     public AppointmentCategory? Category { get; set; }
 
-    public DateTimeOffset? Start { get; set; }
+    public DateTimeOffset? StartDateTime { get; set; }
 
-    public DateTimeOffset? End { get; set; }
+    public DateTimeOffset? EndDateTime { get; set; }
 
     [MaxLength(100)]
     public string? ProviderId { get; set; }

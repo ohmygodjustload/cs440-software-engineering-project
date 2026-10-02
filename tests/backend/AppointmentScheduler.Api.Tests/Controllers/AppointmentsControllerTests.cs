@@ -16,8 +16,8 @@ public class AppointmentsControllerTests
     {
         Title = "Dental checkup",
         Category = AppointmentCategory.Medical,
-        Start = DateTimeOffset.UtcNow.AddDays(1),
-        End = DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
+        StartDateTime = DateTimeOffset.UtcNow.AddDays(1),
+        EndDateTime = DateTimeOffset.UtcNow.AddDays(1).AddHours(1),
         ProviderId = "provider-1",
         Location = "Clinic A"
     };
@@ -40,7 +40,7 @@ public class AppointmentsControllerTests
     {
         var controller = CreateController();
         var dto = ValidDto();
-        dto.End = dto.Start!.Value.AddHours(-1);
+        dto.EndDateTime = dto.StartDateTime!.Value.AddHours(-1);
 
         var result = controller.Create(dto);
 

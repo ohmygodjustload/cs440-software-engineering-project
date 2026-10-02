@@ -16,8 +16,8 @@ public class CalendarControllerTests
         {
             Title = "Haircut",
             Category = AppointmentCategory.Beauty,
-            Start = start,
-            End = start.AddHours(1),
+            StartDateTime = start,
+            EndDateTime = start.AddHours(1),
             ProviderId = "p1",
             Status = AppointmentStatus.Scheduled
         });
@@ -43,8 +43,8 @@ public class CalendarControllerTests
         {
             Title = "Cancelled visit",
             Category = AppointmentCategory.Medical,
-            Start = start,
-            End = start.AddHours(1),
+            StartDateTime = start,
+            EndDateTime = start.AddHours(1),
             ProviderId = "p1",
             Status = AppointmentStatus.Cancelled
         });
