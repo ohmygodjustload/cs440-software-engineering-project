@@ -58,7 +58,7 @@ Content-Type: application/json
   "status": 1
 }
 
-### Delete an appointment - replace the id.
+### Cancel (soft delete) - replace the id. Keeps the record with status Cancelled.
 DELETE {{host}}/api/appointments/REPLACE_WITH_ID
 
 ### Create a provider.

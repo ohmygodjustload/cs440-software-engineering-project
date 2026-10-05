@@ -9,14 +9,17 @@ namespace AppointmentScheduler.Api.Controllers;
 public sealed class AppointmentsController : ControllerBase
 {
     private readonly IAppointmentStore _store;
+    private readonly IProviderStore? _providers;
 
-    public AppointmentsController(IAppointmentStore store)
+    public AppointmentsController(IAppointmentStore store, IProviderStore? providerStore = null)
     {
         _store = store;
+        _providers = providerStore;
     }
 
     [HttpGet]
     [ProducesResponseType<PagedResult<Appointment>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult<PagedResult<Appointment>> List(
         [FromQuery] DateTimeOffset? from,
         [FromQuery] DateTimeOffset? to,
@@ -26,6 +29,11 @@ public sealed class AppointmentsController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
+        if (from.HasValue && to.HasValue && to.Value < from.Value)
+        {
+            return BadRequest("to must not be before from.");
+        }
+
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
@@ -33,12 +41,16 @@ public sealed class AppointmentsController : ControllerBase
 
         if (from.HasValue)
         {
-            query = query.Where(a => a.EndDateTime >= from.Value);
+            // Half-open [from, to): an appointment ending exactly at `from`
+            // belongs to the previous range.
+            query = query.Where(a => a.EndDateTime > from.Value);
         }
 
         if (to.HasValue)
         {
-            query = query.Where(a => a.StartDateTime <= to.Value);
+            // Half-open [from, to): an appointment starting exactly at `to`
+            // belongs to the next range.
+            query = query.Where(a => a.StartDateTime < to.Value);
         }
 
         if (category.HasValue)
@@ -93,7 +105,9 @@ public sealed class AppointmentsController : ControllerBase
             StartDateTime = dto.StartDateTime.Value,
             EndDateTime = dto.EndDateTime.Value,
             ProviderId = dto.ProviderId.Trim(),
-            ProviderName = string.IsNullOrWhiteSpace(dto.ProviderName) ? null : dto.ProviderName.Trim(),
+            ProviderName = string.IsNullOrWhiteSpace(dto.ProviderName)
+                ? ResolveProviderName(dto.ProviderId.Trim())
+                : dto.ProviderName.Trim(),
             UserId = string.IsNullOrWhiteSpace(dto.UserId) ? "demo-user" : dto.UserId.Trim(),
             Location = string.IsNullOrWhiteSpace(dto.Location) ? null : dto.Location.Trim(),
             Notes = string.IsNullOrWhiteSpace(dto.Notes) ? null : dto.Notes,
@@ -149,7 +163,15 @@ public sealed class AppointmentsController : ControllerBase
                 return BadRequest("ProviderId cannot be empty.");
             }
 
-            existing.ProviderId = dto.ProviderId.Trim();
+            var trimmedProviderId = dto.ProviderId.Trim();
+            existing.ProviderId = trimmedProviderId;
+
+            // Keep the denormalized ProviderName in sync when the provider changes,
+            // unless the caller explicitly overrides it in the same request.
+            if (dto.ProviderName is null)
+            {
+                existing.ProviderName = ResolveProviderName(trimmedProviderId);
+            }
         }
 
         if (dto.ProviderName is not null)
@@ -176,12 +198,38 @@ public sealed class AppointmentsController : ControllerBase
         return Ok(existing);
     }
 
-    /// <summary>Cancel (delete) an appointment.</summary>
+    /// <summary>
+    /// Cancel an appointment (soft delete). The record is kept with
+    /// <c>Status = Cancelled</c> so it stays visible as history via
+    /// <c>GET /api/appointments/{id}</c> and <c>GET /api/appointments?status=Cancelled</c>;
+    /// the calendar feed hides cancelled items so the slot frees up.
+    /// Cancelling an already-cancelled appointment is a no-op returning 204.
+    /// </summary>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult Delete(string id)
     {
-        return _store.Remove(id) ? NoContent() : NotFound();
+        var existing = _store.GetById(id);
+        if (existing is null)
+        {
+            return NotFound();
+        }
+
+        if (existing.Status != AppointmentStatus.Cancelled)
+        {
+            existing.Status = AppointmentStatus.Cancelled;
+            _store.Update(existing);
+        }
+
+        return NoContent();
     }
+
+    /// <summary>
+    /// Look up the display name for a provider id. Returns null when no provider
+    /// store is wired (tests) or the id is unknown, leaving ProviderName unset
+    /// rather than failing the write.
+    /// </summary>
+    private string? ResolveProviderName(string providerId) =>
+        _providers?.GetById(providerId)?.Name;
 }

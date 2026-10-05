@@ -58,4 +58,43 @@ public class CalendarControllerTests
         var ok = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Empty(Assert.IsType<List<CalendarItem>>(ok.Value));
     }
+
+    [Fact]
+    public void Get_ExcludesAppointmentStartingExactlyAtTo()
+    {
+        // Half-open [from, to): midnight Nov 1 belongs to November, not October.
+        var store = new InMemoryAppointmentStore();
+        var boundary = new DateTimeOffset(2026, 11, 1, 0, 0, 0, TimeSpan.Zero);
+        store.Add(new Appointment
+        {
+            Title = "Midnight next month",
+            Category = AppointmentCategory.Beauty,
+            StartDateTime = boundary,
+            EndDateTime = boundary.AddHours(1),
+            ProviderId = "p1",
+            Status = AppointmentStatus.Scheduled
+        });
+        var controller = new CalendarController(store);
+
+        var result = controller.Get(
+            new DateTimeOffset(2026, 10, 1, 0, 0, 0, TimeSpan.Zero),
+            boundary,
+            null);
+
+        var ok = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Empty(Assert.IsType<List<CalendarItem>>(ok.Value));
+    }
+
+    [Fact]
+    public void Get_RejectsToBeforeFrom()
+    {
+        var controller = new CalendarController(new InMemoryAppointmentStore());
+
+        var result = controller.Get(
+            new DateTimeOffset(2026, 11, 1, 0, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 10, 1, 0, 0, 0, TimeSpan.Zero),
+            null);
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
 }

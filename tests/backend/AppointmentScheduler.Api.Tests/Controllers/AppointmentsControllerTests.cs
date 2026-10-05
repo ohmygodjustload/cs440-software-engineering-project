@@ -76,7 +76,77 @@ public class AppointmentsControllerTests
         var updated = controller.Update(id, new UpdateAppointmentDto { Title = "Renamed" });
         Assert.Equal("Renamed", Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(updated.Result).Value).Title);
 
+        // DELETE is a soft cancel: record stays with Status = Cancelled.
         Assert.IsType<NoContentResult>(controller.Delete(id));
-        Assert.IsType<NotFoundResult>(controller.GetById(id).Result);
+        var cancelled = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(controller.GetById(id).Result).Value);
+        Assert.Equal(AppointmentStatus.Cancelled, cancelled.Status);
+    }
+
+    [Fact]
+    public void Delete_IsIdempotent_And_KeepsHistory()
+    {
+        var controller = CreateController();
+        var created = Assert.IsType<CreatedAtActionResult>(controller.Create(ValidDto()).Result);
+        var id = Assert.IsType<Appointment>(created.Value).Id;
+
+        Assert.IsType<NoContentResult>(controller.Delete(id));
+        Assert.IsType<NoContentResult>(controller.Delete(id));
+
+        var list = controller.List(null, null, null, AppointmentStatus.Cancelled, null);
+        var ok = Assert.IsType<OkObjectResult>(list.Result);
+        var payload = Assert.IsType<PagedResult<Appointment>>(ok.Value);
+        Assert.Contains(payload.Items, a => a.Id == id);
+    }
+
+    [Fact]
+    public void List_RejectsToBeforeFrom()
+    {
+        var controller = CreateController();
+
+        var result = controller.List(
+            new DateTimeOffset(2026, 11, 1, 0, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 10, 1, 0, 0, 0, TimeSpan.Zero),
+            null, null, null);
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public void Update_ProviderId_ResolvesProviderName()
+    {
+        var appointmentStore = new InMemoryAppointmentStore();
+        var providerStore = new InMemoryProviderStore();
+        var provider = providerStore.GetAll()[0];
+        var controller = new AppointmentsController(appointmentStore, providerStore);
+
+        var created = Assert.IsType<CreatedAtActionResult>(controller.Create(ValidDto()).Result);
+        var id = Assert.IsType<Appointment>(created.Value).Id;
+
+        var updated = controller.Update(id, new UpdateAppointmentDto { ProviderId = provider.Id });
+        var payload = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(updated.Result).Value);
+
+        Assert.Equal(provider.Id, payload.ProviderId);
+        Assert.Equal(provider.Name, payload.ProviderName);
+    }
+
+    [Fact]
+    public void Update_ProviderId_ExplicitNameWins()
+    {
+        var appointmentStore = new InMemoryAppointmentStore();
+        var providerStore = new InMemoryProviderStore();
+        var provider = providerStore.GetAll()[0];
+        var controller = new AppointmentsController(appointmentStore, providerStore);
+
+        var created = Assert.IsType<CreatedAtActionResult>(controller.Create(ValidDto()).Result);
+        var id = Assert.IsType<Appointment>(created.Value).Id;
+
+        var updated = controller.Update(id, new UpdateAppointmentDto
+        {
+            ProviderId = provider.Id,
+            ProviderName = "Custom name"
+        });
+        var payload = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(updated.Result).Value);
+
+        Assert.Equal("Custom name", payload.ProviderName);
     }
 }
