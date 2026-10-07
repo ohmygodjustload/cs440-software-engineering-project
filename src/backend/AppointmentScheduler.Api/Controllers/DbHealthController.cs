@@ -27,6 +27,15 @@ public sealed class DbHealthController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    /// <summary>
+    /// Check MongoDB configuration and connectivity.
+    /// When MongoDB is not configured the endpoint reports the in-memory fallback state.
+    /// When configured, performs a lightweight round-trip to list collection names.
+    /// </summary>
+    /// <returns>
+    /// 200 OK with store status and collections when healthy; 503 ServiceUnavailable when the database
+    /// cannot be reached.
+    /// </returns>
     public IActionResult Get()
     {
         var section = _config.GetSection(MongoDbSettings.SectionName);

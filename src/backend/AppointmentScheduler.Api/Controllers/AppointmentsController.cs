@@ -6,6 +6,9 @@ namespace AppointmentScheduler.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+/// <summary>
+/// Manage appointments: list, retrieve, create, update and cancel (soft-delete).
+/// </summary>
 public sealed class AppointmentsController : ControllerBase
 {
     private readonly IAppointmentStore _store;
@@ -17,6 +20,17 @@ public sealed class AppointmentsController : ControllerBase
         _providers = providerStore;
     }
 
+    /// <summary>
+    /// List appointments with optional filtering and paging.
+    /// </summary>
+    /// <param name="from">Optional inclusive start of the half-open range.</param>
+    /// <param name="to">Optional exclusive end of the half-open range.</param>
+    /// <param name="category">Optional category filter.</param>
+    /// <param name="status">Optional status filter.</param>
+    /// <param name="providerId">Optional provider identifier filter.</param>
+    /// <param name="page">Page number (1-based).</param>
+    /// <param name="pageSize">Page size (max 100).</param>
+    /// <returns>200 OK with a paged result of appointments, or 400 BadRequest for invalid ranges.</returns>
     [HttpGet]
     [ProducesResponseType<PagedResult<Appointment>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,6 +88,11 @@ public sealed class AppointmentsController : ControllerBase
         return Ok(new PagedResult<Appointment>(items, ordered.Count, page, pageSize));
     }
 
+    /// <summary>
+    /// Get an appointment by identifier.
+    /// </summary>
+    /// <param name="id">Appointment identifier.</param>
+    /// <returns>200 OK with the appointment or 404 NotFound when missing.</returns>
     [HttpGet("{id}")]
     [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -83,6 +102,11 @@ public sealed class AppointmentsController : ControllerBase
         return item is null ? NotFound() : Ok(item);
     }
 
+    /// <summary>
+    /// Create a new appointment.
+    /// </summary>
+    /// <param name="dto">Appointment create DTO with required StartDateTime and EndDateTime.</param>
+    /// <returns>201 Created with the created appointment, or 400 BadRequest for invalid input.</returns>
     [HttpPost]
     [ProducesResponseType<Appointment>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -119,6 +143,9 @@ public sealed class AppointmentsController : ControllerBase
     }
 
     /// <summary>Update an appointment (edit / reschedule / cancel via status).</summary>
+    /// <param name="id">Appointment identifier to update.</param>
+    /// <param name="dto">Partial update payload. Fields left null are not modified.</param>
+    /// <returns>200 OK with the updated appointment, 400 BadRequest for validation errors, or 404 NotFound when the appointment does not exist.</returns>
     [HttpPut("{id}")]
     [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -198,13 +225,15 @@ public sealed class AppointmentsController : ControllerBase
         return Ok(existing);
     }
 
-    /// <summary>
-    /// Cancel an appointment (soft delete). The record is kept with
-    /// <c>Status = Cancelled</c> so it stays visible as history via
-    /// <c>GET /api/appointments/{id}</c> and <c>GET /api/appointments?status=Cancelled</c>;
-    /// the calendar feed hides cancelled items so the slot frees up.
-    /// Cancelling an already-cancelled appointment is a no-op returning 204.
-    /// </summary>
+    /// <summary> Cancel an appointment by id (soft delete).</summary>
+    /// <param name="id">Appointment identifier.</param>
+    /// <remarks>
+    /// Performs a soft delete by setting <c>Status = Cancelled</c>. The record
+    /// is retained for history and is still returned by GET /api/appointments/{id}
+    /// and GET /api/appointments?status=Cancelled. Cancelling an already-cancelled
+    /// appointment is a no-op and returns 204 No Content.
+    /// </remarks>
+    /// <returns>204 No Content on success, or 404 Not Found when the appointment does not exist.</returns>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

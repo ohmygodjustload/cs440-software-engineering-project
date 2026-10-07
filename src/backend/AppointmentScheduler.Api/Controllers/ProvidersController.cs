@@ -16,10 +16,19 @@ public sealed class ProvidersController : ControllerBase
         _store = store;
     }
 
+    /// <summary>
+    /// Returns the full list of providers used by the scheduler (for dropdowns and lookups).
+    /// </summary>
+    /// <returns>200 OK with the list of providers.</returns>
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<Provider>>(StatusCodes.Status200OK)]
     public ActionResult<IReadOnlyList<Provider>> List() => Ok(_store.GetAll());
 
+    /// <summary>
+    /// Retrieve a provider by identifier.
+    /// </summary>
+    /// <param name="id">Provider identifier.</param>
+    /// <returns>200 OK with the provider, or 404 NotFound when the id does not exist.</returns>
     [HttpGet("{id}")]
     [ProducesResponseType<Provider>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -29,6 +38,11 @@ public sealed class ProvidersController : ControllerBase
         return item is null ? NotFound() : Ok(item);
     }
 
+    /// <summary>
+    /// Create a new provider.
+    /// </summary>
+    /// <param name="provider">Provider payload. The <c>Name</c> property is required.</param>
+    /// <returns>201 Created with the created provider, or 400 Bad Request for invalid input.</returns>
     [HttpPost]
     [ProducesResponseType<Provider>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -44,6 +58,11 @@ public sealed class ProvidersController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    /// <summary>
+    /// Delete a provider by identifier.
+    /// </summary>
+    /// <param name="id">Provider identifier.</param>
+    /// <returns>204 NoContent when deleted, or 404 NotFound when the id does not exist.</returns>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

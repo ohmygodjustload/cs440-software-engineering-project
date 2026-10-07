@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.IO;
+
 const string AngularCorsPolicy = "AngularClient";
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +17,16 @@ builder.Services.AddOpenApi();
 
 // Register Swagger/OpenAPI generators so all controller endpoints are documented
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Include XML comments from this assembly (requires GenerateDocumentationFile in the project file)
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
 
 // MongoDB settings bind from the "MongoDb" section, with env-var override:
 //   MongoDb__ConnectionString=mongodb+srv://...   (double underscore = section separator)
