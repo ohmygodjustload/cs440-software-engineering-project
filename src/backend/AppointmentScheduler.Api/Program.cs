@@ -12,6 +12,10 @@ builder.Services.AddControllers()
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Register Swagger/OpenAPI generators so all controller endpoints are documented
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 // MongoDB settings bind from the "MongoDb" section, with env-var override:
 //   MongoDb__ConnectionString=mongodb+srv://...   (double underscore = section separator)
 // Order of precedence: env var > User Secrets > appsettings.Development.json > appsettings.json.
@@ -89,6 +93,12 @@ app.Use(async (context, next) =>
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "AppointmentScheduler API v1");
+        options.RoutePrefix = "swagger"; // UI at /swagger
+    });
 }
 
 app.UseCors(AngularCorsPolicy);
