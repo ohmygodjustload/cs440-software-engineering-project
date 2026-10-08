@@ -44,6 +44,7 @@ export const routes: Routes = [
   },
   {
     path: 'settings',
+    title: 'Settings · BAAAM Scheduling System',
     loadComponent: () =>
       import('./pages/settings/settings.component')
         .then(m => m.SettingsComponent)
