@@ -1,6 +1,6 @@
 using AppointmentScheduler.Api.Data;
-using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace AppointmentScheduler.Api.Controllers;
@@ -25,14 +25,16 @@ public sealed class DbHealthController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>
+    /// Reports MongoDB connectivity, latency, config source (without leaking the
+    /// secret), collections, and live document counts — everything the /db admin
+    /// page needs to render connection + entries in one call.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Get()
     {
-        var section = _config.GetSection(MongoDbSettings.SectionName);
-        var configured = !string.IsNullOrWhiteSpace(section.GetValue<string>("ConnectionString"))
-            || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MongoDb__ConnectionString"))
-            || !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MONGODB__CONNECTIONSTRING"));
+        var (configured, configSource, serverHint) = DescribeConfiguration();
 
         if (!configured)
         {
@@ -40,6 +42,9 @@ public sealed class DbHealthController : ControllerBase
             {
                 status = "not-configured",
                 store = "in-memory",
+                configSource,
+                server = (string?)null,
+                database = (string?)null,
                 hint = "Set MongoDb:ConnectionString (User Secrets / appsettings.Development.json / MongoDb__ConnectionString) to use Atlas."
             });
         }
@@ -47,14 +52,43 @@ public sealed class DbHealthController : ControllerBase
         try
         {
             var context = _services.GetRequiredService<MongoDbContext>();
-            // Lightweight round-trip: list collection names in the configured database.
+            var settings = _config.GetSection(MongoDbSettings.SectionName).Get<MongoDbSettings>() ?? new MongoDbSettings();
+
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             var collections = context.Database.ListCollectionNames().ToList();
+            stopwatch.Stop();
+
+            long Count(string name)
+            {
+                try { return (long)context.Database.GetCollection<BsonDocument>(name).EstimatedDocumentCount(); }
+                catch { return -1; }
+            }
+
+            var counts = new Dictionary<string, long>
+            {
+                [settings.AppointmentsCollection] = Count(settings.AppointmentsCollection),
+                [settings.ProvidersCollection] = Count(settings.ProvidersCollection),
+                [settings.UsersCollection] = Count(settings.UsersCollection),
+            };
+
+            foreach (var extra in new[] { "Status", "ServiceType", "Location" })
+            {
+                if (collections.Contains(extra) && !counts.ContainsKey(extra))
+                {
+                    counts[extra] = Count(extra);
+                }
+            }
+
             return Ok(new
             {
                 status = "ok",
                 store = "mongodb",
+                configSource,
+                server = serverHint,
                 database = context.Database.DatabaseNamespace.DatabaseName,
-                collections
+                latencyMs = stopwatch.ElapsedMilliseconds,
+                collections,
+                counts
             });
         }
         catch (Exception ex)
@@ -65,8 +99,67 @@ public sealed class DbHealthController : ControllerBase
             {
                 status = "unhealthy",
                 store = "mongodb",
+                configSource,
+                server = serverHint,
                 error = "Database unavailable. Check the connection string, IP access list, and network, then retry."
             });
+        }
+    }
+
+    /// <summary>
+    /// Figures out where the connection string came from and derives a safe
+    /// server hint (host only — never the password) for display.
+    /// </summary>
+    private (bool configured, string source, string? serverHint) DescribeConfiguration()
+    {
+        var fromConfig = _config.GetValue<string>($"{MongoDbSettings.SectionName}:ConnectionString");
+        string? raw = null;
+        var source = "none";
+
+        if (!string.IsNullOrWhiteSpace(fromConfig))
+        {
+            raw = fromConfig;
+            source = "appsettings / user-secrets";
+        }
+        else if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MongoDb__ConnectionString")))
+        {
+            raw = Environment.GetEnvironmentVariable("MongoDb__ConnectionString");
+            source = "env:MongoDb__ConnectionString";
+        }
+        else if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("MONGODB__CONNECTIONSTRING")))
+        {
+            raw = Environment.GetEnvironmentVariable("MONGODB__CONNECTIONSTRING");
+            source = "env:MONGODB__CONNECTIONSTRING";
+        }
+
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return (false, source, null);
+        }
+
+        return (true, source, SafeServerHint(raw));
+    }
+
+    /// <summary>Extracts host from a MongoDB string without leaking credentials.</summary>
+    private static string? SafeServerHint(string connectionString)
+    {
+        try
+        {
+            var at = connectionString.IndexOf('@');
+            var rest = at >= 0 ? connectionString[(at + 1)..] : connectionString;
+            var scheme = rest.IndexOf("://", StringComparison.Ordinal);
+            if (scheme >= 0)
+            {
+                rest = rest[(scheme + 3)..];
+            }
+
+            var end = rest.IndexOfAny(['/', '?']);
+            var host = (end >= 0 ? rest[..end] : rest).Trim();
+            return string.IsNullOrWhiteSpace(host) ? null : host;
+        }
+        catch
+        {
+            return null;
         }
     }
 }

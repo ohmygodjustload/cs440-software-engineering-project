@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scheduler DB viewer</title>
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<header>
+<div>
+<h1>Database Content Viewer</h1>
+<p>Database <-> Backend Interface</p>
+</div>
+<nav>
+  <a href="/swagger/index.html">Swagger</a>
+  <a href="/openapi/v1.json">OpenAPI</a>
+  <a href="/api/health">health</a>
+  <a href="/api/dbhealth">dbhealth</a>
+</nav>
+</header>
+<main>
+<section class="card">
+<h2>MongoDB connection</h2>
+<p class="sub">Backend to MongoDB monitor. Host only, never the password.</p>
+<div id="connPill"><span class="pill warn">checking...</span></div>
+<dl class="kv" id="connKv"></dl>
+<div id="connErr"></div>
+</section>
+<section class="card">
+<h2>Collections</h2>
+<p class="sub">Live document counts.</p>
+<div class="grid" id="counts"></div>
+</section>
+<section class="card">
+<h2>Appointments by category</h2>
+<p class="sub">From live GET /api/appointments.</p>
+<div class="grid" id="cats"></div>
+</section>
+<section class="card">
+<h2>Appointment entries</h2>
+<p class="sub" id="apptSub">Loading...</p>
+<div class="toolbar">
+<label>Category<select id="fCat"><option value="">All</option><option>Medical</option><option>Beauty</option><option>Fitness</option></select></label>
+<label>Status<select id="fStatus"><option value="">All</option><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select></label>
+<label>Page size<select id="fSize"><option>10</option><option selected>20</option><option>50</option><option>100</option></select></label>
+<button id="fGo" type="button">Refresh</button>
+<button id="fPrev" class="ghost" type="button">Prev</button>
+<button id="fNext" class="ghost" type="button">Next</button>
+</div>
+<div id="apptErr"></div>
+<div style="overflow-x:auto"><table>
+<thead><tr><th>Start (UTC)</th><th>Title</th><th>Category</th><th>Status</th><th>Provider</th><th>Location</th><th>ID</th></tr></thead>
+<tbody id="rows"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+</table></div>
+</section>
+<section class="card">
+<h2>How this is wired</h2>
+<dl class="kv">
+<dt>Connection</dt><dd><code>GET /api/dbhealth</code> store, host, database, latency, counts</dd>
+<dt>Entries</dt><dd><code>GET /api/appointments</code> real BAAAM Appointment docs</dd>
+<dt>Config</dt><dd><code>MongoDb:ConnectionString</code> in User Secrets or appsettings.Development.json</dd>
+</dl>
+</section>
+</main>
+<footer>Backend DB viewer - <span id="stamp"></span></footer>
+<script src="./db.js"></script>
+</body>
+</html>
