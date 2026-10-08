@@ -61,41 +61,25 @@ export type SettingsTabId = 'profile' | 'login' | 'preferences' | 'privacy';
 export interface SettingsTab {
   readonly id: SettingsTabId;
   readonly label: string;
-  /** Only `profile` is implemented; the rest are visibly unavailable. */
+  /** All four sections render content; non-persisted areas stay read-only. */
   readonly available: boolean;
   /** Reason shown on unavailable tabs (tooltip + screen-reader text). */
   readonly unavailableReason?: string;
 }
 
 /**
- * Secondary navigation for the Settings page. The Profile panel renders the
- * profile-information, personal-preferences, and privacy-summary sections on
- * one scrolling page; the other destinations are not implemented and must
- * stay clearly labelled as unavailable rather than rendering misleading
- * controls (e.g. no invented password or verification workflows).
+ * Secondary navigation for the Settings page. Each entry switches a panel on
+ * this page (accessible tabs, not routes): Profile holds the editable
+ * identity form, Preferences holds calendar/notification choices, Login &
+ * security shows read-only account facts, and Privacy explains data handling.
+ * Nothing here invents a password, verification, or delete workflow — areas
+ * without backend support stay read-only with an honest explanation.
  */
 export const SETTINGS_TABS: readonly SettingsTab[] = [
   { id: 'profile', label: 'Profile', available: true },
-  {
-    id: 'login',
-    label: 'Login & security',
-    available: false,
-    unavailableReason: 'Login & security settings are not available in this version.'
-  },
-  {
-    id: 'preferences',
-    label: 'Preferences',
-    available: false,
-    unavailableReason:
-      'A standalone Preferences section is not available in this version — notification and calendar preferences live on the Profile panel.'
-  },
-  {
-    id: 'privacy',
-    label: 'Privacy',
-    available: false,
-    unavailableReason:
-      'A standalone Privacy section is not available in this version — the privacy summary lives on the Profile panel.'
-  }
+  { id: 'login', label: 'Login & security', available: true },
+  { id: 'preferences', label: 'Preferences', available: true },
+  { id: 'privacy', label: 'Privacy', available: true }
 ];
 
 /** Editable value snapshot of the Settings form. */

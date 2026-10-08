@@ -1,25 +1,34 @@
-<!-- Settings page: heading, pill secondary nav, Profile panel. -->
+<!-- Settings page: heading, pill tab strip, one visible panel at a time. -->
 <div class="settings-page">
   <header class="settings-head">
     <h1>Settings</h1>
     <p>Update account information and personal preferences.</p>
   </header>
 
-  <nav class="settings-tabs" aria-label="Settings sections">
-    @for (tab of tabs; track tab.id) {
-      @if (tab.available) {
-        <button type="button" class="settings-tab settings-tab--active"
-          [attr.aria-current]="'page'" (click)="selectTab(tab.id)">{{ tab.label }}</button>
-      } @else {
-        <button type="button" class="settings-tab settings-tab--disabled"
-          disabled [attr.aria-disabled]="'true'" [title]="tab.unavailableReason">{{ tab.label }}</button>
+  <div class="settings-layout">
+    <div
+      class="settings-side"
+      role="tablist"
+      aria-label="Settings sections"
+      aria-orientation="vertical"
+    >
+      @for (tab of tabs; track tab.id) {
+        <button
+          type="button"
+          role="tab"
+          [id]="'settings-tab-' + tab.id"
+          [attr.aria-selected]="activeTabId === tab.id"
+          [attr.aria-controls]="'settings-panel-' + tab.id"
+          [attr.tabindex]="activeTabId === tab.id ? '0' : '-1'"
+          class="settings-side__item"
+          [class.settings-side__item--active]="activeTabId === tab.id"
+          (click)="selectTab(tab.id)"
+          (keydown)="onTabKeydown($event, tab.id)"
+        >{{ tab.label }}</button>
       }
-    }
-  </nav>
-  <p class="settings-tabs-note" role="note">
-    Login &amp; security, Preferences, and Privacy are unavailable for now —
-    everything editable sits on the Profile panel below.
-  </p>
+    </div>
+
+    <div class="settings-content">
 
   @if (isLoading) {
     <p class="settings-status" role="status">Loading your settings…</p>
@@ -35,7 +44,9 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
-      <section class="settings-card" aria-labelledby="profile-info-heading">
+      @if (activeTabId === 'profile') {
+      <div role="tabpanel" id="settings-panel-profile" aria-labelledby="settings-tab-profile" tabindex="0">
+      <section class="settings-section" aria-labelledby="profile-info-heading">
         <h2 id="profile-info-heading">Profile information</h2>
         <div class="settings-grid">
           <div class="field">
@@ -80,8 +91,41 @@
           </div>
         </div>
       </section>
-      <section class="settings-card" aria-labelledby="prefs-heading">
-        <h2 id="prefs-heading">Personal preferences</h2>
+      </div>
+      }
+
+      @if (activeTabId === 'login') {
+      <div role="tabpanel" id="settings-panel-login" aria-labelledby="settings-tab-login" tabindex="0">
+      <section class="settings-section" aria-labelledby="login-heading">
+        <h2 id="login-heading">Login &amp; security</h2>
+        <p class="section-lede">Read-only account facts from your loaded record. No password or verification changes are available in this version.</p>
+        <dl class="settings-facts">
+          <div>
+            <dt>Username</dt>
+            <dd>{{ username }}</dd>
+          </div>
+          <div>
+            <dt>Email address</dt>
+            <dd>{{ form.controls.email.value || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Role</dt>
+            <dd>{{ roleSummary }}</dd>
+          </div>
+        </dl>
+        <div class="settings-unavailable settings-unavailable--inline" role="note">
+          <strong>Password changes unavailable.</strong>
+          <span>The backend exposes no login or password endpoint, so this page shows information only.</span>
+        </div>
+      </section>
+      </div>
+      }
+
+      @if (activeTabId === 'preferences') {
+      <div role="tabpanel" id="settings-panel-preferences" aria-labelledby="settings-tab-preferences" tabindex="0">
+      <section class="settings-section" aria-labelledby="prefs-heading">
+        <h2 id="prefs-heading">Preferences</h2>
+        <p class="section-lede">Calendar and notification choices. These are collected on this page but not consumed anywhere yet.</p>
         <div class="field field--narrow">
           <label for="settings-calendar-view">Default calendar view</label>
           <select id="settings-calendar-view" formControlName="defaultCalendarView">
@@ -105,11 +149,22 @@
           <p class="field-hint">Kept on this page only — no notification behavior changes yet.</p>
         </fieldset>
       </section>
+      </div>
+      }
 
-      <section class="settings-card" aria-labelledby="privacy-heading">
-        <h2 id="privacy-heading">Privacy &amp; access</h2>
-        <p class="privacy-text">{{ privacySummary }}</p>
+      @if (activeTabId === 'privacy') {
+      <div role="tabpanel" id="settings-panel-privacy" aria-labelledby="settings-tab-privacy" tabindex="0">
+      <section class="settings-section" aria-labelledby="privacy-heading">
+        <h2 id="privacy-heading">Privacy</h2>
+        <p class="section-lede">How your information is handled in this application.</p>
+        <ul class="settings-list">
+          <li>Your profile holds your name, email, phone, and time zone — only what you provide on the Profile panel.</li>
+          <li>Appointments you create stay linked to your account and power the calendar, notifications, and statistics views.</li>
+          <li>Passwords are never returned by the API for security reasons, and this page has no export or delete-account action yet.</li>
+        </ul>
       </section>
+      </div>
+      }
 
       @if (saveError) {
         <div class="settings-alert settings-alert--error" role="alert"><p>{{ saveError }}</p></div>
@@ -125,6 +180,8 @@
       </div>
     </form>
   }
+    </div>
+  </div>
 </div>
 
 
