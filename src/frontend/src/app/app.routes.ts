@@ -32,6 +32,7 @@ export const routes: Routes = [
   },
   {
     path: 'notifications',
+    title: 'Notifications · BAAAM Scheduling System',
     loadComponent: () =>
       import('./pages/notifications/notifications.component')
         .then(m => m.NotificationsComponent)

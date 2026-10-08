@@ -1,0 +1,49 @@
+/* Notifications page theme. */
+.notifications-page { max-width: 980px; margin: 0 auto; padding: 40px 24px 80px; color: #344b48; }
+.notifications-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.notifications-head__titles h1 { margin: 0; font-size: 32px; font-weight: 500; }
+.notifications-head__titles p { margin: 10px 0 0; font-size: 14px; color: #526460; }
+.notifications-mark { border: 0; background: transparent; color: #344b48; font-size: 13px; cursor: pointer; padding: 10px 4px; white-space: nowrap; }
+.notifications-mark:hover:not(:disabled) { text-decoration: underline; }
+.notifications-mark:disabled { opacity: 0.55; cursor: not-allowed; }
+.notifications-mark:focus-visible { outline: 3px solid #1f6feb; outline-offset: 2px; }
+.notifications-alert { margin-top: 20px; padding: 12px 16px; border-left: 3px solid; font-size: 13px; }
+.notifications-alert p { margin: 0; }
+.notifications-alert--error { background: #fdecec; border-color: #c04949; color: #7a2222; }
+.notifications-alert--success { background: #e7f3ea; border-color: #4c8a5c; color: #234d2e; }
+.notifications-retry { margin-top: 8px; padding: 10px 20px; border: 1px solid #344f4b; background: transparent; color: #344f4b; cursor: pointer; }
+.notifications-retry:focus-visible { outline: 3px solid #1f6feb; outline-offset: 2px; }
+.notifications-panel { margin-top: 28px; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; background: #fff; border: 1px solid #e3ded2; border-radius: 12px; }
+.notifications-panel__text h2 { margin: 0; font-size: 18px; font-weight: 500; }
+.notifications-panel__text p { margin: 8px 0 0; font-size: 13px; color: #526460; }
+.notifications-field-error { margin: 12px 0 0; font-size: 12px; color: #9c2b2b; flex-basis: 100%; }
+.notifications-section { margin-top: 40px; }
+.notifications-section h2 { margin: 0 0 8px; font-size: 14px; font-weight: 400; }
+.notifications-status { color: #526460; font-size: 13px; }
+.notifications-empty { color: #526460; font-size: 13px; }
+.notifications-inline-error { font-size: 13px; color: #7a2222; }
+.notifications-inline-error p { margin: 0 0 4px; }
+.notifications-switch { display: inline-flex; align-items: center; border: 0; background: #344f4b; color: #fff; border-radius: 999px; min-width: 84px; min-height: 34px; padding: 5px 16px 5px 7px; font-size: 12px; cursor: pointer; }
+.notifications-switch[aria-checked="false"] { background: #9aa5a1; }
+.notifications-switch:disabled { opacity: 0.7; cursor: wait; }
+.notifications-switch:focus-visible { outline: 3px solid #1f6feb; outline-offset: 2px; }
+.notifications-switch__track { display: inline-flex; align-items: center; width: 26px; height: 18px; margin-right: 8px; }
+.notifications-switch__thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; margin-left: 2px; }
+.notifications-switch__label { min-width: 30px; text-align: center; }
+.notifications-schedule { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.notifications-schedule__row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; align-items: center; gap: 16px; padding: 18px 8px; font-size: 14px; }
+.notifications-schedule__control { display: flex; justify-content: flex-end; }
+.notifications-history { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; }
+.notifications-history__row { display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: baseline; padding: 16px 8px; font-size: 14px; }
+.notifications-history__row--unread .notifications-history__event { font-weight: 600; }
+.notifications-history__message { color: #526460; }
+.notifications-unread-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #344f4b; margin-left: 8px; vertical-align: middle; }
+.notifications-unread-tag { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: #dce9ed; color: #344b48; font-size: 11px; }
+@media (max-width: 800px) {
+  .notifications-head { flex-direction: column; align-items: flex-start; }
+  .notifications-panel { align-items: flex-start; flex-direction: column; }
+  .notifications-schedule__row { grid-template-columns: 1fr auto; row-gap: 4px; }
+  .notifications-schedule__recipient { grid-column: 1; font-size: 13px; color: #526460; }
+  .notifications-schedule__control { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
+  .notifications-history__row { grid-template-columns: 1fr; gap: 4px; }
+}
