@@ -42,9 +42,54 @@ export function phoneValidator(): ValidatorFn {
 }
 
 type LoadState = 'loading' | 'loaded' | 'error';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
+
+import { User } from '../../core/models/user';
+import {
+  CALENDAR_VIEWS,
+  SETTINGS_TABS,
+  SettingsFormValue,
+  SettingsTabId,
+  TIME_ZONES
+} from '../../core/models/user-settings';
+import { UserSettingsService } from '../../core/services/user-settings.service';
+
+/** Full-name alphabet: Unicode letters/marks plus everyday punctuation. */
+const FULL_NAME_PATTERN = /^[\p{L}\p{M} .'\-]+$/u;
+
+/**
+ * Permissive phone check: empty is allowed (phone is optional); otherwise the
+ * value must contain at least 7 digits and only telephone punctuation.
+ */
+export function phoneValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const raw = (control.value ?? '').toString().trim();
+    if (raw === '') {
+      return null;
+    }
+    const digits = raw.replace(/\D/g, '');
+    const allowed = /^[+()\-.\s\d]+(?:\s*(?:x|ext\.?|extension)\s*\d+)?$/i.test(raw);
+    if (!allowed || digits.length < 7 || raw.length > 50) {
+      return { phone: true };
+    }
+    return null;
+  };
+}
+
+type LoadState = 'loading' | 'loaded' | 'error';
 
 @Component({
   selector: 'app-settings',
+  imports: [CommonModule, ReactiveFormsModule],
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
@@ -85,32 +130,6 @@ export class SettingsComponent implements OnInit {
     const tab = this.tabs.find((entry) => entry.id === id);
     if (tab?.available) {
       this.activeTabId = id;
-      this.saveSuccess = false;
-    }
-  }
-
-  /** Keyboard support for the tablist: arrows move between enabled tabs. */
-  onTabKeydown(event: KeyboardEvent, id: SettingsTabId): void {
-    const order = this.tabs.filter((tab) => tab.available).map((tab) => tab.id);
-    const current = order.indexOf(id);
-    if (current < 0) {
-      return;
-    }
-    let next: number | null = null;
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      next = (current + 1) % order.length;
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      next = (current - 1 + order.length) % order.length;
-    } else if (event.key === 'Home') {
-      next = 0;
-    } else if (event.key === 'End') {
-      next = order.length - 1;
-    }
-    if (next !== null) {
-      event.preventDefault();
-      const target = order[next];
-      this.selectTab(target);
-      document.getElementById(`settings-tab-${target}`)?.focus();
     }
   }
 
@@ -129,24 +148,12 @@ export class SettingsComponent implements OnInit {
     return this.loadState === 'loaded' && this.isDirty && !this.saving && this.form.valid;
   }
 
-  /** Display username from the loaded record (read-only; never invented). */
-  get username(): string {
-    return this.currentUser?.username ?? '—';
-  }
-
-  /** Human-readable account roles from the loaded record. */
-  get roleSummary(): string {
-    const roles: string[] = [];
+  get privacySummary(): string {
     if (this.currentUser?.isAdmin) {
-      roles.push('Admin');
+      return 'As an admin, your account can manage any user\u2019s information. ' +
+        'Non-admin accounts can access and modify only their own personal and appointment data.';
     }
-    if (this.currentUser?.isServiceProvider) {
-      roles.push('Service provider');
-    }
-    if (this.currentUser?.isClient) {
-      roles.push('Client');
-    }
-    return roles.length > 0 ? roles.join(', ') : '—';
+    return 'Your account can access and modify only your own personal and appointment data.';
   }
 
   resolveDefaultTimeZone(): string {
