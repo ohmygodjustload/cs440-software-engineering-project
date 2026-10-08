@@ -14,6 +14,18 @@ builder.Services.AddControllers()
         new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 
+// Register Swagger/OpenAPI generators so all controller endpoints are documented
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Include XML comments from this assembly (requires GenerateDocumentationFile in the project file)
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
 
 // MongoDB settings bind from the "MongoDb" section, with env-var override:
 //   MongoDb__ConnectionString=mongodb+srv://...   (double underscore = section separator)
@@ -92,8 +104,12 @@ app.Use(async (context, next) =>
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-
-
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "AppointmentScheduler API v1");
+        options.RoutePrefix = "swagger"; // UI at /swagger
+    });
 }
 
 // Simple backend DB viewer (like Swagger UI but for data): static page at /db

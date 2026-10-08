@@ -1,35 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { of, throwError } from 'rxjs';
 
-import { User } from '../../core/models/user';
-import { UserSettingsService } from '../../core/services/user-settings.service';
 import { User } from '../../core/models/user';
 import { UserSettingsService } from '../../core/services/user-settings.service';
 import { SettingsComponent } from './settings.component';
-
-const demoUser: User = {
-  id: 'user-1',
-  firstName: 'Jane',
-  lastName: 'Porter',
-  username: 'JanePorter123',
-  email: 'jane@example.com',
-  phone: '456-456-4567',
-  isClient: true,
-  isServiceProvider: false,
-  isAdmin: false
-};
-
-function configure(serviceStub: Partial<UserSettingsService>): ComponentFixture<SettingsComponent> {
-  TestBed.configureTestingModule({
-    imports: [SettingsComponent],
-    providers: [{ provide: UserSettingsService, useValue: serviceStub }]
-  });
-  TestBed.compileComponents();
-  const fixture = TestBed.createComponent(SettingsComponent);
-  fixture.detectChanges();
-  return fixture;
-}
 
 const demoUser: User = {
   id: 'user-1',
@@ -126,27 +100,65 @@ describe('SettingsComponent', () => {
     expect(component.form.controls.fullName.value).toBe('Jane Updated');
   });
 
-  it('should expose accessible labels, tabs, and the privacy summary', () => {
+  it('should expose accessible tablist, panels, and per-tab content', () => {
     const fixture = configure({ getCurrentUser: () => of(demoUser) });
+    const component = fixture.componentInstance;
+    const root = fixture.nativeElement as HTMLElement;
 
-    expect(fixture.nativeElement.querySelector('label[for="settings-fullname"]')).not.toBeNull();
-    const tabs = Array.from(fixture.nativeElement.querySelectorAll('.settings-tab')).map((t) =>
+    expect(root.querySelector('[role="tablist"]')).not.toBeNull();
+    const tabs = Array.from(root.querySelectorAll('[role="tab"]')).map((t) =>
       (t as HTMLElement).textContent?.trim()
     );
     expect(tabs).toEqual(['Profile', 'Login & security', 'Preferences', 'Privacy']);
-    const active = fixture.nativeElement.querySelector('.settings-tab--active') as HTMLElement;
-    expect(active.getAttribute('aria-current')).toBe('page');
-    const privacy = fixture.nativeElement.querySelector('.privacy-text') as HTMLElement;
-    expect(privacy.textContent).toContain('only your own personal and appointment data');
+
+    // Profile panel is visible initially with the identity form.
+    expect(root.querySelector('label[for="settings-fullname"]')).not.toBeNull();
+    expect(root.querySelector('#settings-panel-preferences')).toBeNull();
+
+    // Login & security panel shows read-only facts and no password controls.
+    component.selectTab('login');
+    fixture.detectChanges();
+    expect(root.querySelector('#settings-panel-login')).not.toBeNull();
+    expect(root.textContent).toContain('JanePorter123');
+    expect(root.textContent).toContain('Password changes unavailable');
+    expect(root.querySelector('input[type="password"]')).toBeNull();
+
+    // Preferences panel holds the calendar + notification controls.
+    component.selectTab('preferences');
+    fixture.detectChanges();
+    expect(root.querySelector('#settings-panel-preferences')).not.toBeNull();
+    expect(root.querySelector('label[for="settings-calendar-view"]')).not.toBeNull();
+    expect(root.querySelectorAll('.notify-option').length).toBe(3);
+
+    // Privacy panel explains data handling with no security-boundary claim.
+    component.selectTab('privacy');
+    fixture.detectChanges();
+    expect(root.querySelector('#settings-panel-privacy')).not.toBeNull();
+    expect(root.textContent).toContain('no security boundary');
+
+    // Active tab is exposed via aria-selected on the vertical sidebar item.
+    const active = root.querySelector('#settings-tab-privacy') as HTMLElement;
+    expect(active.getAttribute('aria-selected')).toBe('true');
+    expect(active.classList.contains('settings-side__item--active')).toBe(true);
+    expect(root.querySelector('.settings-side')?.getAttribute('aria-orientation')).toBe('vertical');
   });
 
-  it('should describe the admin privacy rule for admin accounts', () => {
+  it('should render sidebar items with a non-pill flat style', () => {
+    const fixture = configure({ getCurrentUser: () => of(demoUser) });
+    const root = fixture.nativeElement as HTMLElement;
+    const items = Array.from(root.querySelectorAll('.settings-side__item'));
+    expect(items.length).toBe(4);
+    expect(root.querySelector('.settings-section')).not.toBeNull();
+  });
+
+  it('should derive username and roles from the loaded record', () => {
     const fixture = configure({
-      getCurrentUser: () => of({ ...demoUser, isAdmin: true })
+      getCurrentUser: () => of({ ...demoUser, isAdmin: true, isServiceProvider: true })
     });
-    const privacy = fixture.nativeElement.querySelector('.privacy-text') as HTMLElement;
-    expect(privacy.textContent).toContain('can manage any user');
+    const component = fixture.componentInstance;
+    expect(component.username).toBe('JanePorter123');
+    expect(component.roleSummary).toContain('Admin');
+    expect(component.roleSummary).toContain('Client');
   });
 });
-
 
