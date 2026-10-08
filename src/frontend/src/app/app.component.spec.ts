@@ -53,7 +53,9 @@ describe('AppComponent', () => {
       'Home',
       'Calendar',
       'Appointments',
-      'Statistics'
+      'Notifications',
+      'Statistics',
+      'Settings'
     ]);
   });
 

@@ -1,1 +1,130 @@
-<p>settings works!</p>
+<!-- Settings page: heading, pill secondary nav, Profile panel. -->
+<div class="settings-page">
+  <header class="settings-head">
+    <h1>Settings</h1>
+    <p>Update account information and personal preferences.</p>
+  </header>
+
+  <nav class="settings-tabs" aria-label="Settings sections">
+    @for (tab of tabs; track tab.id) {
+      @if (tab.available) {
+        <button type="button" class="settings-tab settings-tab--active"
+          [attr.aria-current]="'page'" (click)="selectTab(tab.id)">{{ tab.label }}</button>
+      } @else {
+        <button type="button" class="settings-tab settings-tab--disabled"
+          disabled [attr.aria-disabled]="'true'" [title]="tab.unavailableReason">{{ tab.label }}</button>
+      }
+    }
+  </nav>
+  <p class="settings-tabs-note" role="note">
+    Login &amp; security, Preferences, and Privacy are unavailable for now —
+    everything editable sits on the Profile panel below.
+  </p>
+
+  @if (isLoading) {
+    <p class="settings-status" role="status">Loading your settings…</p>
+  } @else if (loadState === 'error') {
+    <div class="settings-alert settings-alert--error" role="alert">
+      <p>{{ loadError }}</p>
+      <button type="button" class="settings-retry" (click)="retryLoad()">Try again</button>
+    </div>
+  } @else {
+    <div class="settings-unavailable" role="note">
+      <strong>Saving is unavailable.</strong>
+      <span>The API has no user-update endpoint yet. Edits stay on this page.</span>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
+      <section class="settings-card" aria-labelledby="profile-info-heading">
+        <h2 id="profile-info-heading">Profile information</h2>
+        <div class="settings-grid">
+          <div class="field">
+            <label for="settings-fullname">Full name</label>
+            <input id="settings-fullname" type="text" formControlName="fullName" autocomplete="name" />
+            @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+              <p class="field-error" id="settings-fullname-error" role="alert">
+                @if (form.controls.fullName.errors?.['required']) { Enter your full name. }
+                @else if (form.controls.fullName.errors?.['pattern']) {
+                  Use letters, spaces, hyphens, apostrophes, or periods only. }
+                @else { Keep your name to 200 characters or fewer. }
+              </p>
+            }
+          </div>
+          <div class="field">
+            <label for="settings-email">Email address</label>
+            <input id="settings-email" type="email" formControlName="email" autocomplete="email" />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <p class="field-error" id="settings-email-error" role="alert">
+                @if (form.controls.email.errors?.['required']) { Enter your email address. }
+                @else { Enter a valid email address. }
+              </p>
+            }
+          </div>
+          <div class="field">
+            <label for="settings-phone">Phone</label>
+            <input id="settings-phone" type="tel" formControlName="phone"
+              autocomplete="tel" placeholder="Optional" />
+            @if (form.controls.phone.touched && form.controls.phone.invalid) {
+              <p class="field-error" id="settings-phone-error" role="alert">
+                Enter a valid phone number (at least 7 digits; spaces, dashes, and + are fine).
+              </p>
+            }
+          </div>
+          <div class="field">
+            <label for="settings-timezone">Time zone</label>
+            <select id="settings-timezone" formControlName="timeZone">
+              @for (zone of timeZones; track zone.value) {
+                <option [value]="zone.value">{{ zone.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </section>
+      <section class="settings-card" aria-labelledby="prefs-heading">
+        <h2 id="prefs-heading">Personal preferences</h2>
+        <div class="field field--narrow">
+          <label for="settings-calendar-view">Default calendar view</label>
+          <select id="settings-calendar-view" formControlName="defaultCalendarView">
+            @for (view of calendarViews; track view.value) {
+              <option [value]="view.value">{{ view.label }}</option>
+            }
+          </select>
+          <p class="field-hint">The Calendar page does not use this preference yet.</p>
+        </div>
+        <fieldset class="notify-group">
+          <legend>Notification settings</legend>
+          <label class="notify-option">
+            <input type="checkbox" formControlName="notifyMedical" /> Medical
+          </label>
+          <label class="notify-option">
+            <input type="checkbox" formControlName="notifyBeauty" /> Beauty
+          </label>
+          <label class="notify-option">
+            <input type="checkbox" formControlName="notifyFitness" /> Fitness
+          </label>
+          <p class="field-hint">Kept on this page only — no notification behavior changes yet.</p>
+        </fieldset>
+      </section>
+
+      <section class="settings-card" aria-labelledby="privacy-heading">
+        <h2 id="privacy-heading">Privacy &amp; access</h2>
+        <p class="privacy-text">{{ privacySummary }}</p>
+      </section>
+
+      @if (saveError) {
+        <div class="settings-alert settings-alert--error" role="alert"><p>{{ saveError }}</p></div>
+      }
+      @if (saveSuccess) {
+        <div class="settings-alert settings-alert--success" role="status"><p>Settings saved.</p></div>
+      }
+
+      <div class="settings-actions">
+        <button type="submit" class="settings-save" [disabled]="!canSave">
+          {{ saving ? 'Saving…' : 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  }
+</div>
+
+
