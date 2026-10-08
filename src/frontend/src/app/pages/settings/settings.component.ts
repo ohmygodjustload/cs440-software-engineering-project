@@ -22,49 +22,7 @@ import { UserSettingsService } from '../../core/services/user-settings.service';
 /** Full-name alphabet: Unicode letters/marks plus everyday punctuation. */
 const FULL_NAME_PATTERN = /^[\p{L}\p{M} .'\-]+$/u;
 
-/**
- * Permissive phone check: empty is allowed (phone is optional); otherwise the
- * value must contain at least 7 digits and only telephone punctuation.
- */
-export function phoneValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const raw = (control.value ?? '').toString().trim();
-    if (raw === '') {
-      return null;
-    }
-    const digits = raw.replace(/\D/g, '');
-    const allowed = /^[+()\-.\s\d]+(?:\s*(?:x|ext\.?|extension)\s*\d+)?$/i.test(raw);
-    if (!allowed || digits.length < 7 || raw.length > 50) {
-      return { phone: true };
-    }
-    return null;
-  };
-}
-
 type LoadState = 'loading' | 'loaded' | 'error';
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators
-} from '@angular/forms';
-
-import { User } from '../../core/models/user';
-import {
-  CALENDAR_VIEWS,
-  SETTINGS_TABS,
-  SettingsFormValue,
-  SettingsTabId,
-  TIME_ZONES
-} from '../../core/models/user-settings';
-import { UserSettingsService } from '../../core/services/user-settings.service';
-
-/** Full-name alphabet: Unicode letters/marks plus everyday punctuation. */
-const FULL_NAME_PATTERN = /^[\p{L}\p{M} .'\-]+$/u;
 
 /**
  * Permissive phone check: empty is allowed (phone is optional); otherwise the
@@ -84,12 +42,8 @@ export function phoneValidator(): ValidatorFn {
     return null;
   };
 }
-
-type LoadState = 'loading' | 'loaded' | 'error';
-
 @Component({
   selector: 'app-settings',
-  imports: [CommonModule, ReactiveFormsModule],
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
@@ -115,7 +69,7 @@ export class SettingsComponent implements OnInit {
     fullName: ['', [Validators.required, Validators.maxLength(200), Validators.pattern(FULL_NAME_PATTERN)]],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(320)]],
     phone: ['', [phoneValidator()]],
-    timeZone: ['UTC', [Validators.required]],
+    timeZone: ['', [Validators.required]],
     defaultCalendarView: ['month', [Validators.required]],
     notifyMedical: [true],
     notifyBeauty: [true],
@@ -235,5 +189,3 @@ export class SettingsComponent implements OnInit {
     };
   }
 }
-
-
