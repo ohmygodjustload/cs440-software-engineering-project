@@ -16,10 +16,19 @@ public sealed class UsersController : ControllerBase
         _store = store;
     }
 
+    /// <summary>
+    /// Returns all users from the read-only user directory.
+    /// </summary>
+    /// <returns>200 OK with the list of users.</returns>
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<User>>(StatusCodes.Status200OK)]
     public ActionResult<IReadOnlyList<User>> List() => Ok(_store.GetAll());
 
+    /// <summary>
+    /// Retrieve a user by identifier.
+    /// </summary>
+    /// <param name="id">User identifier.</param>
+    /// <returns>200 OK with the user or 404 NotFound when not found.</returns>
     [HttpGet("{id}")]
     [ProducesResponseType<User>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
