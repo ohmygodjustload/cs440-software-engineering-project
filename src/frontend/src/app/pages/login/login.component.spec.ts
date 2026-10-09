@@ -45,6 +45,16 @@ describe('LoginComponent', () => {
     expect(component.passwordVisible).toBeTrue();
   });
 
+  it('should route create account based on selected account type', () => {
+    const component = fixture.componentInstance;
+
+    expect(component.createAccountRoute).toBe('/signup');
+
+    component.form.controls.accountType.setValue('serviceProvider');
+
+    expect(component.createAccountRoute).toBe('/signup/provider');
+  });
+
   it('should require username and password before submission can proceed', () => {
     const component = fixture.componentInstance;
 

@@ -2,7 +2,7 @@
   <div class="login-layout">
     <section class="login-brand" aria-label="BAAAM Scheduling">
       <p class="login-brand__name">BAAAM Scheduling</p>
-      <h1 class="login-brand__tagline">Your time, beautifully organized</h1>
+      <h1 class="login-brand__tagline">Your time, beautifully organized.</h1>
 
       <div class="login-brand__artwork" aria-hidden="true"></div>
     </section>
@@ -95,7 +95,7 @@
         <button class="login-submit" type="submit">Sign in</button>
 
         <p class="login-form__signup">
-          New here? <a class="login-link" routerLink="/signup">Create an account</a>
+          New here? <a class="login-link" [routerLink]="createAccountRoute">Create an account</a>
         </p>
       </form>
     </section>

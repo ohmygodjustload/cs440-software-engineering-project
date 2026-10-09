@@ -31,6 +31,10 @@ input {
   background: var(--signup-background);
 }
 
+.signup-card--wide {
+  width: min(720px, 100%);
+}
+
 .signup-card__brand {
   margin: 0;
   font-size: 18px;
@@ -62,7 +66,10 @@ input {
 }
 
 .signup-form > .signup-field + .signup-field,
-.signup-form__row + .signup-field {
+.signup-form > .signup-field + .signup-form__row,
+.signup-form__row + .signup-field,
+.signup-field + .signup-section,
+.signup-section + .signup-section {
   margin-top: 22px;
 }
 
@@ -136,6 +143,44 @@ input {
   outline-offset: 2px;
 }
 
+.signup-section {
+  margin-inline: 0;
+  padding: 20px;
+  border: 1px solid var(--signup-border);
+  border-radius: 18px;
+}
+
+.signup-section__title {
+  padding: 0 6px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.signup-checklist {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.signup-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--signup-border);
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.signup-check input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--signup-foreground);
+}
+
 .signup-field__hint,
 .signup-field__error,
 .signup-form__message,
@@ -200,6 +245,10 @@ input {
   }
 
   .signup-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .signup-checklist {
     grid-template-columns: 1fr;
   }
 

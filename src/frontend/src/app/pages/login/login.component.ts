@@ -22,6 +22,12 @@ export class LoginComponent {
     remember: [false]
   });
 
+  get createAccountRoute(): string {
+    return this.form.controls.accountType.value === 'serviceProvider'
+      ? '/signup/provider'
+      : '/signup';
+  }
+
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

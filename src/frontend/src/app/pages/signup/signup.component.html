@@ -48,6 +48,34 @@
         <p class="signup-field__hint">Usernames will be checked for uniqueness when backend registration is connected.</p>
       </div>
 
+      <div class="signup-form__row">
+        <div class="signup-field">
+          <label class="signup-field__label" for="email">Email</label>
+          <input
+            class="signup-field__input"
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            formControlName="email"
+            required
+          />
+        </div>
+
+        <div class="signup-field">
+          <label class="signup-field__label" for="phone">Phone number</label>
+          <input
+            class="signup-field__input"
+            id="phone"
+            name="phone"
+            type="tel"
+            autocomplete="tel"
+            formControlName="phone"
+            required
+          />
+        </div>
+      </div>
+
       <div class="signup-field">
         <label class="signup-field__label" for="password">Password</label>
         <div class="signup-password">

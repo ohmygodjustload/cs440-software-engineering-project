@@ -27,6 +27,8 @@ describe('SignupComponent', () => {
     expect(page.textContent).toContain('First name');
     expect(page.textContent).toContain('Last name');
     expect(page.textContent).toContain('Username');
+    expect(page.textContent).toContain('Email');
+    expect(page.textContent).toContain('Phone number');
     expect(page.textContent).toContain('Password');
     expect(page.textContent).toContain('Confirm password');
     expect(page.textContent).toContain('Already have an account? Sign in');
@@ -41,6 +43,8 @@ describe('SignupComponent', () => {
     expect(component.form.controls.firstName.touched).toBeTrue();
     expect(component.form.controls.lastName.touched).toBeTrue();
     expect(component.form.controls.username.touched).toBeTrue();
+    expect(component.form.controls.email.touched).toBeTrue();
+    expect(component.form.controls.phone.touched).toBeTrue();
     expect(component.form.controls.password.touched).toBeTrue();
   });
 
@@ -51,6 +55,8 @@ describe('SignupComponent', () => {
       firstName: 'Jane',
       lastName: 'Porter',
       username: 'JanePorter123',
+      email: 'jane@example.com',
+      phone: '555-123-4567',
       password: 'password123',
       confirmPassword: 'different123'
     });
@@ -75,6 +81,8 @@ describe('SignupComponent', () => {
       firstName: 'Jane',
       lastName: 'Porter',
       username: 'JanePorter123',
+      email: 'jane@example.com',
+      phone: '555-123-4567',
       password: 'password123',
       confirmPassword: 'password123'
     });

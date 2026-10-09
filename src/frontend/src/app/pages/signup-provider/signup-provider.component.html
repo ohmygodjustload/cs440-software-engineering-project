@@ -1,0 +1,160 @@
+<main class="signup-page">
+  <section class="signup-card signup-card--wide" aria-labelledby="signup-provider-title">
+    <p class="signup-card__brand">BAAAM Scheduling</p>
+    <h1 id="signup-provider-title" class="signup-card__title">Create a Service Provider Account</h1>
+    <p class="signup-card__lede">Service provider accounts are subject to admin approval.</p>
+
+    <form class="signup-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="signup-form__row">
+        <div class="signup-field">
+          <label class="signup-field__label" for="firstName">First name</label>
+          <input class="signup-field__input" id="firstName" name="firstName" type="text" autocomplete="given-name" formControlName="firstName" required />
+        </div>
+
+        <div class="signup-field">
+          <label class="signup-field__label" for="lastName">Last name</label>
+          <input class="signup-field__input" id="lastName" name="lastName" type="text" autocomplete="family-name" formControlName="lastName" required />
+        </div>
+      </div>
+
+      <div class="signup-field">
+        <label class="signup-field__label" for="username">Username</label>
+        <input class="signup-field__input" id="username" name="username" type="text" autocomplete="username" placeholder="Choose a unique username" formControlName="username" required />
+        <p class="signup-field__hint">Usernames will be checked for uniqueness when backend registration is connected.</p>
+      </div>
+
+      <div class="signup-form__row">
+        <div class="signup-field">
+          <label class="signup-field__label" for="email">Email</label>
+          <input class="signup-field__input" id="email" name="email" type="email" autocomplete="email" formControlName="email" required />
+        </div>
+
+        <div class="signup-field">
+          <label class="signup-field__label" for="phone">Phone number</label>
+          <input class="signup-field__input" id="phone" name="phone" type="tel" autocomplete="tel" formControlName="phone" required />
+        </div>
+      </div>
+
+      <div class="signup-field">
+        <label class="signup-field__label" for="password">Password</label>
+        <div class="signup-password">
+          <input class="signup-field__input signup-password__input" id="password" name="password" [type]="passwordVisible ? 'text' : 'password'" autocomplete="new-password" placeholder="At least 8 characters" formControlName="password" required />
+          <button class="signup-password__toggle" type="button" [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'" [attr.aria-pressed]="passwordVisible" (click)="togglePasswordVisibility()">
+            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path d="M12 5c5.2 0 8.5 4.1 9.7 6-.9 1.5-4.2 6-9.7 6s-8.8-4.5-9.7-6c1.2-1.9 4.5-6 9.7-6Zm0 2c-3.7 0-6.3 2.5-7.3 4 1 1.5 3.6 4 7.3 4s6.3-2.5 7.3-4c-1-1.5-3.6-4-7.3-4Zm0 1.5A2.5 2.5 0 1 1 12 13a2.5 2.5 0 0 1 0-5Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="signup-field">
+        <label class="signup-field__label" for="confirmPassword">Confirm password</label>
+        <div class="signup-password">
+          <input class="signup-field__input signup-password__input" id="confirmPassword" name="confirmPassword" [type]="confirmPasswordVisible ? 'text' : 'password'" autocomplete="new-password" formControlName="confirmPassword" required />
+          <button class="signup-password__toggle" type="button" [attr.aria-label]="confirmPasswordVisible ? 'Hide confirm password' : 'Show confirm password'" [attr.aria-pressed]="confirmPasswordVisible" (click)="toggleConfirmPasswordVisibility()">
+            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path d="M12 5c5.2 0 8.5 4.1 9.7 6-.9 1.5-4.2 6-9.7 6s-8.8-4.5-9.7-6c1.2-1.9 4.5-6 9.7-6Zm0 2c-3.7 0-6.3 2.5-7.3 4 1 1.5 3.6 4 7.3 4s6.3-2.5 7.3-4c-1-1.5-3.6-4-7.3-4Zm0 1.5A2.5 2.5 0 1 1 12 13a2.5 2.5 0 0 1 0-5Z" />
+            </svg>
+          </button>
+        </div>
+        @if (hasPasswordMismatch) {
+          <p class="signup-field__error">Passwords must match.</p>
+        }
+      </div>
+
+      <fieldset class="signup-section" formGroupName="services">
+        <legend class="signup-section__title">Service type</legend>
+        <p class="signup-field__hint">Choose at least one service category.</p>
+
+        <div class="signup-checklist">
+          <label class="signup-check">
+            <input type="checkbox" formControlName="medical" />
+            <span>Medical</span>
+          </label>
+          <label class="signup-check">
+            <input type="checkbox" formControlName="beauty" />
+            <span>Beauty</span>
+          </label>
+          <label class="signup-check">
+            <input type="checkbox" formControlName="fitness" />
+            <span>Fitness</span>
+          </label>
+        </div>
+
+        @if (hasServiceTypeError) {
+          <p class="signup-field__error">Select at least one service type.</p>
+        }
+      </fieldset>
+
+      @if (medicalSelected) {
+        <fieldset class="signup-section" formGroupName="medicalCredentials">
+          <legend class="signup-section__title">Medical credentials</legend>
+          <div class="signup-form__row">
+            <div class="signup-field">
+              <label class="signup-field__label" for="medicalQualification">Medical qualification</label>
+              <input class="signup-field__input" id="medicalQualification" type="text" formControlName="qualification" />
+            </div>
+            <div class="signup-field">
+              <label class="signup-field__label" for="medicalSchool">University or school</label>
+              <input class="signup-field__input" id="medicalSchool" type="text" formControlName="school" />
+            </div>
+          </div>
+          <div class="signup-field">
+            <label class="signup-field__label" for="medicalLicense">License number</label>
+            <input class="signup-field__input" id="medicalLicense" type="text" formControlName="licenseNumber" />
+          </div>
+        </fieldset>
+      }
+
+      @if (beautySelected) {
+        <fieldset class="signup-section" formGroupName="beautyCredentials">
+          <legend class="signup-section__title">Beauty credentials</legend>
+          <div class="signup-form__row">
+            <div class="signup-field">
+              <label class="signup-field__label" for="beautyCertification">Certification or training</label>
+              <input class="signup-field__input" id="beautyCertification" type="text" formControlName="certification" />
+            </div>
+            <div class="signup-field">
+              <label class="signup-field__label" for="beautyLicense">License or certificate number</label>
+              <input class="signup-field__input" id="beautyLicense" type="text" formControlName="licenseNumber" />
+            </div>
+          </div>
+          <div class="signup-field">
+            <label class="signup-field__label" for="beautySpecialties">Specialties</label>
+            <input class="signup-field__input" id="beautySpecialties" type="text" formControlName="specialties" placeholder="Hair, nails, skincare, makeup" />
+          </div>
+        </fieldset>
+      }
+
+      @if (fitnessSelected) {
+        <fieldset class="signup-section" formGroupName="fitnessCredentials">
+          <legend class="signup-section__title">Fitness credentials</legend>
+          <div class="signup-form__row">
+            <div class="signup-field">
+              <label class="signup-field__label" for="fitnessCertification">Certification organization</label>
+              <input class="signup-field__input" id="fitnessCertification" type="text" formControlName="certification" />
+            </div>
+            <div class="signup-field">
+              <label class="signup-field__label" for="fitnessNumber">Certification number</label>
+              <input class="signup-field__input" id="fitnessNumber" type="text" formControlName="certificationNumber" />
+            </div>
+          </div>
+          <div class="signup-field">
+            <label class="signup-field__label" for="fitnessSpecialties">Specialties</label>
+            <input class="signup-field__input" id="fitnessSpecialties" type="text" formControlName="specialties" placeholder="Strength, yoga, cardio, rehab" />
+          </div>
+        </fieldset>
+      }
+
+      <button class="signup-submit" type="submit">Submit for approval</button>
+
+      @if (submitMessage) {
+        <p class="signup-form__message">{{ submitMessage }}</p>
+      }
+
+      <p class="signup-form__login">
+        Already have an account? <a class="signup-link" routerLink="/login">Sign in</a>
+      </p>
+    </form>
+  </section>
+</main>

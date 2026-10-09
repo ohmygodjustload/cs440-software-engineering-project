@@ -17,13 +17,23 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
     : null;
 }
 
+function serviceTypeValidator(control: AbstractControl): ValidationErrors | null {
+  const services = control.get('services');
+  const selected =
+    services?.get('medical')?.value ||
+    services?.get('beauty')?.value ||
+    services?.get('fitness')?.value;
+
+  return selected ? null : { serviceTypeRequired: true };
+}
+
 @Component({
-  selector: 'app-signup',
+  selector: 'app-signup-provider',
   imports: [ReactiveFormsModule, RouterLink],
-  templateUrl: './signup.component.html',
-  styleUrl: './signup.component.css'
+  templateUrl: './signup-provider.component.html',
+  styleUrl: '../signup/signup.component.css'
 })
-export class SignupComponent {
+export class SignupProviderComponent {
   private readonly formBuilder = inject(FormBuilder);
 
   confirmPasswordVisible = false;
@@ -38,13 +48,49 @@ export class SignupComponent {
       email: ['', [Validators.required, Validators.email, Validators.maxLength(320)]],
       phone: ['', [Validators.required, Validators.maxLength(50)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required]],
+      services: this.formBuilder.nonNullable.group({
+        medical: [false],
+        beauty: [false],
+        fitness: [false]
+      }),
+      medicalCredentials: this.formBuilder.nonNullable.group({
+        qualification: [''],
+        school: [''],
+        licenseNumber: ['']
+      }),
+      beautyCredentials: this.formBuilder.nonNullable.group({
+        certification: [''],
+        licenseNumber: [''],
+        specialties: ['']
+      }),
+      fitnessCredentials: this.formBuilder.nonNullable.group({
+        certification: [''],
+        certificationNumber: [''],
+        specialties: ['']
+      })
     },
-    { validators: passwordsMatchValidator }
+    { validators: [passwordsMatchValidator, serviceTypeValidator] }
   );
 
   get hasPasswordMismatch(): boolean {
     return this.form.hasError('passwordsMismatch') && this.form.controls.confirmPassword.touched;
+  }
+
+  get hasServiceTypeError(): boolean {
+    return this.form.hasError('serviceTypeRequired') && this.form.controls.services.touched;
+  }
+
+  get medicalSelected(): boolean {
+    return this.form.controls.services.controls.medical.value;
+  }
+
+  get beautySelected(): boolean {
+    return this.form.controls.services.controls.beauty.value;
+  }
+
+  get fitnessSelected(): boolean {
+    return this.form.controls.services.controls.fitness.value;
   }
 
   onSubmit(): void {
@@ -55,7 +101,7 @@ export class SignupComponent {
       return;
     }
 
-    this.submitMessage = 'Account details are ready. Backend registration will be connected later.';
+    this.submitMessage = 'Service provider account details are ready for admin approval.';
   }
 
   togglePasswordVisibility(): void {

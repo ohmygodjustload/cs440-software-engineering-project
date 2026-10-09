@@ -24,6 +24,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/signup/signup.component').then((m) => m.SignupComponent)
   },
   {
+    path: 'signup/provider',
+    title: 'Create service provider account · BAAAM Scheduling System',
+    loadComponent: () =>
+      import('./pages/signup-provider/signup-provider.component').then(
+        (m) => m.SignupProviderComponent
+      )
+  },
+  {
     path: '',
     title: 'Home · BAAAM Scheduling System',
     loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent)
