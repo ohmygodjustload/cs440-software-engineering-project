@@ -80,7 +80,11 @@ public sealed class DbHealthController : ControllerBase
                 [settings.UsersCollection] = Count(settings.UsersCollection),
             };
 
-            foreach (var extra in new[] { "Status", "ServiceType", "Location" })
+            foreach (var extra in new[]
+            {
+                "Status", "ServiceType", "Location", "AppointmentType", "ProviderServiceConfig",
+                "ProviderRequest", "AppointmentAuditLog",
+            })
             {
                 if (collections.Contains(extra) && !counts.ContainsKey(extra))
                 {

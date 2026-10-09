@@ -12,7 +12,7 @@
     "ConnectionString": "mongodb+srv://<db-user>:<db-password>@<cluster-host>/<database>?retryWrites=true&w=majority",
     "DatabaseName": "BAAAM",
     "AppointmentsCollection": "Appointment",
-    "ProvidersCollection": "ServiceProvider",
+    "ProvidersCollection": "Provider",
     "UsersCollection": "User"
   }
 }
