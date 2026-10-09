@@ -23,15 +23,15 @@ public sealed class User
     [Required, MinLength(1), MaxLength(100)]
     public string Username { get; set; } = string.Empty;
 
-    [MaxLength(320)]
-    public string? Email { get; set; }
-
-    [MaxLength(50)]
-    public string? Phone { get; set; }
-
     public bool IsClient { get; set; }
 
-    public bool IsServiceProvider { get; set; }
+    public bool IsProvider { get; set; }
 
     public bool IsAdmin { get; set; }
+
+    public bool IsActive { get; set; }
+
+    public bool IsDeleted { get; set; }
+
+    public DateTimeOffset DeletedAt { get; set; }
 }

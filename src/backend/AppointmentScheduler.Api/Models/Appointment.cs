@@ -14,9 +14,7 @@ public sealed class Appointment
     [BsonRepresentation(BsonType.String)]
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
-    public string Title { get; set; } = string.Empty;
-
-    public AppointmentCategory Category { get; set; }
+    public ObjectId AppointmentTypeId { get; set; }
 
     /// <summary>Stored as BSON date (UTC) by the driver's DateTimeOffsetSerializer.</summary>
     public DateTimeOffset StartDateTime { get; set; }
@@ -24,17 +22,14 @@ public sealed class Appointment
     /// <summary>Stored as BSON date (UTC) by the driver's DateTimeOffsetSerializer.</summary>
     public DateTimeOffset EndDateTime { get; set; }
 
-    /// <summary>Service provider (doctor, stylist, trainer, ...). Free-form id for now.</summary>
-    public string ProviderId { get; set; } = string.Empty;
-
-    public string? ProviderName { get; set; }
-
     /// <summary>Owner of the appointment. Used later for per-user filtering + auth.</summary>
     public string UserId { get; set; } = "demo-user";
 
-    public string? Location { get; set; }
-
-    public string? Notes { get; set; }
+    public string? Notes { get; set; } = string.Empty;
 
     public AppointmentStatus Status { get; set; } = AppointmentStatus.Scheduled;
+
+    public bool IsDeleted {get; set; } = false; 
+    
+    public DateTimeOffset DeletedAt { get; set; }
 }

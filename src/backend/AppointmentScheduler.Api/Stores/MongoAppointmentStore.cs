@@ -103,14 +103,9 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         return new Appointment
         {
             Id = id,
-            Title = $"{typeName} appointment",
-            Category = typeName == "Beauty" ? AppointmentCategory.Beauty : typeName == "Fitness" ? AppointmentCategory.Fitness : AppointmentCategory.Medical,
             StartDateTime = ToDto(d.GetValue("StartTime", BsonNull.Value)),
             EndDateTime = ToDto(d.GetValue("EndTime", BsonNull.Value)),
-            ProviderId = providerId,
-            ProviderName = providerName,
             UserId = clientId,
-            Location = location,
             Notes = d.GetValue("Notes", BsonNull.Value) is BsonString n ? n.Value : null,
             Status = statusName == "Canceled" ? AppointmentStatus.Cancelled : statusName == "Completed" ? AppointmentStatus.Completed : AppointmentStatus.Scheduled,
         };

@@ -10,13 +10,13 @@ public sealed class InMemoryProviderStore : IProviderStore
 
     public InMemoryProviderStore()
     {
-        Add(new Provider { Name = "Dr. Smith", Specialty = "General", Email = "smith@example.com" });
-        Add(new Provider { Name = "Glow Studio", Specialty = "Beauty", Email = "hello@glowstudio.example" });
-        Add(new Provider { Name = "Coach Rivera", Specialty = "Fitness", Email = "coach@example.com" });
+        Add(new Provider {  });
+        Add(new Provider {  });
+        Add(new Provider {  });
     }
 
     public IReadOnlyList<Provider> GetAll() =>
-        _items.Values.OrderBy(p => p.Name).ToList();
+        _items.Values.OrderBy(p => p.UserId).ToList();
 
     public Provider? GetById(string id) =>
         _items.TryGetValue(id, out var item) ? item : null;

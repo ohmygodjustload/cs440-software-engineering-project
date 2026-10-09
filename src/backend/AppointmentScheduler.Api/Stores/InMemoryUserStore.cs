@@ -7,8 +7,8 @@ public sealed class InMemoryUserStore : IUserStore
 {
     private readonly List<User> _items = new()
     {
-        new User { Id = "6abc1939a313dfdf8ecc0265", FirstName = "John", LastName = "Smith", Username = "JohnSmith123", Email = "test@gmail.com", Phone = "123-123-1234", IsServiceProvider = true },
-        new User { Id = "6abc20bda313dfdf8ecc0286", FirstName = "Jane", LastName = "Porter", Username = "JanePorter123", Email = "test2@gmail.com", Phone = "456-456-4567", IsClient = true },
+        new User { Id = "6abc1939a313dfdf8ecc0265", FirstName = "John", LastName = "Smith", Username = "JohnSmith123", IsProvider = true },
+        new User { Id = "6abc20bda313dfdf8ecc0286", FirstName = "Jane", LastName = "Porter", Username = "JanePorter123", IsClient = true },
     };
 
     public IReadOnlyList<User> GetAll() =>

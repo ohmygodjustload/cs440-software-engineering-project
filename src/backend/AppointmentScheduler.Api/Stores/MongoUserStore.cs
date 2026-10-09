@@ -43,10 +43,20 @@ public sealed class MongoUserStore : IUserStore
         FirstName = d.GetValue("FirstName", "").AsString,
         LastName = d.GetValue("LastName", "").AsString,
         Username = d.GetValue("Username", "").AsString,
-        Email = d.GetValue("email", BsonNull.Value) is BsonString e ? e.Value : null,
-        Phone = d.GetValue("phone", BsonNull.Value) is BsonString p ? p.Value : null,
         IsClient = d.GetValue("IsClient", false).AsBoolean,
-        IsServiceProvider = d.GetValue("IsServiceProvider", false).AsBoolean,
+        IsProvider = d.GetValue("IsProvider", false).AsBoolean,
         IsAdmin = d.GetValue("IsAdmin", false).AsBoolean,
+        IsActive = d.GetValue("IsActive", true).AsBoolean,
+        IsDeleted = d.GetValue("IsDeleted", false).AsBoolean,
+        DeletedAt = ToDto(d.GetValue("EndTime", BsonNull.Value))
+    };
+    
+    private static DateTimeOffset ToDto(BsonValue v) => v switch
+    {
+        BsonDateTime dt => new DateTimeOffset(dt.ToUniversalTime(), TimeSpan.Zero),
+        BsonString s when DateTimeOffset.TryParse(s.Value, out var p) => p.ToUniversalTime(),
+        _ => DateTimeOffset.UtcNow,
     };
 }
+
+

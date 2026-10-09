@@ -30,7 +30,7 @@ public sealed class MongoProviderStore : IProviderStore
         return _raw.Find(FilterDefinition<BsonDocument>.Empty)
             .ToList()
             .Select(d => Map(d, users))
-            .OrderBy(p => p.Name)
+            .OrderBy(p => p.UserId)
             .ToList();
     }
 
@@ -56,25 +56,9 @@ public sealed class MongoProviderStore : IProviderStore
 
     private static Provider Map(BsonDocument d, Dictionary<string, BsonDocument> users)
     {
-        var name = $"Provider {d["_id"].AsObjectId.ToString()[..8]}";
-        string? email = null;
-        string? phone = null;
-        string? specialty = null;
-        if (d.GetValue("userId", BsonNull.Value) is BsonObjectId uid &&
-            users.TryGetValue(uid.Value.ToString(), out var u))
-        {
-            name = $"{u.GetValue("FirstName", "").AsString} {u.GetValue("LastName", "").AsString}".Trim();
-            email = u.GetValue("email", BsonNull.Value) is BsonString e ? e.Value : null;
-            phone = u.GetValue("phone", BsonNull.Value) is BsonString ph ? ph.Value : null;
-        }
-
         return new Provider
         {
-            Id = d["_id"].AsObjectId.ToString(),
-            Name = string.IsNullOrWhiteSpace(name) ? $"Provider {d["_id"].AsObjectId.ToString()[..8]}" : name,
-            Specialty = specialty,
-            Email = email,
-            Phone = phone,
+            Id = d["_id"].AsObjectId.ToString()
         };
     }
 }

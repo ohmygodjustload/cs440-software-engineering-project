@@ -4,32 +4,33 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace AppointmentScheduler.Api.Models;
 
-/// <summary>Service provider (doctor, stylist, trainer).</summary>
-public sealed class Provider
+/// <summary>A type of appointment.</summary>
+public sealed class AppointmentType
 {
     [BsonId]
     [BsonRepresentation(BsonType.String)]
     public string Id { get; set; } = Guid.NewGuid().ToString("N");
     
-    public ObjectId UserId { get; set; }
-
-    public bool IsApproved { get; set; }
-
+    public ObjectId ProviderId { get; set; }
+    
+    public string CustomServiceName { get; set; }
+    
+    public int DurationInMinutes { get; set; }
+    
+    public decimal Price { get; set; }
+    
+    public ObjectId LocationId { get; set; }
+    
+    public string Contact { get; set; }
+    
     public bool IsBeauty { get; set; }
-
+    
     public bool IsMedical { get; set; }
-
+    
     public bool IsFitness { get; set; }
-
-    public bool IsActive { get; set; }
-
-    public string BeautyQualification { get; set; } = string.Empty;
-   
-    public string MedicalQualification { get; set; } = string.Empty;
-   
-    public string FitnessQualification { get; set; } = string.Empty;
-   
+    
     public bool IsDeleted {get; set; } = false; 
-   
+    
     public DateTimeOffset DeletedAt { get; set; }
+
 }
