@@ -1,0 +1,92 @@
+<main class="login-page">
+  <div class="login-layout">
+    <section class="login-brand" aria-label="BAAAM Scheduling">
+      <p class="login-brand__name">BAAAM Scheduling</p>
+      <h1 class="login-brand__tagline">Your time, beautifully organized</h1>
+
+      <div class="login-brand__artwork" aria-hidden="true"></div>
+    </section>
+
+    <section class="login-panel" aria-labelledby="login-title">
+      <h2 id="login-title" class="login-panel__title">Welcome back</h2>
+
+      <form class="login-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <fieldset class="login-role" aria-label="Login type">
+          <legend class="login-role__legend">Sign in as</legend>
+
+          <label class="login-role__option">
+            <input
+              class="login-role__input"
+              type="radio"
+              name="accountType"
+              value="client"
+              formControlName="accountType"
+            />
+            <span>User</span>
+          </label>
+
+          <label class="login-role__option">
+            <input
+              class="login-role__input"
+              type="radio"
+              name="accountType"
+              value="serviceProvider"
+              formControlName="accountType"
+            />
+            <span>Service provider</span>
+          </label>
+        </fieldset>
+
+        <div class="login-field">
+          <label class="login-field__label" for="username">Username</label>
+          <input
+            class="login-field__input"
+            id="username"
+            name="username"
+            type="text"
+            placeholder="username"
+            autocomplete="username"
+            formControlName="username"
+            required
+          />
+        </div>
+
+        <div class="login-field">
+          <label class="login-field__label" for="password">Password</label>
+          <input
+            class="login-field__input"
+            id="password"
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            formControlName="password"
+            required
+          />
+        </div>
+
+        <div class="login-form__options">
+          <label class="login-remember">
+            <input
+              class="login-remember__checkbox"
+              name="remember"
+              type="checkbox"
+              formControlName="remember"
+            />
+            <span>Remember me</span>
+          </label>
+
+          <a class="login-link" routerLink="/forgot-password">
+            Forgot password?
+          </a>
+        </div>
+
+        <button class="login-submit" type="submit">Sign in</button>
+
+        <p class="login-form__signup">
+          New here? <a class="login-link" routerLink="/signup">Create an account</a>
+        </p>
+      </form>
+    </section>
+  </div>
+</main>

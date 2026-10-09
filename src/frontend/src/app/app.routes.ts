@@ -14,6 +14,11 @@ import { Routes } from '@angular/router';
  */
 export const routes: Routes = [
   {
+    path: 'login',
+    title: 'Sign in · BAAAM Scheduling System',
+    loadComponent: () => import('./pages/login/login.component').then((m) => m.LoginComponent)
+  },
+  {
     path: '',
     title: 'Home · BAAAM Scheduling System',
     loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent)
