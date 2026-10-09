@@ -182,6 +182,46 @@ input {
   box-shadow: 0 0 0 3px rgb(52 73 69 / 12%);
 }
 
+.login-password {
+  position: relative;
+}
+
+.login-password__input {
+  padding-right: 48px;
+}
+
+.login-password__toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--login-foreground);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.login-password__toggle svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.login-password__toggle:hover {
+  background: rgb(52 73 69 / 8%);
+}
+
+.login-password__toggle:focus-visible {
+  outline: 2px solid var(--login-foreground);
+  outline-offset: 2px;
+}
+
 .login-form__options {
   display: flex;
   align-items: center;

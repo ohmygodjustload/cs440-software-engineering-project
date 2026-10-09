@@ -37,6 +37,14 @@ describe('LoginComponent', () => {
     expect(fixture.componentInstance.form.controls.accountType.value).toBe('client');
   });
 
+  it('should toggle password visibility', () => {
+    const component = fixture.componentInstance;
+
+    component.togglePasswordVisibility();
+
+    expect(component.passwordVisible).toBeTrue();
+  });
+
   it('should require username and password before submission can proceed', () => {
     const component = fixture.componentInstance;
 

@@ -37,6 +37,6 @@ export class AppComponent {
   ];
 
   get usesFullPageLayout(): boolean {
-    return this.router.url.split(/[?#]/)[0] === '/login';
+    return ['/login', '/signup'].includes(this.router.url.split(/[?#]/)[0]);
   }
 }

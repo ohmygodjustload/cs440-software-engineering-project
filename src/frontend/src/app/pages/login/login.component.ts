@@ -13,6 +13,8 @@ type LoginAccountType = 'client' | 'serviceProvider';
 export class LoginComponent {
   private readonly formBuilder = inject(FormBuilder);
 
+  passwordVisible = false;
+
   readonly form = this.formBuilder.nonNullable.group({
     accountType: ['client' as LoginAccountType, [Validators.required]],
     username: ['', [Validators.required, Validators.maxLength(100)]],
@@ -27,5 +29,9 @@ export class LoginComponent {
     }
 
     // Authentication will be connected here when the backend exposes a login endpoint.
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
   }
 }
