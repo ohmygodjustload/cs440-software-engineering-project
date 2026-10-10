@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Security.Authentication;
 
 namespace AppointmentScheduler.Api.Data;
 
@@ -24,6 +25,14 @@ public sealed class MongoDbContext
         // strings and respects ?tls= options for plain mongodb:// strings.
         // Forcing it on unconditionally breaks non-TLS local connections and can
         // mask handshake misconfigurations.
+        //
+        // Atlas requires TLS 1.2+; some sandboxed/network clients negotiate 1.3
+        // and never complete the handshake. Pinning to 1.2 makes the handshake
+        // deterministic. Safe for plain mongodb:// hosts too.
+        clientSettings.SslSettings = new SslSettings
+        {
+            EnabledSslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
+        };
 
         // Fail fast at startup instead of hanging a request for 30s.
         clientSettings.ServerSelectionTimeout = TimeSpan.FromSeconds(5);
