@@ -203,3 +203,5 @@ secrets.json
 appsettings.Development.json
 appsettings.Local.json
 appsettings.*.Local.json
+
+/src/frontend/node_modules.backup-*/
