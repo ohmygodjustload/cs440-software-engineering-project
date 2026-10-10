@@ -104,3 +104,7 @@
 .app-main {
   padding: 1.5rem;
 }
+
+.app-main--full-page {
+  padding: 0;
+}
