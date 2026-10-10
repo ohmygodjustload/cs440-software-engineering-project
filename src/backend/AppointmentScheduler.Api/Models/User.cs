@@ -34,4 +34,6 @@ public sealed class User
     public bool IsServiceProvider { get; set; }
 
     public bool IsAdmin { get; set; }
+
+    public bool IsActive { get; set; } = true;
 }
