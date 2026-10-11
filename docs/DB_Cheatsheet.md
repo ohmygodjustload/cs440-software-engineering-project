@@ -19,17 +19,17 @@ This system uses a normalized, referenced document methodology. The text block b
     +-----------------------+          +-----------------+  (1) (1) +------------+
     |    AppointmentType    | <------- |     Provider    | <------- |    User    | 
     +-----------------------+ (M)  (1) +-----------------+          +------------+ 
-                |  (1)                                                     | (1)
-                |           +---------------+                              |
-                +---------> |  Appointment  | <----------------------------+
-                  (Many)    +---------------+   (Many)
-                                ^   ^   ^                               
-                         (Many) |   |   | (Many)
-                            (1) |   |   | (1)
-                                v   |   v
-                     +-----------+  |  +---------------------+
-                     | Location  |  |  | AppointmentAuditLog |
-                     +-----------+  |  +---------------------+
+            ^   |  (1)                                                     | (1)
+            |   |           +---------------+                              |
+            |   +---------> |  Appointment  | <----------------------------+
+            |     (Many)    +---------------+   (Many)
+            |                       ^   ^                               
+            |                       |   | (Many)
+            | (Many)                |   | (1)
+            | (1)                   |   v
+        +-----------+               |  +---------------------+
+        | Location  |               |  | AppointmentAuditLog |
+        +-----------+               |  +---------------------+
                                     | (Many)      ^  
                                     | (1)         | (Many)
                               +-----------+       |
@@ -66,9 +66,9 @@ public class User : BaseEntity
     public bool IsProvider { get; set; }
     public bool IsAdmin { get; set; }
     public bool IsClient { get; set; }
-    public bool IsActive { get; set; }
     public bool IsDeleted {get; set; } = false; 
-    public DateTimeOffset DeletedAt { get; set; }
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTimeOffset? DeletedAt { get; set; }
 }
 
 public class Provider : BaseEntity
@@ -78,12 +78,12 @@ public class Provider : BaseEntity
     public bool IsBeauty { get; set; }
     public bool IsMedical { get; set; }
     public bool IsFitness { get; set; }
-    public bool IsActive { get; set; }
     public string BeautyQualification { get; set; }
     public string MedicalQualification { get; set; }
     public string FitnessQualification { get; set; }
     public bool IsDeleted {get; set; } = false; 
-    public DateTimeOffset DeletedAt { get; set; }
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTimeOffset? DeletedAt { get; set; }
 }
 
 public class ProviderRequest : BaseEntity
@@ -91,8 +91,10 @@ public class ProviderRequest : BaseEntity
     public ObjectId ProviderId { get; set; }
     public bool IsApproved { get; set; }
     public string Notes { get; set; } = string.Empty; // Natively defaults to "" instead of null
+    public bool IsReviewed { get; set; }
     public bool IsDeleted {get; set; } = false; 
-    public DateTimeOffset DeletedAt { get; set; }
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTimeOffset? DeletedAt { get; set; }
 }
 
 public class AppointmentType : BaseEntity
@@ -107,7 +109,8 @@ public class AppointmentType : BaseEntity
     public bool IsMedical { get; set; }
     public bool IsFitness { get; set; }
     public bool IsDeleted {get; set; } = false; 
-    public DateTimeOffset DeletedAt { get; set; }
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTimeOffset? DeletedAt { get; set; }
 }
 
 public class Appointment : BaseEntity
@@ -121,7 +124,8 @@ public class Appointment : BaseEntity
     public ObjectId AppointmentTypeId { get; set; }
     public ObjectId UserId { get; set; }
     public bool IsDeleted {get; set; } = false; 
-    public DateTimeOffset DeletedAt { get; set; }
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    public DateTimeOffset? DeletedAt { get; set; }
 }
 
 public class AppointmentAuditLog
@@ -152,7 +156,7 @@ public class Status
 {
     [BsonId]
     public ObjectId Id { get; set; }
-    public string Name { get; set; } // Core state lookups: "Scheduled", "Completed", "Canceled", "Available"
+    public string Name { get; set; } // Core state lookups: "Booked", "Completed", "Canceled", "Available", "Missed
 }
 ```
 
@@ -193,10 +197,8 @@ var logCollection = database.GetCollection<AppointmentAuditLog>("AppointmentAudi
 ```csharp
 var newAppointment = new Appointment
 {
-    LocationId = ObjectId.Parse("6abc1bc6a313dfdf8ecc026d"),
-    ProviderServiceConfigId = ObjectId.Parse("6abc1deca313dfdf8ecc0278"),
-    ServiceProviderId = ObjectId.Parse("6abc1b08a313dfdf8ecc026a"),
-    ClientId = ObjectId.Parse("6abc20bda313dfdf8ecc0286"),
+    AppointmentTypeId = ObjectId.Parse("6abc1deca313dfdf8ecc0278"),
+    UserId = ObjectId.Parse("6abc20bda313dfdf8ecc0286"), //Client that booked the appointment
     StartTime = serializedUtcForDatabase,
     EndTime = serializedUtcForDatabase.AddMinutes(45), // Computed dynamically via configuration data
     StatusId = ObjectId.Parse("6abc2038a313dfdf8ecc0282"),
@@ -212,7 +214,7 @@ await appointmentCollection.InsertOneAsync(newAppointment);
 ```csharp
 // Explicit builder rule: Combine business criteria alongside the soft-delete filter condition
 var readFilter = Builders<Appointment>.Filter.And(
-    Builders<Appointment>.Filter.Eq(a => a.ClientId, ObjectId.Parse("6abc20bda313dfdf8ecc0286")),
+    Builders<Appointment>.Filter.Eq(a => a.UserId, ObjectId.Parse("6abc20bda313dfdf8ecc0286")),
     Builders<Appointment>.Filter.Eq(a => a.IsDeleted, false)
 );
 
@@ -295,15 +297,13 @@ public static async Task GenerateSystemPerformanceIndexes(IMongoDatabase context
     var collection = contextDatabase.GetCollection<Appointment>("Appointment");
 
     // Compound Index Configurations: Explicitly pairing foreign IDs with soft-delete indicators
-    var indexProviderRule = Builders<Appointment>.IndexKeys.Ascending(a => a.ServiceProviderId).Ascending(a => a.IsDeleted);
-    var indexClientRule = Builders<Appointment>.IndexKeys.Ascending(a => a.ClientId).Ascending(a => a.IsDeleted);
+    var indexClientRule = Builders<Appointment>.IndexKeys.Ascending(a => a.UserId).Ascending(a => a.IsDeleted);
     var indexTimelineRule = Builders<Appointment>.IndexKeys.Ascending(a => a.StartTime).Ascending(a => a.IsDeleted);
     
     // Performance Full-Text Indexing Configuration: Optimizes string keyword scans across notes data
     var indexNotesFullText = Builders<Appointment>.IndexKeys.Text(a => a.Notes);
 
     await collection.Indexes.CreateManyAsync(new[] {
-        new CreateIndexModel<Appointment>(indexProviderRule, new CreateIndexOptions { Name = "idx_provider_active" }),
         new CreateIndexModel<Appointment>(indexClientRule, new CreateIndexOptions { Name = "idx_client_active" }),
         new CreateIndexModel<Appointment>(indexTimelineRule, new CreateIndexOptions { Name = "idx_timeline_active" }),
         new CreateIndexModel<Appointment>(indexNotesFullText, new CreateIndexOptions { Name = "idx_notes_text_search" })
