@@ -1,134 +1,826 @@
-﻿Issue Type,Issue key,Issue id,Summary,Assignee,Assignee Id,Reporter,Reporter Id,Priority,Status,Resolution,Created,Updated,Due date
-Story,BAAAM-111,10155,Add team members to README (EACH MEMBER MUST DO THIS INDIVIDUALLY),,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Medium,Done,Done,23/Sep/26 5:32 PM,01/Oct/26 11:26 PM,
-Task,BAAAM-113,10157,Design UI for Regular User Portal - Calendar & Appointments,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Medium,Done,Done,26/Sep/26 4:54 PM,01/Oct/26 4:19 PM,
-Task,BAAAM-2,10016,Create POV Document,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Low,Done,Done,08/Sep/26 5:47 PM,17/Sep/26 11:31 PM,
-Task,BAAAM-3,10017,Complete & Submit POV Document,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,High,Done,Done,08/Sep/26 5:48 PM,30/Sep/26 8:44 AM,17/Sep/26 12:00 AM
-Task,BAAAM-5,10019,Create UserStories Document,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,10/Sep/26 9:37 AM,23/Sep/26 8:42 PM,
-Story,BAAAM-18,10062,Set up project repository and version control,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:27 AM,24/Sep/26 9:56 AM,
-Task,BAAAM-6,10020,Complete & Submit UserStories Document,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,10/Sep/26 9:37 AM,30/Sep/26 6:30 PM,
-Epic,BAAAM-7,10051,User & Authentication System,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,High,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,15/Oct/26 12:00 AM
-Epic,BAAAM-11,10055,Service Provider Management,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,19/Nov/26 12:00 AM
-Epic,BAAAM-8,10052,Project Kickoff & Document 1 (Product Overview & Project Plan),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Highest,Done,Done,16/Sep/26 9:26 AM,06/Oct/26 12:51 PM,01/Oct/26 12:00 AM
-Epic,BAAAM-9,10053,Requirements Engineering & Document 2,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,High,In Progress,,16/Sep/26 9:26 AM,06/Oct/26 12:51 PM,01/Oct/26 12:00 AM
-Epic,BAAAM-10,10054,Appointment Booking & Scheduling,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Highest,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,19/Nov/26 12:00 AM
-Epic,BAAAM-12,10056,"Appointment History, Reports & Trends",,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,19/Nov/26 12:00 AM
-Epic,BAAAM-13,10057,Admin Console,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,19/Nov/26 12:00 AM
-Epic,BAAAM-14,10058,Alerts & Notifications,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,19/Nov/26 12:00 AM
-Epic,BAAAM-15,10059,Architectural Design & Document 3,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,High,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,05/Nov/26 12:00 AM
-Epic,BAAAM-16,10060,"Final Testing, Demo & Delivery",,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Highest,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,15/Dec/26 12:00 AM
-Epic,BAAAM-17,10061,Team Process & Governance,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,18/Dec/26 12:00 AM
-Story,BAAAM-19,10064,"Write project scope, objectives, and risk register (GROUP)",,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:28 AM,06/Oct/26 9:17 AM,
-Story,BAAAM-20,10063,"Document team roles, meeting cadence, and git workflow",Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:28 AM,17/Sep/26 11:31 PM,
-Story,BAAAM-21,10065,Document functional and non-functional requirements,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:29 AM,30/Sep/26 8:54 PM,
-Story,BAAAM-22,10066,Implement Database UML Structure,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:29 AM,01/Oct/26 10:56 AM,
-Story,BAAAM-120,10196,Implement frontend basics,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,In Development,,30/Sep/26 5:41 PM,06/Oct/26 9:22 AM,
-Story,BAAAM-116,10192,Implement basic backend API endpoints and connections,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Highest,Done,Done,29/Sep/26 11:16 AM,06/Oct/26 12:49 PM,
-Story,BAAAM-115,10191,Figma - Design Service Provider Web UI,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Low,In Progress,,27/Sep/26 1:48 AM,08/Oct/26 10:35 AM,
-Story,BAAAM-23,10067,Design wireframes and UI mockups for all screens (FIGMA),Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Low,In Progress,,16/Sep/26 9:29 AM,08/Oct/26 10:35 AM,
-Task,BAAAM-131,10207,Add Swagger/OpenAPI documentation and UI to Project,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Low,Done,Done,02/Oct/26 10:48 AM,07/Oct/26 9:38 PM,
-Story,BAAAM-25,10069,"Implement role-based access control (user, provider, admin)",Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,High,To Do,,16/Sep/26 9:29 AM,07/Oct/26 9:16 AM,
-Story,BAAAM-26,10070,Implement user profile management and session handling,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:29 AM,07/Oct/26 9:16 AM,
-Story,BAAAM-27,10071,Implement provider view of their own appointments and users,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:29 AM,06/Oct/26 10:22 AM,
-Story,BAAAM-28,10072,Implement provider category and business profile setup,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:29 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-106,10150,Implement Welcome Screen,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 2:53 PM,06/Oct/26 12:49 PM,
-Story,BAAAM-29,10073,Implement provider slot creation and management,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:29 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-30,10074,Implement category browse and provider search for booking,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:31 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-31,10075,Implement slot availability display and real-time fetching,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:31 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-32,10076,Implement appointment creation and booking confirmation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:32 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-33,10077,Implement conflict prevention and first-come-first-serve booking logic,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:32 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-34,10078,Implement appointment modify and cancel functionality,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:32 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-35,10079,Implement appointment history view for users and providers,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-36,10080,Implement category and time-period appointment reports,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-37,10081,Implement appointment trends dashboard with charts,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-38,10082,Implement upcoming appointment alert logic,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-39,10083,Implement user and provider notification UI for appointment alerts,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-40,10084,Implement admin search for users and service providers,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:34 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-41,10085,Implement admin appointment search and system dashboard,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:34 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-42,10086,Write architectural design document and system diagrams (Document 3),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:34 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-43,10087,Design database schema and API contract documentation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:35 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-44,10088,Design UI navigation flow and design system,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:35 AM,22/Sep/26 9:50 AM,
-Story,BAAAM-45,10089,Conduct integration and system testing across all features,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:36 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-46,10090,Prepare final demo presentation and rehearse,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:36 AM,22/Sep/26 9:48 AM,
-Story,BAAAM-47,10091,Package and deliver final source code with documentation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,
-Story,BAAAM-48,10092,Write user manual documentation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,
-Story,BAAAM-49,10093,Track and document code reviews for each team member,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,
-Story,BAAAM-50,10094,Maintain meeting notes and decision log throughout project,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,
-Story,BAAAM-51,10095,Complete team member evaluation report,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 9:37 AM,16/Sep/26 2:38 PM,
-Subtask,BAAAM-54,10098,Draft and finalize requirements document (Document 2),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:39 AM,06/Oct/26 9:24 AM,
-Subtask,BAAAM-52,10096,Create GitHub/GitLab repo and branch strategy,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:39 AM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-53,10097,"Set up .gitignore, README, and CI skeleton",,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:39 AM,06/Oct/26 9:24 AM,
-Subtask,BAAAM-56,10100,"Draft and finalize scope, objectives, and risk register (Document 1)",,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:39 AM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-55,10099,"Document roles, meeting cadence, and git workflow",,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 9:39 AM,06/Oct/26 9:26 AM,
-Subtask,BAAAM-57,10101,Create use case diagrams and descriptions (Document 2),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,16/Sep/26 12:18 PM,06/Oct/26 9:24 AM,
-Subtask,BAAAM-59,10102,Design wireframes and UI mockups for all screens,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,In Progress,,16/Sep/26 12:18 PM,01/Oct/26 9:32 AM,
-Subtask,BAAAM-58,10103,Implement frontend role-based routing and access guards,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-61,10104,Implement backend auth API and user/provider DB schema (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-60,10105,Build frontend registration and login screens (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-62,10106,Build frontend user profile management UI,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-63,10107,Implement backend RBAC middleware and role assignment (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-64,10108,Build frontend provider appointment and user list view,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-65,10109,Implement backend provider appointment query API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-66,10110,Implement backend profile and session APIs (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-67,10111,Build frontend provider profile setup UI (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-68,10112,Implement backend provider profile/category API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-69,10113,Build frontend slot management UI (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-70,10114,Implement backend slot creation API + DB schema (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-71,10115,Build frontend category browse and search UI (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-72,10116,Implement backend search API for providers by category (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-73,10117,Build frontend slot availability display (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-74,10118,Implement backend real-time slot availability API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-75,10119,Build frontend booking confirmation flow (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-76,10120,Implement backend booking creation API + appointment DB schema (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,
-Subtask,BAAAM-77,10121,Implement backend conflict detection and first-come-first-serve logic (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:22 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-78,10122,Build frontend conflict error handling and booking feedback (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:24 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-79,10123,Build frontend modify/cancel appointment UI (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:24 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-80,10124,Implement backend modify/cancel appointment API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:25 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-81,10125,Build frontend appointment history view (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-82,10126,Implement backend appointment history query API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-83,10127,Build frontend reports filter UI for category and time period (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-84,10128,Implement backend reports query API for category and time period (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-85,10129,Build frontend trends dashboard with charts (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-86,10130,Implement backend trends aggregation API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-87,10131,Implement backend alert scheduling and trigger logic (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-88,10132,Implement backend alert notification delivery API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-89,10133,Build frontend notification UI for appointment alerts (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-90,10134,Implement backend notification delivery service (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-91,10135,Build frontend admin search UI for users and providers (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-92,10136,Implement backend admin search API for users and providers (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-93,10137,Build frontend admin dashboard with system stats (Angular),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-94,10138,Implement backend admin stats and appointment search API (C#),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:29 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-95,10139,Draft and finalize architectural design document (Document 3),,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:30 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-96,10140,Design and document database schema and API contracts,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:30 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-97,10141,Design UI navigation flow and design system documentation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:30 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-98,10142,Write and execute integration and system test cases,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-99,10143,Prepare and rehearse final demo presentation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-100,10144,Package and deliver final source code with documentation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-101,10145,Write user manual documentation,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-102,10146,Conduct and document code reviews for each team member,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-103,10147,Maintain meeting notes and decision log throughout project,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,
-Subtask,BAAAM-104,10148,Complete peer and self-evaluation report,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 12:32 PM,22/Sep/26 9:50 AM,
-Story,BAAAM-105,10149,Update Requirements and Architecture Documents,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 2:49 PM,22/Sep/26 9:50 AM,
-Story,BAAAM-107,10151,Implement comment additions within the project,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 2:54 PM,22/Sep/26 9:50 AM,
-Story,BAAAM-108,10152,Attach Meeting Logs to Deliverables,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 2:56 PM,22/Sep/26 9:50 AM,
-Story,BAAAM-109,10153,Implement Soft Delete when removing users from the project,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,To Do,,16/Sep/26 4:47 PM,22/Sep/26 9:47 AM,
-Task,BAAAM-114,10158,"Design UI for Regular User Portal - Notifications, Settings and Statistics",Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Medium,Done,Done,26/Sep/26 5:02 PM,30/Sep/26 8:56 PM,
-Task,BAAAM-112,10156,Create Project Boilerplate,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,24/Sep/26 12:28 AM,27/Sep/26 11:45 AM,
-Subtask,BAAAM-117,10193,Add Github Handle to README,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,30/Sep/26 8:49 AM,30/Sep/26 8:55 PM,
-Subtask,BAAAM-118,10194,Add Github Handle to README,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,30/Sep/26 8:49 AM,01/Oct/26 11:26 PM,
-Subtask,BAAAM-119,10195,Add Github Handle to README,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,30/Sep/26 8:50 AM,30/Sep/26 8:55 PM,
-Subtask,BAAAM-121,10197,Homepage,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,Done,Done,30/Sep/26 5:41 PM,08/Oct/26 9:44 AM,
-Subtask,BAAAM-122,10198,Calendar,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,Pull Request,,30/Sep/26 5:42 PM,10/Oct/26 6:42 PM,
-Subtask,BAAAM-123,10199,Appointments,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,To Do,,30/Sep/26 5:42 PM,30/Sep/26 5:42 PM,
-Subtask,BAAAM-124,10200,Notifications,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,Pull Request,,30/Sep/26 5:42 PM,08/Oct/26 9:43 AM,
-Subtask,BAAAM-125,10201,Settings,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,In Development,,30/Sep/26 5:42 PM,08/Oct/26 9:43 AM,
-Subtask,BAAAM-126,10202,Statistics,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,To Do,,30/Sep/26 5:42 PM,30/Sep/26 5:42 PM,
-Subtask,BAAAM-127,10203,User page,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,In Progress,,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,
-Subtask,BAAAM-128,10204,Service provider page,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,To Do,,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,
-Subtask,BAAAM-129,10205,Admin page,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,In Progress,,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,
-Story,BAAAM-137,10245,Backend: Implement user and service provider registration and login,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Highest,In Development,,09/Oct/26 12:49 AM,09/Oct/26 1:20 AM,
-Story,BAAAM-130,10206,Finalize Database Collections and Models,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Highest,In Development,,01/Oct/26 10:55 AM,08/Oct/26 4:55 PM,
-Story,BAAAM-133,10241,Create Settings Page for UI,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Done,Done,07/Oct/26 8:37 PM,08/Oct/26 5:07 PM,
-Story,BAAAM-24,10068,Frontend: Implement user and service provider registration and login view,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Highest,Pull Request,,16/Sep/26 9:29 AM,09/Oct/26 12:53 AM,
-Story,BAAAM-134,10242,Create Notifications Page for UI,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Pull Request,,08/Oct/26 9:35 AM,08/Oct/26 10:36 AM,
-Story,BAAAM-135,10243,implement enhanced user profile,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Medium,To Do,,08/Oct/26 10:01 AM,08/Oct/26 10:02 AM,
-Story,BAAAM-136,10244,Create a Backend Administration Page to visualize database entries,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Medium,Pull Request,,08/Oct/26 1:26 PM,08/Oct/26 5:06 PM,
+﻿Summary,Issue key,Issue id,Issue Type,Status,Project key,Project name,Project type,Project lead,Project lead id,Project description,Priority,Resolution,Assignee,Assignee Id,Reporter,Reporter Id,Creator,Creator Id,Created,Updated,Last Viewed,Resolved,Due date,Votes,Labels,Labels,Labels,Labels,Description,Environment,Watchers,Watchers,Watchers Id,Watchers Id,Original estimate,Remaining Estimate,Time Spent,Work Ratio,Σ Original Estimate,Σ Remaining Estimate,Σ Time Spent,Security Level,Attachment,Custom field (Development),Custom field (Issue color),Custom field (Peer Reviewer),Custom field (Peer Reviewer)Id,Custom field (Rank),Sprint,Sprint,Sprint,Custom field (Start date),Custom field (Story point estimate),Custom field (Team),Custom field (Vulnerability),Comment,Comment,Comment,Parent,Parent key,Parent summary,Status category,Status category changed
+Add team members to README (EACH MEMBER MUST DO THIS INDIVIDUALLY),BAAAM-111,10155,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,23/Sep/26 5:32 PM,01/Oct/26 11:26 PM,25/Sep/26 2:57 PM,01/Oct/26 11:26 PM,,0,,,,,"As a team member, I would like to be able to add myself to the README document.
+
+Acceptance Criteria:
+
+* AC1: Add your name under the Team section of the README.md document in the format of [<github-username>](<href-to-account>)
+
+Notes:
+
+* This is a demo ticket designed to get everybody familiar with the workflow process (Branch main → make local changes → commit and push → make PR → squash and merge)
+
+* Don’t include the “<>” in actual implementation",,Andrew,,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,,,,,,,,,,,{},,,,0|i0002r:,User Stories / Planning,,,,,,,,,,,,,Done,01/Oct/26 11:26 PM
+Design UI for Regular User Portal - Calendar & Appointments,BAAAM-113,10157,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,26/Sep/26 4:54 PM,01/Oct/26 4:19 PM,,01/Oct/26 4:19 PM,,0,,,,,"BAAAM UI Design
+
+h3. 
+Acceptance Criteria
+
+Implement all customer-facing views for the BAAAM web app, covering below screens:
+
+* Calendar View (include sub screen/modal view within calendar)
+* Appointments Overview Page
+* Appointments Details Page
+* Create Appointment Page",,Manoj Khadka,,712020:d30279c8-ce50-4163-a875-1320c647fae1,,,,,,,,,,,{},,,,0|i0002v:,User Stories / Planning,,,,,,,,,,10053,BAAAM-9,Requirements Engineering & Document 2,Done,01/Oct/26 4:19 PM
+Create POV Document,BAAAM-2,10016,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Low,Done,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,08/Sep/26 5:47 PM,17/Sep/26 11:31 PM,,08/Sep/26 5:48 PM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00033:,POV,User Stories / Planning,,,,,,,,,10052,BAAAM-8,Project Kickoff & Document 1 (Product Overview & Project Plan),Done,08/Sep/26 5:48 PM
+Complete & Submit POV Document,BAAAM-3,10017,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,High,Done,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,08/Sep/26 5:48 PM,30/Sep/26 8:44 AM,,16/Sep/26 6:05 PM,17/Sep/26 12:00 AM,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0003b:,POV,User Stories / Planning,,,,,,,,,10052,BAAAM-8,Project Kickoff & Document 1 (Product Overview & Project Plan),Done,16/Sep/26 6:05 PM
+Create UserStories Document,BAAAM-5,10019,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,10/Sep/26 9:37 AM,23/Sep/26 8:42 PM,,22/Sep/26 2:31 PM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0003r:,User Stories / Planning,,,,,,,,,,10052,BAAAM-8,Project Kickoff & Document 1 (Product Overview & Project Plan),Done,22/Sep/26 2:31 PM
+Set up project repository and version control,BAAAM-18,10062,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:27 AM,24/Sep/26 9:56 AM,24/Sep/26 9:56 AM,24/Sep/26 9:56 AM,,0,,,,,"As a developer, I'd like to set up a project repository and version control so that the team can collaborate on code effectively. This includes creating a shared repository with a branching strategy, configuration files, and documentation to ensure consistent development practices across the team.
+
+Acceptance Criteria:
+
+- GitHub or GitLab repository is created and accessible to all team members
+
+- Branch strategy is documented (main, develop, feature branches)
+
+- .gitignore is configured for Angular and C# projects
+
+- README file includes project name, description, and setup instructions
+
+- Repository is linked in Jira project",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0003v:,POV,User Stories / Planning,,,,,,23/Sep/26 8:47 PM;712020:561627c7-6e04-4165-8d15-a503a75143c6;[~accountid:712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12] Why is this ticket blocked?,,,10052,BAAAM-8,Project Kickoff & Document 1 (Product Overview & Project Plan),Done,24/Sep/26 9:56 AM
+Complete & Submit UserStories Document,BAAAM-6,10020,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,10/Sep/26 9:37 AM,30/Sep/26 6:30 PM,,24/Sep/26 10:00 AM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0003z:,User Stories / Planning,,,,,,,,,,10052,BAAAM-8,Project Kickoff & Document 1 (Product Overview & Project Plan),Done,24/Sep/26 10:00 AM
+User & Authentication System,BAAAM-7,10051,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,High,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,15/Oct/26 12:00 AM,0,auth,first-demo,,,"Registration, login, and role-based access for users, service providers, and admins.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00047:,Demo 1,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+Service Provider Management,BAAAM-11,10055,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,19/Nov/26 12:00 AM,0,provider,second-demo,,,Service providers add/edit appointment slots and manage their own appointments/categories.,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0004f:,Demo 1,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+Project Kickoff & Document 1 (Product Overview & Project Plan),BAAAM-8,10052,Epic,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,06/Oct/26 12:51 PM,,06/Oct/26 12:51 PM,01/Oct/26 12:00 AM,0,document-1,,,,"Establish team workflow, repository, and submit Document 1. Due Sept 17, 2026.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0004n:,POV,User Stories / Planning,Demo 1,02/Sep/26 12:00 AM,,,,,,,,,,Done,06/Oct/26 12:51 PM
+Requirements Engineering & Document 2,BAAAM-9,10053,Epic,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,High,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,06/Oct/26 12:51 PM,,,01/Oct/26 12:00 AM,0,document-2,,,,"Write functional requirements, use case models, and user stories with assumptions. Due Oct 1, 2026.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0004v:,User Stories / Planning,Demo 1,,,,,,,,,,,,In Progress,06/Oct/26 12:51 PM
+Appointment Booking & Scheduling,BAAAM-10,10054,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,19/Nov/26 12:00 AM,0,booking,second-demo,,,"Core booking flow by category (medical/beauty/fitness), search/modify, conflict prevention, first-come-first-served logic.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00053:,Demo 2,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+"Appointment History, Reports & Trends",BAAAM-12,10056,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,19/Nov/26 12:00 AM,0,reports,second-demo,,,"Appointment history views and category/time-period reports (monthly, yearly) with trend visualizations.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0005b:,Demo 2,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+Admin Console,BAAAM-13,10057,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,19/Nov/26 12:00 AM,0,admin,second-demo,,,"Admin search capabilities across users, appointments, and service providers.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0005j:,Demo 2,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+Alerts & Notifications,BAAAM-14,10058,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,19/Nov/26 12:00 AM,0,alerts,second-demo,,,Upcoming appointment alerts for both users and service providers.,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0005r:,Demo 2,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+Architectural Design & Document 3,BAAAM-15,10059,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,High,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,05/Nov/26 12:00 AM,0,document-3,,,,"Produce UML class diagram, ER diagram, and architecture document. Due Nov 5, 2026.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0005z:,Architecture Design,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+"Final Testing, Demo & Delivery",BAAAM-16,10060,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,15/Dec/26 12:00 AM,0,document-4,final-demo,source-code,user-manual,"Document 4, second/final demo prep, end-to-end testing, well-commented source code, and user manual. Runs Nov 24 - Dec 15, 2026.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00067:,Final Demo,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+Team Process & Governance,BAAAM-17,10061,Epic,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:26 AM,22/Sep/26 9:45 AM,,,18/Dec/26 12:00 AM,0,governance,ongoing,,,"Cross-cutting, ongoing team requirements: meeting logs, signature pages, code reviews, AI-use citations, and the team member evaluation report (due Dec 18, 2026).",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0006f:,Final Demo,,,,,,,,,,,,,To Do,16/Sep/26 9:26 AM
+"Write project scope, objectives, and risk register (GROUP)",BAAAM-19,10064,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:28 AM,06/Oct/26 9:17 AM,,06/Oct/26 9:17 AM,,0,,,,,"As a project lead, I'd like to document the project scope, objectives, and risk register so that the team has clear project boundaries and risk awareness. This ensures everyone understands what is in and out of scope, what goals we are working toward, and what risks may impact our timeline.
+
+Acceptance Criteria:
+
+- Project scope is clearly defined with in-scope and out-of-scope items
+
+- Objectives are SMART (Specific, Measurable, Achievable, Relevant, Time-bound)
+
+- Risk register identifies at least 5 risks with likelihood, impact, and mitigation
+
+- Document 1 is completed and submitted by September 17, 2026",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0006v:,POV,User Stories / Planning,,,,,,,,,10052,BAAAM-8,Project Kickoff & Document 1 (Product Overview & Project Plan),Done,06/Oct/26 9:17 AM
+"Document team roles, meeting cadence, and git workflow",BAAAM-20,10063,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:28 AM,17/Sep/26 11:31 PM,,16/Sep/26 6:03 PM,,0,,,,,"As a team member, I'd like to document team roles, meeting cadence, and git workflow so that everyone understands responsibilities and processes. This creates a shared understanding of how the team will operate throughout the semester.
+
+Acceptance Criteria:
+
+- Each team member's role is documented with responsibilities
+
+- Meeting cadence is defined (frequency, day, time, format)
+
+- Git workflow is documented including branching, merging, and PR review process
+
+- Communication channels and tools are listed",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00073:,POV,User Stories / Planning,,,,,,,,,10052,BAAAM-8,Project Kickoff & Document 1 (Product Overview & Project Plan),Done,16/Sep/26 6:03 PM
+Document functional and non-functional requirements,BAAAM-21,10065,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,30/Sep/26 8:54 PM,,30/Sep/26 8:54 PM,,0,,,,,"As a business analyst, I'd like to document functional and non-functional requirements so that the development team has clear specifications to build against. This document serves as the foundation for all design and implementation decisions throughout the project.
+
+Acceptance Criteria:
+
+- All functional requirements are listed (registration, booking, history, reports, alerts, admin)
+
+- Non-functional requirements cover performance, security, usability, and reliability
+
+- Each requirement has a unique ID for traceability
+
+- Document 2 is completed and submitted by October 1, 2026",,Andree Lin,Brendan Lambrecht,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,{},,,,0|i0007b:,User Stories / Planning,,,,,,,23/Sep/26 8:47 PM;712020:561627c7-6e04-4165-8d15-a503a75143c6;[~accountid:712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1]  I have helped you on this ticket within the UserStories document. Feel free to add more to this or use what I have added for your own documentation!,24/Sep/26 9:55 AM;712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1;[~accountid:712020:561627c7-6e04-4165-8d15-a503a75143c6] I’ll review it later today! Thanks Brendan,,10053,BAAAM-9,Requirements Engineering & Document 2,Done,30/Sep/26 8:54 PM
+Implement Database UML Structure,BAAAM-22,10066,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,01/Oct/26 10:56 AM,,01/Oct/26 10:56 AM,,0,,,,,"*User Story*  
+As a systems analyst, I’d like to design and document the system’s database structure using UML so that the development team has a clear, shared understanding of the data model, entity relationships, and integrity rules before implementation begins.
+
+The UML database diagrams should identify the core entities, their attributes, primary and foreign keys, and the relationships between them. This structure will guide database implementation, support the functional requirements, and reduce data-modeling issues early in development.
+
+h2. Acceptance Criteria
+
+* A UML class/entity-relationship diagram is created for the system database structure.
+* The diagram includes all major entities required for the system, including entities related to users, service providers, administrators, and relevant system processes.
+* Each entity includes its key attributes, including primary keys and applicable foreign keys.
+* Relationships between entities are clearly shown, including cardinality (for example, one-to-one, one-to-many, or many-to-many).
+* The design identifies any required junction tables for many-to-many relationships.
+* Database constraints and business rules, such as required fields, unique values, and referential integrity requirements, are documented where applicable.
+* All entities and relationships map back to the system’s functional requirements and use cases.
+* The database structure is reviewed for completeness, consistency, and support for anticipated edge cases.",,Amelia Koch,Brendan Lambrecht,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,{},,,,0|i0007j:,User Stories / Planning,,,,,,,27/Sep/26 11:58 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;What exactly needs to be done here? ,27/Sep/26 12:12 PM;712020:5ca236ff-2826-488f-aa01-d3b15d2807d8;[~accountid:712020:561627c7-6e04-4165-8d15-a503a75143c6] I don’t think we need to do this task since we did User Stories. I can change it to be about the database stuff I am doing or add a different task for that.,30/Sep/26 8:29 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;I took care of changing the ticket to what you mentioned. Feel free to modify as needed!,10053,BAAAM-9,Requirements Engineering & Document 2,Done,01/Oct/26 10:56 AM
+Implement frontend basics,BAAAM-120,10196,Story,In Development,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,30/Sep/26 5:41 PM,06/Oct/26 9:22 AM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i00083:,Demo 1,,,,,,,,,,,,,In Progress,30/Sep/26 5:45 PM
+Implement basic backend API endpoints and connections,BAAAM-116,10192,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,Done,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,29/Sep/26 11:16 AM,06/Oct/26 12:49 PM,,06/Oct/26 12:49 PM,,0,,,,,"I created this ticket to keep trach of my work on the basic API endpoints and connections. This ticket is just for the introductory content, and due to the lack of a UI for the moment, these tickets are not visible until then.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,0|i00084:,Demo 1,,,,,,,,,,,,,Done,06/Oct/26 12:49 PM
+Figma - Design Service Provider Web UI,BAAAM-115,10191,Story,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Low,,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,27/Sep/26 1:48 AM,08/Oct/26 10:35 AM,,,,0,,,,,//Will update the desc,,Manoj Khadka,,712020:d30279c8-ce50-4163-a875-1320c647fae1,,,,,,,,,,,{},,,,0|i00084:i,Demo 1,,,,,,,,,,10055,BAAAM-11,Service Provider Management,In Progress,01/Oct/26 4:19 PM
+Design wireframes and UI mockups for all screens (FIGMA),BAAAM-23,10067,Story,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Low,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,08/Oct/26 10:35 AM,24/Sep/26 9:57 AM,,,0,,,,,"As a UX designer, I'd like to design wireframes and UI mockups for all screens so that developers have a visual guide for implementation. This ensures the final product has a consistent, intuitive interface across every user flow.
+
+Acceptance Criteria:
+
+- Wireframes cover all major screens (welcome, login, register, dashboard, booking, history, reports, admin)
+
+- Mockups show the visual design for each screen
+
+- Navigation flow between screens is documented
+
+- Wireframes are reviewed and approved by the team",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00084:r,Demo 1,,,,,,,,,,10053,BAAAM-9,Requirements Engineering & Document 2,In Progress,24/Sep/26 9:52 AM
+Add Swagger/OpenAPI documentation and UI to Project,BAAAM-131,10207,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Low,Done,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,02/Oct/26 10:48 AM,07/Oct/26 9:38 PM,10/Oct/26 5:52 PM,07/Oct/26 9:38 PM,,0,,,,,"Currently, our project does not have an interactive API documentation interface. Integrating Swagger (Swashbuckle / OpenAPI) will allow developers, QA, and frontend consumers to explore endpoints, inspect request/response schemas, and execute test requests directly through an interactive UI.
+
+
+h3. *Scope of Work:*
+
+* Install necessary Swagger/OpenAPI NuGet packages ({{Swashbuckle.AspNetCore}}).
+* Configure Swagger generation in service registration ({{Program.cs}} / {{Startup.cs}}).
+* Configure Swagger UI middleware (typically enabled for Development and Staging environments).
+* Enable XML documentation generation in the {{.csproj}} file to surface triple-slash ({{///}}) code comments in the UI.
+
+
+
+h3. Acceptance Criteria
+
+Scenario 1: Swagger UI availability in allowed environments
+  Given the API application is running in a local or Development/Staging environment
+  When a user navigates to {{/swagger}} or {{/swagger/index.html}}
+  Then the Swagger UI dashboard should render successfully without console errors.
+
+Scenario 2: Endpoint discovery and schema accuracy
+  Given the Swagger UI is open
+  When viewing the list of controller endpoints
+  Then all active API endpoints, HTTP methods, route parameters, and query parameters should be visible
+  And request/response body schemas (models and status codes: 200, 400, 401, 404, 500) should match the codebase.
+
+Scenario 3: XML documentation integration
+  Given an endpoint or model with triple-slash ({{/// <summary>}}) XML comments in code
+  When inspected in Swagger UI
+  Then the summary descriptions and parameter explanations should be visible on the corresponding endpoints and models.
+
+Scenario 4: Security definition (JWT Bearer Auth - Optional/If Applicable)
+  Given the API uses token-based authentication
+  When a user clicks the ""Authorize"" button in Swagger UI and provides a valid Bearer token
+  Then subsequent ""Try it out"" API requests should include the {{Authorization: Bearer <token>}} header.",,Manoj Khadka,,712020:d30279c8-ce50-4163-a875-1320c647fae1,,,,,,,,,,07/Oct/26 1:13 AM;ug:039cb636-1308-470b-94ab-c2e19176fad6;image-20261007-061309.png;https://baaa.atlassian.net/rest/api/3/attachment/content/10000,{},,,,0|i00085:,Demo 1,,,,,,,"07/Oct/26 1:13 AM;712020:d30279c8-ce50-4163-a875-1320c647fae1;!image-20261007-061309.png|width=598,alt=""image-20261007-061309.png""!",,,,,,Done,07/Oct/26 9:38 PM
+"Implement role-based access control (user, provider, admin)",BAAAM-25,10069,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,High,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,07/Oct/26 9:16 AM,10/Oct/26 9:07 PM,,,0,,,,,"As an administrator, I'd like to implement role-based access control so that users, providers, and admins have appropriate permissions. This ensures each user type can only access features and data relevant to their role.
+
+Acceptance Criteria:
+
+- Three roles are defined: user, service provider, admin
+
+- Each role has specific permissions and access levels
+
+- Frontend routing guards prevent unauthorized access
+
+- Backend API endpoints enforce role-based authorization
+
+- Default role is assigned on registration",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00087:,Demo 1,,,,,,,,,,10051,BAAAM-7,User & Authentication System,To Do,16/Sep/26 9:29 AM
+Implement user profile management and session handling,BAAAM-26,10070,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,07/Oct/26 9:16 AM,10/Oct/26 9:07 PM,,,0,,,,,"As a user, I'd like to manage my profile and maintain my session so that my information is up to date and I stay logged in. This includes viewing and editing personal details as well as secure session persistence across the application.
+
+Acceptance Criteria:
+
+- Users can view and edit their profile information
+
+- Profile changes are validated and saved
+
+- Session is maintained across page navigations
+
+- Users can log out to end their session
+
+- Profile page shows relevant fields based on user role",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0008f:,Demo 1,,,,,,,,,,10051,BAAAM-7,User & Authentication System,To Do,16/Sep/26 9:29 AM
+Implement provider view of their own appointments and users,BAAAM-27,10071,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,06/Oct/26 10:22 AM,,,,0,,,,,"As a service provider, I'd like to view my appointments and users so that I can manage my schedule. This view is restricted to only the provider's own appointments, ensuring data privacy between providers.
+
+Acceptance Criteria:
+
+- Provider can see a list of their upcoming appointments
+
+- Each appointment shows user name, date, time, and category
+
+- Provider can only see their own appointments (not other providers')
+
+- List is sorted by date and time
+
+- Empty state message is shown when no appointments exist",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0008n:,Demo 1,,,,,,,,,,10055,BAAAM-11,Service Provider Management,To Do,16/Sep/26 9:29 AM
+Implement provider category and business profile setup,BAAAM-28,10072,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a service provider, I'd like to set up my business profile and select my service category so that users can find and book me. This includes entering business details and choosing from predefined service categories like medical, beauty, or fitness.
+
+Acceptance Criteria:
+
+- Provider can enter business name, description, and contact info
+
+- Provider can select from predefined categories (medical, beauty, fitness)
+
+- Profile information is saved and displayed to users
+
+- Provider can edit their profile at any time
+
+- Profile setup is required before publishing availability slots",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0008v:,Demo 1,,,,,,,,,,10055,BAAAM-11,Service Provider Management,To Do,16/Sep/26 9:29 AM
+Implement Welcome Screen,BAAAM-106,10150,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 2:53 PM,06/Oct/26 12:49 PM,10/Oct/26 7:01 PM,,,0,,,,,"As a user, I would like to see a welcome screen when I open the software so that I can understand the available functionality and choose where to begin.
+
+h2. Intended Behavior
+
+* Display the welcome screen when the application first launches.
+* Implement the screen according to the approved wireframes in *BAAAM-23*.
+* Clearly present the main features and available user actions.
+* Provide intuitive navigation from the welcome screen to each core software function.
+* Use consistent styling, layout, terminology, and visual design throughout the application.
+* Ensure the screen is responsive and usable at the project’s supported display sizes.
+* Handle navigation errors gracefully and avoid dead-end paths.
+
+*Acceptance Criteria*
+
+* The welcome screen appears on initial application launch.
+* All required major functionalities are displayed and clearly labeled.
+* Each displayed function leads the user to the correct screen or workflow.
+* The implementation aligns with the BAAAM-23 wireframes.
+* The screen is tested and has no broken navigation paths.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0008z:,Demo 1,,,,,,,,,,10051,BAAAM-7,User & Authentication System,To Do,16/Sep/26 2:53 PM
+Implement provider slot creation and management,BAAAM-29,10073,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,10/Oct/26 8:55 PM,10/Oct/26 9:09 PM,,,0,,,,,"As a service provider, I'd like to create and manage my availability slots so that users can book appointments with me. This includes creating, editing, and deleting time slots while preventing conflicts with already booked appointments.
+
+Acceptance Criteria:
+
+- Provider can create time slots with date, start time, and end time
+
+- Provider can view, edit, and delete existing slots
+
+- Slots that are already booked cannot be deleted
+
+- Slot duration is configurable
+
+- Slots are displayed in a calendar or list view",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00093:,Demo 1,,,,,,,,,,10055,BAAAM-11,Service Provider Management,To Do,16/Sep/26 9:29 AM
+Implement category browse and provider search for booking,BAAAM-30,10074,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:31 AM,22/Sep/26 9:48 AM,10/Oct/26 8:59 PM,,,0,,,,,"As a user, I'd like to browse categories and search for service providers so that I can find the right provider for my needs. This includes filtering by category and searching by name or service type with paginated results.
+
+Acceptance Criteria:
+
+- User can browse service categories (medical, beauty, fitness)
+
+- User can search providers by name, category, or service type
+
+- Search results show provider name, category, and availability status
+
+- Results are paginated for large result sets
+
+- Empty state is shown when no providers match the search",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009b:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:31 AM
+Implement slot availability display and real-time fetching,BAAAM-31,10075,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:31 AM,10/Oct/26 8:57 PM,10/Oct/26 9:10 PM,,,0,,,,,"As a user, I'd like to see available time slots in real time so that I can select a slot that is currently open. This ensures users see the most up-to-date availability before attempting to book.
+
+Acceptance Criteria:
+
+- Available slots are displayed in a calendar or list view
+
+- Slot availability is fetched in real time from the backend
+
+- Booked slots are visually distinguished from available ones
+
+- Loading indicator is shown while fetching
+
+- Slots are filtered by date range",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009j:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:31 AM
+Implement appointment creation and booking confirmation,BAAAM-32,10076,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:32 AM,10/Oct/26 8:57 PM,10/Oct/26 9:09 PM,,,0,,,,,"As a user, I'd like to create an appointment and receive a confirmation so that my booking is secured. The system should create a record in the database and immediately display confirmation details to the user.
+
+Acceptance Criteria:
+
+- User can select an available slot and confirm the booking
+
+- Booking creates an appointment record in the database
+
+- Confirmation screen shows appointment details
+
+- Confirmation is displayed immediately after booking
+
+- User receives a notification of the confirmed appointment",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009r:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:32 AM
+Implement conflict prevention and first-come-first-serve booking logic,BAAAM-33,10077,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:32 AM,10/Oct/26 8:57 PM,10/Oct/26 9:02 PM,,,0,,,,,"As a user, I'd like the system to prevent double-booking so that each appointment slot is reserved for only one user. The system should enforce first-come-first-serve logic without holds or pre-reservations.
+
+Acceptance Criteria:
+
+- System checks for conflicts before confirming a booking
+
+- If a slot is already taken, user is shown an error message
+
+- First-come-first-serve logic is implemented (no holds or pre-reservations)
+
+- Concurrent booking attempts are handled safely
+
+- Conflict errors suggest the next available slot",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009z:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:32 AM
+Implement appointment modify and cancel functionality,BAAAM-34,10078,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:32 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a user, I'd like to modify or cancel my appointments so that I can manage my schedule changes. Modifications are subject to slot availability, and cancellations release the slot for other users.
+
+Acceptance Criteria:
+
+- User can modify the date/time of an existing appointment
+
+- User can cancel an appointment
+
+- Modifications are subject to slot availability
+
+- Cancellation releases the slot for other users
+
+- Confirmation is required before modifying or canceling",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000a7:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:32 AM
+Implement appointment history view for users and providers,BAAAM-35,10079,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a user, I'd like to view my appointment history so that I can track past and upcoming appointments. This includes filtering by status and sorting by date for both users and providers.
+
+Acceptance Criteria:
+
+- User can see a list of past and upcoming appointments
+
+- Each entry shows date, time, provider, category, and status
+
+- History is sorted by date (most recent first)
+
+- User can filter by status (upcoming, completed, canceled)
+
+- Provider can view their appointment history similarly",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000af:,Demo 2,,,,,,,,,,10056,BAAAM-12,"Appointment History, Reports & Trends",To Do,16/Sep/26 9:33 AM
+Implement category and time-period appointment reports,BAAAM-36,10080,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As an admin, I'd like to generate appointment reports by category and time period so that I can analyze system usage. Reports should include totals for appointments, cancellations, and no-shows with export capability.
+
+Acceptance Criteria:
+
+- Admin can filter reports by category (medical, beauty, fitness)
+
+- Admin can filter by time period (monthly, yearly)
+
+- Report shows total appointments, cancellations, and no-shows
+
+- Report can be exported (CSV or PDF)
+
+- Data is accurate and reflects real-time state",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000an:,Demo 2,,,,,,,,,,10056,BAAAM-12,"Appointment History, Reports & Trends",To Do,16/Sep/26 9:33 AM
+Implement appointment trends dashboard with charts,BAAAM-37,10081,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As an admin, I'd like to view a trends dashboard with charts so that I can visualize appointment patterns over time. The dashboard should display key metrics and interactive charts filterable by category and time period.
+
+Acceptance Criteria:
+
+- Dashboard shows line/bar charts for appointment trends
+
+- Charts can be filtered by category and time period
+
+- Dashboard shows key metrics (total bookings, peak times, popular categories)
+
+- Charts are responsive and interactive
+
+- Data updates in real time",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000av:,Demo 2,,,,,,,,,,10056,BAAAM-12,"Appointment History, Reports & Trends",To Do,16/Sep/26 9:33 AM
+Implement upcoming appointment alert logic,BAAAM-38,10082,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a user, I'd like to receive alerts about upcoming appointments so that I don't miss my scheduled visits. The system should generate configurable alerts for both users and service providers as a background service.
+
+Acceptance Criteria:
+
+- System generates alerts for upcoming appointments
+
+- Alert timing is configurable (e.g., 24 hours before, 1 hour before)
+
+- Alerts are generated for both users and service providers
+
+- Alert logic runs as a background service
+
+- Alerts are stored in the database for tracking",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000b3:,Demo 2,,,,,,,,,,10058,BAAAM-14,Alerts & Notifications,To Do,16/Sep/26 9:33 AM
+Implement user and provider notification UI for appointment alerts,BAAAM-39,10083,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:33 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a user, I'd like to see notifications for appointment alerts in the UI so that I am aware of upcoming appointments. This includes a notification bell with unread count and a list of recent alerts.
+
+Acceptance Criteria:
+
+- Notification bell/icon shows unread alert count
+
+- Clicking the icon opens a list of recent notifications
+
+- Each notification shows appointment details and time
+
+- Notifications can be marked as read
+
+- Notification list updates in real time",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000bb:,Demo 2,,,,,,,,,,10058,BAAAM-14,Alerts & Notifications,To Do,16/Sep/26 9:33 AM
+Implement admin search for users and service providers,BAAAM-40,10084,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:34 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As an admin, I'd like to search for users and service providers so that I can manage and monitor system accounts. Search should support partial matches by name, email, category, or business name.
+
+Acceptance Criteria:
+
+- Admin can search users by name, email, or account ID
+
+- Admin can search providers by name, category, or business name
+
+- Search results show account details and status
+
+- Admin can view individual account details
+
+- Search supports partial matches",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000bj:,Demo 2,,,,,,,,,,10057,BAAAM-13,Admin Console,To Do,16/Sep/26 9:34 AM
+Implement admin appointment search and system dashboard,BAAAM-41,10085,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:34 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As an admin, I'd like to search appointments and view system statistics so that I can monitor overall system activity. The dashboard should display totals for users, providers, and appointments alongside recent activity.
+
+Acceptance Criteria:
+
+- Admin can search appointments by user, provider, date, or status
+
+- Dashboard shows total users, providers, and appointments
+
+- Dashboard shows recent activity summary
+
+- Admin can access appointment details from search results
+
+- Statistics are updated in real time",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000br:,Demo 2,,,,,,,,,,10057,BAAAM-13,Admin Console,To Do,16/Sep/26 9:34 AM
+Write architectural design document and system diagrams (Document 3),BAAAM-42,10086,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:34 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a software architect, I'd like to write the architectural design document and system diagrams so that the team has a blueprint for implementation. This includes architecture, component, and deployment diagrams with technology justifications.
+
+Acceptance Criteria:
+
+- Document 3 includes system architecture diagram
+
+- Component diagram shows frontend, backend, and database layers
+
+- Deployment diagram is included
+
+- Technology choices (Angular, C#, DB) are justified
+
+- Document 3 is completed by November 5, 2026",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000bz:,Architecture Design,,,,,,,,,,10059,BAAAM-15,Architectural Design & Document 3,To Do,16/Sep/26 9:34 AM
+Design database schema and API contract documentation,BAAAM-43,10087,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:35 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a backend developer, I'd like to design the database schema and API contracts so that frontend and backend teams can work in parallel. This includes entity relationships, endpoint documentation, and versioning strategy.
+
+Acceptance Criteria:
+
+- Database schema includes all required tables/collections
+
+- Entity relationships are documented
+
+- API endpoints are documented with request/response formats
+
+- API versioning strategy is defined
+
+- Schema and API docs are reviewed by the team",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000c7:,Architecture Design,,,,,,,,,,10059,BAAAM-15,Architectural Design & Document 3,To Do,16/Sep/26 9:35 AM
+Design UI navigation flow and design system,BAAAM-44,10088,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:35 AM,22/Sep/26 9:50 AM,,,,0,,,,,"As a UX designer, I'd like to design the UI navigation flow and design system so that the application has a consistent look and feel. This includes defining the color palette, typography, component library, and responsive breakpoints.
+
+Acceptance Criteria:
+
+- Navigation flow diagram shows all screen transitions
+
+- Design system includes color palette, typography, and spacing
+
+- Component library is defined (buttons, forms, cards, etc.)
+
+- Responsive design considerations are documented
+
+- Design system is shared with the development team",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000cf:,Architecture Design,,,,,,,,,,10059,BAAAM-15,Architectural Design & Document 3,To Do,16/Sep/26 9:35 AM
+Conduct integration and system testing across all features,BAAAM-45,10089,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:36 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a QA engineer, I'd like to conduct integration and system testing so that all features work correctly together. This includes verifying frontend-backend communication and end-to-end user flows.
+
+Acceptance Criteria:
+
+- Test cases cover all functional requirements
+
+- Integration tests verify frontend-backend communication
+
+- System tests cover end-to-end user flows
+
+- Test results are documented with pass/fail status
+
+- Bugs are logged and tracked to resolution",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000cn:,Final Demo,,,,,,,,,,10060,BAAAM-16,"Final Testing, Demo & Delivery",To Do,16/Sep/26 9:36 AM
+Prepare final demo presentation and rehearse,BAAAM-46,10090,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:36 AM,22/Sep/26 9:48 AM,,,,0,,,,,"As a team lead, I'd like to prepare and rehearse the final demo presentation so that the team delivers a polished presentation. This includes scripting the flow, assigning speaking parts, and rehearsing at least twice.
+
+Acceptance Criteria:
+
+- Demo script outlines the presentation flow
+
+- All team members have speaking parts
+
+- Demo is rehearsed at least twice
+
+- Presentation includes live demonstration of key features
+
+- Slides are finalized and reviewed",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000cv:,Final Demo,,,,,,,,,,10060,BAAAM-16,"Final Testing, Demo & Delivery",To Do,16/Sep/26 9:36 AM
+Package and deliver final source code with documentation,BAAAM-47,10091,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,,,,0,,,,,"As a developer, I'd like to package and deliver the final source code with documentation so that the project is complete and maintainable. This includes cleaning up the codebase, documenting dependencies, and providing setup instructions.
+
+Acceptance Criteria:
+
+- Source code is cleaned and organized
+
+- All dependencies are documented
+
+- Setup and deployment instructions are included
+
+- Code is committed to the repository with final tag
+
+- Source code is submitted by December 15, 2026",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000d3:,Final Demo,,,,,,,,,,10060,BAAAM-16,"Final Testing, Demo & Delivery",To Do,16/Sep/26 9:36 AM
+Write user manual documentation,BAAAM-48,10092,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,,,,0,,,,,"As a technical writer, I'd like to write user manual documentation so that end users can easily use the system. The manual should cover all user roles with step-by-step instructions and a troubleshooting section.
+
+Acceptance Criteria:
+
+- Manual covers all user roles (user, provider, admin)
+
+- Step-by-step instructions with screenshots
+
+- Troubleshooting section is included
+
+- Manual is formatted professionally
+
+- User manual is submitted by December 15, 2026",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000db:,Final Demo,,,,,,,,,,10060,BAAAM-16,"Final Testing, Demo & Delivery",To Do,16/Sep/26 9:36 AM
+Track and document code reviews for each team member,BAAAM-49,10093,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,,,,0,,,,,"As a team member, I'd like to track and document code reviews so that each member has completed at least one review. This is a course requirement and ensures code quality through peer review.
+
+Acceptance Criteria:
+
+- Each team member conducts at least one code review
+
+- Reviews are documented with reviewer, date, and feedback
+
+- Review feedback is addressed by the original author
+
+- Review records are compiled in a summary document
+
+- Summary is included in the final delivery",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000dj:,Final Demo,,,,,,,,,,10061,BAAAM-17,Team Process & Governance,To Do,16/Sep/26 9:36 AM
+Maintain meeting notes and decision log throughout project,BAAAM-50,10094,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:36 AM,22/Sep/26 9:49 AM,,,,0,,,,,"As a team member, I'd like to maintain meeting notes and a decision log so that project decisions are documented and traceable. This should be maintained throughout the entire project in a shared, accessible location.
+
+Acceptance Criteria:
+
+- Meeting notes are recorded for every team meeting
+
+- Notes include attendees, agenda, discussions, and action items
+
+- Decision log records key decisions with rationale
+
+- Notes are stored in a shared, accessible location
+
+- Notes are maintained throughout the entire project",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000dr:,Final Demo,,,,,,,,,,10061,BAAAM-17,Team Process & Governance,To Do,16/Sep/26 9:36 AM
+Complete team member evaluation report,BAAAM-51,10095,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:37 AM,16/Sep/26 2:38 PM,,,,0,,,,,"As a team member, I'd like to complete a peer and self-evaluation report so that individual contributions are recognized. This includes self-evaluations and peer evaluations covering participation, contribution, and collaboration.
+
+Acceptance Criteria:
+
+- Each member completes a self-evaluation
+
+- Each member evaluates their peers
+
+- Evaluation covers participation, contribution, and collaboration
+
+- Report is compiled and submitted by December 18, 2026
+
+- Evaluations are confidential and constructive",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000dz:,Final Demo,,,,,,,,,,10061,BAAAM-17,Team Process & Governance,To Do,16/Sep/26 9:37 AM
+Draft and finalize requirements document (Document 2),BAAAM-54,10098,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:39 AM,06/Oct/26 9:24 AM,,06/Oct/26 9:24 AM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000e7:,User Stories / Planning,,,,,,,,,,10065,BAAAM-21,Document functional and non-functional requirements,Done,06/Oct/26 9:24 AM
+Create GitHub/GitLab repo and branch strategy,BAAAM-52,10096,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:39 AM,22/Sep/26 9:49 AM,,22/Sep/26 9:35 AM,,0,,,,,"[~accountid:712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12] has created the GitHub Repository.
+
+----
+
+h1. Our Group’s Standup Discussion (In Summary):
+
+We have decided to name our branches after the following format:
+
+”Code_Author/BAAAM-##/Description”
+
+h1. Cyclic Methodology:
+
+Whenever a developer decides to implement a ticket, the developer will:
+
+# Create a new branch (cloned from main) to create their work. 
+# Once the work is complete, the developer will create a pull request for that branch, provide proof of concept (description, images, videos, etc.).
+# Allow for a code review from the other team members.
+# Once approved by 2+ people, the PR (pull request) is considered approved, and the code author (of the ticket) can merge the branch they made into main. 
+# The developer can then choose to either delete their branch (for lack of confusion).",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000ef:,POV,User Stories / Planning,,,,,,"22/Sep/26 9:35 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;Since we decided on a common practice, I am moving this ticket to “Done”.",,,10062,BAAAM-18,Set up project repository and version control,Done,22/Sep/26 9:35 AM
+"Set up .gitignore, README, and CI skeleton",BAAAM-53,10097,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:39 AM,06/Oct/26 9:24 AM,22/Sep/26 2:03 PM,06/Oct/26 9:24 AM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000en:,POV,User Stories / Planning,,,,,,"22/Sep/26 9:36 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;[~accountid:712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12] I reccoment speaking with [~accountid:712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1] and [~accountid:712020:d30279c8-ce50-4163-a875-1320c647fae1] to establish a base skeleton (just make the project run first, worry about how the UI works after). 
+
+
+
+In this way, [~accountid:712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12], you can know for sure of how to implement the CI/CD in the repo.",,,10062,BAAAM-18,Set up project repository and version control,Done,06/Oct/26 9:24 AM
+"Draft and finalize scope, objectives, and risk register (Document 1)",BAAAM-56,10100,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:39 AM,22/Sep/26 9:49 AM,,22/Sep/26 9:39 AM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000ev:,POV,User Stories / Planning,,,,,,22/Sep/26 9:39 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;This task has been completed. Moving to “Done”.,,,10064,BAAAM-19,"Write project scope, objectives, and risk register (GROUP)",Done,22/Sep/26 9:39 AM
+"Document roles, meeting cadence, and git workflow",BAAAM-55,10099,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:39 AM,06/Oct/26 9:26 AM,,06/Oct/26 9:26 AM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000f3:,POV,User Stories / Planning,,,,,,"22/Sep/26 9:42 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;h1. Roles:
+
+Database Development: Amelia, Brendan
+
+Back-End Development: Andrew, Brendan, Amelia
+
+Front-End Development: Manoj, Andree
+
+h1. Meeting Cadence:
+
+We plan to meet in weekly standups that occur every Wednesday. We plan to use this time to discuss project requirements, how we are doing, where we need help, and any blockers we may have and how others can help to “un-block” the task at hand.
+
+
+
+h1. Git Workflow
+
+[~accountid:712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12] is working on this within the repo, but the idea is clear team-wide: [https://baaa.atlassian.net/browse/BAAAM-52|https://baaa.atlassian.net/browse/BAAAM-52|smart-link] ",,,10063,BAAAM-20,"Document team roles, meeting cadence, and git workflow",Done,06/Oct/26 9:26 AM
+Create use case diagrams and descriptions (Document 2),BAAAM-57,10101,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,06/Oct/26 9:24 AM,,06/Oct/26 9:24 AM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000fb:,User Stories / Planning,,,,,,,,,,10066,BAAAM-22,Implement Database UML Structure,Done,06/Oct/26 9:24 AM
+Design wireframes and UI mockups for all screens,BAAAM-59,10102,Subtask,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,01/Oct/26 9:32 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000fj:,Demo 1,,,,,,,"22/Sep/26 9:38 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;We are using [Figma.com|http://Figma.com] to implement the mockup wireframes. If you would like to view these, go to the “Shortcuts” tab and click on the Figma link. Once you do, you will need to request access to the board itself.",,,10067,BAAAM-23,Design wireframes and UI mockups for all screens (FIGMA),In Progress,24/Sep/26 9:59 AM
+Implement frontend role-based routing and access guards,BAAAM-58,10103,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,10/Oct/26 7:08 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000fr:,Demo 1,,,,,,,,,,10069,BAAAM-25,"Implement role-based access control (user, provider, admin)",To Do,16/Sep/26 12:18 PM
+Implement backend auth API and user/provider DB schema (C#),BAAAM-61,10104,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000fz:,Demo 1,,,,,,,,,,10068,BAAAM-24,Frontend: Implement user and service provider registration and login view,To Do,16/Sep/26 12:18 PM
+Build frontend registration and login screens (Angular),BAAAM-60,10105,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000g7:,Demo 1,,,,,,,,,,10068,BAAAM-24,Frontend: Implement user and service provider registration and login view,To Do,16/Sep/26 12:18 PM
+Build frontend user profile management UI,BAAAM-62,10106,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,10/Oct/26 7:11 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gf:,Demo 1,,,,,,,,,,10070,BAAAM-26,Implement user profile management and session handling,To Do,16/Sep/26 12:19 PM
+Implement backend RBAC middleware and role assignment (C#),BAAAM-63,10107,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,10/Oct/26 9:07 PM,10/Oct/26 9:07 PM,,,0,,,,,"Role checks on tickets 1–4. Clients book, providers create slots, admins approve.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gn:,Demo 1,,,,,,,,,,10069,BAAAM-25,"Implement role-based access control (user, provider, admin)",To Do,16/Sep/26 12:19 PM
+Build frontend provider appointment and user list view,BAAAM-64,10108,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gv:,Demo 1,,,,,,,,,,10071,BAAAM-27,Implement provider view of their own appointments and users,To Do,16/Sep/26 12:19 PM
+Implement backend provider appointment query API (C#),BAAAM-65,10109,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000h3:,Demo 1,,,,,,,,,,10071,BAAAM-27,Implement provider view of their own appointments and users,To Do,16/Sep/26 12:19 PM
+Implement backend profile and session APIs (C#),BAAAM-66,10110,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,10/Oct/26 7:12 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hb:,Demo 1,,,,,,,,,,10070,BAAAM-26,Implement user profile management and session handling,To Do,16/Sep/26 12:19 PM
+Build frontend provider profile setup UI (Angular),BAAAM-67,10111,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hj:,Demo 1,,,,,,,,,,10072,BAAAM-28,Implement provider category and business profile setup,To Do,16/Sep/26 12:20 PM
+Implement backend provider profile/category API (C#),BAAAM-68,10112,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hr:,Demo 1,,,,,,,,,,10072,BAAAM-28,Implement provider category and business profile setup,To Do,16/Sep/26 12:20 PM
+Build frontend slot management UI (Angular),BAAAM-69,10113,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hz:,Demo 1,,,,,,,,,,10073,BAAAM-29,Implement provider slot creation and management,To Do,16/Sep/26 12:20 PM
+Backend: Provider slot creation API,BAAAM-70,10114,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,10/Oct/26 9:10 PM,10/Oct/26 9:09 PM,,,0,,,,,"A slot is an Appointment whose status is ""Available"". An approved provider creates slots from one of their own appointment types.
+
+* {{POST /api/slots {appointmentTypeId, startTime}}} creates an Available appointment. The end time is the start time plus the type's duration.
+* {{GET /api/slots/mine}} returns the provider's own slots.
+* {{DELETE /api/slots/{id}}} soft-deletes a slot, but only if it's still Available.
+* Add {{Available}} to the status list the API understands, so open slots stop showing as Scheduled.
+
+Acceptance criteria: the provider must be approved and must own the appointment type; reject a start time in the past; reject overlap with the provider's existing appointments; tests for each.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000i7:,Demo 1,,,,,,,,,,10073,BAAAM-29,Implement provider slot creation and management,To Do,16/Sep/26 12:20 PM
+Build frontend category browse and search UI (Angular),BAAAM-71,10115,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000if:,Demo 2,,,,,,,,,,10074,BAAAM-30,Implement category browse and provider search for booking,To Do,16/Sep/26 12:20 PM
+Implement backend search API for providers by category (C#),BAAAM-72,10116,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000in:,Demo 2,,,,,,,,,,10074,BAAAM-30,Implement category browse and provider search for booking,To Do,16/Sep/26 12:21 PM
+Build frontend slot availability display (Angular),BAAAM-73,10117,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000iv:,Demo 2,,,,,,,,,,10075,BAAAM-31,Implement slot availability display and real-time fetching,To Do,16/Sep/26 12:21 PM
+Backend: Available slots API,BAAAM-74,10118,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,10/Oct/26 9:10 PM,10/Oct/26 9:10 PM,,,0,,,,,"* {{POST /api/slots/{id}/book {notes?}}} sets {{UserId}} to the client and the status to Scheduled.
+
+Acceptance criteria: clients only; the booking happens as one step that succeeds only if the slot is still Available; the second person to book gets 409 Conflict; a test where two bookings race for the same slot.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000j3:,Demo 2,,,,,,,,,,10075,BAAAM-31,Implement slot availability display and real-time fetching,To Do,16/Sep/26 12:21 PM
+Build frontend booking confirmation flow (Angular),BAAAM-75,10119,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jb:,Demo 2,,,,,,,,,,10076,BAAAM-32,Implement appointment creation and booking confirmation,To Do,16/Sep/26 12:21 PM
+"Backend: Book a slot, first-come-first-serve",BAAAM-76,10120,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,10/Oct/26 9:02 PM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jj:,Demo 2,,,,,,,,,,10076,BAAAM-32,Implement appointment creation and booking confirmation,To Do,16/Sep/26 12:21 PM
+"Backend: Book a slot, first-come-first-serve",BAAAM-77,10121,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:22 PM,10/Oct/26 9:02 PM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jr:,Demo 2,,,,,,,,,,10077,BAAAM-33,Implement conflict prevention and first-come-first-serve booking logic,To Do,16/Sep/26 12:22 PM
+Build frontend conflict error handling and booking feedback (Angular),BAAAM-78,10122,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:24 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jz:,Demo 2,,,,,,,,,,10077,BAAAM-33,Implement conflict prevention and first-come-first-serve booking logic,To Do,16/Sep/26 12:24 PM
+Build frontend modify/cancel appointment UI (Angular),BAAAM-79,10123,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:24 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000k7:,Demo 2,,,,,,,,,,10078,BAAAM-34,Implement appointment modify and cancel functionality,To Do,16/Sep/26 12:24 PM
+Implement backend modify/cancel appointment API (C#),BAAAM-80,10124,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:25 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000kf:,Demo 2,,,,,,,,,,10078,BAAAM-34,Implement appointment modify and cancel functionality,To Do,16/Sep/26 12:25 PM
+Build frontend appointment history view (Angular),BAAAM-81,10125,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000kn:,Demo 2,,,,,,,,,,10079,BAAAM-35,Implement appointment history view for users and providers,To Do,16/Sep/26 12:26 PM
+Implement backend appointment history query API (C#),BAAAM-82,10126,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000kv:,Demo 2,,,,,,,,,,10079,BAAAM-35,Implement appointment history view for users and providers,To Do,16/Sep/26 12:26 PM
+Build frontend reports filter UI for category and time period (Angular),BAAAM-83,10127,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000l3:,Demo 2,,,,,,,,,,10080,BAAAM-36,Implement category and time-period appointment reports,To Do,16/Sep/26 12:26 PM
+Implement backend reports query API for category and time period (C#),BAAAM-84,10128,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:26 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000lb:,Demo 2,,,,,,,,,,10080,BAAAM-36,Implement category and time-period appointment reports,To Do,16/Sep/26 12:26 PM
+Build frontend trends dashboard with charts (Angular),BAAAM-85,10129,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000lj:,Demo 2,,,,,,,,,,10081,BAAAM-37,Implement appointment trends dashboard with charts,To Do,16/Sep/26 12:27 PM
+Implement backend trends aggregation API (C#),BAAAM-86,10130,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000lr:,Demo 2,,,,,,,,,,10081,BAAAM-37,Implement appointment trends dashboard with charts,To Do,16/Sep/26 12:27 PM
+Implement backend alert scheduling and trigger logic (C#),BAAAM-87,10131,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000lz:,Demo 2,,,,,,,,,,10082,BAAAM-38,Implement upcoming appointment alert logic,To Do,16/Sep/26 12:27 PM
+Implement backend alert notification delivery API (C#),BAAAM-88,10132,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000m7:,Demo 2,,,,,,,,,,10082,BAAAM-38,Implement upcoming appointment alert logic,To Do,16/Sep/26 12:27 PM
+Build frontend notification UI for appointment alerts (Angular),BAAAM-89,10133,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:27 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000mf:,Demo 2,,,,,,,,,,10083,BAAAM-39,Implement user and provider notification UI for appointment alerts,To Do,16/Sep/26 12:27 PM
+Implement backend notification delivery service (C#),BAAAM-90,10134,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000mn:,Demo 2,,,,,,,,,,10083,BAAAM-39,Implement user and provider notification UI for appointment alerts,To Do,16/Sep/26 12:28 PM
+Build frontend admin search UI for users and providers (Angular),BAAAM-91,10135,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000mv:,Demo 2,,,,,,,,,,10084,BAAAM-40,Implement admin search for users and service providers,To Do,16/Sep/26 12:28 PM
+Implement backend admin search API for users and providers (C#),BAAAM-92,10136,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000n3:,Demo 2,,,,,,,,,,10084,BAAAM-40,Implement admin search for users and service providers,To Do,16/Sep/26 12:28 PM
+Build frontend admin dashboard with system stats (Angular),BAAAM-93,10137,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:28 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000nb:,Demo 2,,,,,,,,,,10085,BAAAM-41,Implement admin appointment search and system dashboard,To Do,16/Sep/26 12:28 PM
+Implement backend admin stats and appointment search API (C#),BAAAM-94,10138,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:29 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000nj:,Demo 2,,,,,,,,,,10085,BAAAM-41,Implement admin appointment search and system dashboard,To Do,16/Sep/26 12:29 PM
+Draft and finalize architectural design document (Document 3),BAAAM-95,10139,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:30 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000nr:,Architecture Design,,,,,,,,,,10086,BAAAM-42,Write architectural design document and system diagrams (Document 3),To Do,16/Sep/26 12:30 PM
+Design and document database schema and API contracts,BAAAM-96,10140,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:30 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000nz:,Architecture Design,,,,,,,,,,10087,BAAAM-43,Design database schema and API contract documentation,To Do,16/Sep/26 12:30 PM
+Design UI navigation flow and design system documentation,BAAAM-97,10141,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:30 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000o7:,Architecture Design,,,,,,,,,,10088,BAAAM-44,Design UI navigation flow and design system,To Do,16/Sep/26 12:30 PM
+Write and execute integration and system test cases,BAAAM-98,10142,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000of:,Final Demo,,,,,,,,,,10089,BAAAM-45,Conduct integration and system testing across all features,To Do,16/Sep/26 12:31 PM
+Prepare and rehearse final demo presentation,BAAAM-99,10143,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000on:,Final Demo,,,,,,,,,,10090,BAAAM-46,Prepare final demo presentation and rehearse,To Do,16/Sep/26 12:31 PM
+Package and deliver final source code with documentation,BAAAM-100,10144,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000ov:,Final Demo,,,,,,,,,,10091,BAAAM-47,Package and deliver final source code with documentation,To Do,16/Sep/26 12:31 PM
+Write user manual documentation,BAAAM-101,10145,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000p3:,Final Demo,,,,,,,,,,10092,BAAAM-48,Write user manual documentation,To Do,16/Sep/26 12:31 PM
+Conduct and document code reviews for each team member,BAAAM-102,10146,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000pb:,Final Demo,,,,,,,,,,10093,BAAAM-49,Track and document code reviews for each team member,To Do,16/Sep/26 12:31 PM
+Maintain meeting notes and decision log throughout project,BAAAM-103,10147,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:31 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000pj:,Final Demo,,,,,,,,,,10094,BAAAM-50,Maintain meeting notes and decision log throughout project,To Do,16/Sep/26 12:31 PM
+Complete peer and self-evaluation report,BAAAM-104,10148,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:32 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000pr:,Final Demo,,,,,,,,,,10095,BAAAM-51,Complete team member evaluation report,To Do,16/Sep/26 12:32 PM
+Update Requirements and Architecture Documents,BAAAM-105,10149,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 2:49 PM,22/Sep/26 9:50 AM,,,,0,,,,,"As a user, I would like to revisit and update the requirements document (Document 2) and architectural design document (Document 3) so that both accurately reflect the final system and the knowledge gained during development.
+
+h2. Intended Behavior
+
+* Review Document 2 and update functional and non-functional requirements to match the implemented software.
+* Review Document 3 and update the architectural design, including diagrams, components, data flow, and technology decisions where applicable.
+* Ensure changes made during development are accurately documented and justified.
+* Verify that Document 2 and Document 3 are consistent with one another.
+* Prepare the updated documents as Document 4 for submission.
+* Include the required team signature page.
+* Compile and attach the relevant meeting logs.
+* Submit by *November 24*.
+
+*Acceptance Criteria*
+
+* Document 2 reflects the final implemented requirements.
+* Document 3 accurately represents the final architecture.
+* Both documents are internally consistent and professionally formatted.
+* A signature page and applicable meeting logs are included.
+* The deliverable is ready for submission by November 24.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000pz:,Final Demo,,,,,,,,,,10060,BAAAM-16,"Final Testing, Demo & Delivery",To Do,16/Sep/26 2:49 PM
+Implement comment additions within the project,BAAAM-107,10151,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 2:54 PM,22/Sep/26 9:50 AM,,,,0,,,,,"As a user, I would like the project source code to be clearly and appropriately commented so that team members, instructors, and future maintainers can understand the purpose, logic, and usage of the code.
+
+h2. Intended Behavior
+
+* Review the complete codebase for readability and maintainability.
+* Add comments to explain non-obvious business logic, algorithms, calculations, data transformations, and control flow.
+* Add documentation for major classes, modules, components, functions, and public interfaces where appropriate.
+* Explain assumptions, dependencies, limitations, and important implementation decisions.
+* Avoid comments that merely restate obvious code.
+* Ensure comments remain accurate after code changes.
+* Complete the documentation review before packaging and submitting the source code for Document 5.
+* Coordinate this work with *BAAAM-47*, while treating code comments and code quality as a distinct deliverable requirement.
+
+*Acceptance Criteria*
+
+* All major modules and components have appropriate documentation.
+* Complex or non-obvious sections of code have useful explanatory comments.
+* Comments accurately match the current behavior of the code.
+* The codebase can be understood by a reviewer without relying solely on verbal explanations.
+* The reviewed, well-commented source code is ready for Document 5 submission by *December 15*.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000qf:,,,,,,,,,,,10060,BAAAM-16,"Final Testing, Demo & Delivery",To Do,16/Sep/26 2:54 PM
+Attach Meeting Logs to Deliverables,BAAAM-108,10152,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 2:56 PM,22/Sep/26 9:50 AM,,,,0,,,,,"As a user, I would like relevant team meeting logs to be compiled and attached to each project deliverable so that the submission demonstrates the team’s planning, collaboration, decisions, and progress.
+
+h2. Intended Behavior
+
+* Maintain meeting notes throughout the project in coordination with *BAAAM-50*.
+* Before each deliverable deadline, identify the meeting logs relevant to that deliverable.
+* Review the logs to ensure they include meeting dates, attendees, discussion topics, decisions, assigned responsibilities, and action items where applicable.
+* Compile the relevant logs in a clean, readable format.
+* Attach the compiled meeting logs to the corresponding deliverable submission.
+* Confirm that the logs are included with the final version of the deliverable.
+* Keep a copy of the submitted logs with the project records.
+
+*Acceptance Criteria*
+
+* Relevant meeting notes are maintained for each stage of the project.
+* Meeting logs include sufficient detail to demonstrate team collaboration and decision-making.
+* The appropriate logs are compiled before each deliverable is submitted.
+* Meeting logs are attached to every required document submission.
+* The team verifies inclusion of the logs as part of its final submission checklist.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000qn:,,,,,,,,,,,10060,BAAAM-16,"Final Testing, Demo & Delivery",To Do,16/Sep/26 2:56 PM
+Implement Soft Delete when removing users from the project,BAAAM-109,10153,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 4:47 PM,22/Sep/26 9:47 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000qv:,Final Demo,,,,,,,,,,,,,To Do,16/Sep/26 4:47 PM
+"Design UI for Regular User Portal - Notifications, Settings and Statistics",BAAAM-114,10158,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,26/Sep/26 5:02 PM,30/Sep/26 8:56 PM,,30/Sep/26 8:56 PM,,0,,,,,"BAAAM UI Design
+
+h3. 
+Acceptance Criteria
+
+Implement all customer-facing views for the BAAAM web app, covering below screens:
+
+* Notifications Page
+* Statistics
+* Settings & Privacy",,Manoj Khadka,,712020:d30279c8-ce50-4163-a875-1320c647fae1,,,,,,,,,,,{},,,,0|i000qz:,User Stories / Planning,,,,,,,,,,,,,Done,30/Sep/26 8:56 PM
+Create Project Boilerplate,BAAAM-112,10156,Task,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,24/Sep/26 12:28 AM,27/Sep/26 11:45 AM,,27/Sep/26 11:45 AM,,0,,,,,"The boilerplate code is intended to allow for the start of the angular project (for both front and back end).
+
+
+
+Pull Request: [https://github.com/ohmygodjustload/cs440-software-engineering-project/pull/3|https://github.com/ohmygodjustload/cs440-software-engineering-project/pull/3|smart-link] ",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000rb:,User Stories / Planning,,,,,,,24/Sep/26 12:29 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;Just finished this. Moving my implementation to PR (Pull request) for review: [https://github.com/ohmygodjustload/cs440-software-engineering-project/pull/3|https://github.com/ohmygodjustload/cs440-software-engineering-project/pull/3],,,,,,Done,27/Sep/26 11:45 AM
+Add Github Handle to README,BAAAM-117,10193,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,30/Sep/26 8:49 AM,30/Sep/26 8:55 PM,,30/Sep/26 8:55 PM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000rz:,User Stories / Planning,,,,,,,,,,10155,BAAAM-111,Add team members to README (EACH MEMBER MUST DO THIS INDIVIDUALLY),Done,30/Sep/26 8:55 PM
+Add Github Handle to README,BAAAM-118,10194,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,30/Sep/26 8:49 AM,01/Oct/26 11:26 PM,,01/Oct/26 11:26 PM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000s7:,User Stories / Planning,,,,,,,,,,10155,BAAAM-111,Add team members to README (EACH MEMBER MUST DO THIS INDIVIDUALLY),Done,01/Oct/26 11:26 PM
+Add Github Handle to README,BAAAM-119,10195,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,30/Sep/26 8:50 AM,30/Sep/26 8:55 PM,,30/Sep/26 8:55 PM,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000sf:,User Stories / Planning,,,,,,,,,,10155,BAAAM-111,Add team members to README (EACH MEMBER MUST DO THIS INDIVIDUALLY),Done,30/Sep/26 8:55 PM
+Homepage,BAAAM-121,10197,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,30/Sep/26 5:41 PM,08/Oct/26 9:44 AM,,08/Oct/26 9:44 AM,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000sv:,Demo 1,,,,,,,,,,10196,BAAAM-120,Implement frontend basics,Done,08/Oct/26 9:44 AM
+Calendar,BAAAM-122,10198,Subtask,Pull Request,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,30/Sep/26 5:42 PM,10/Oct/26 6:42 PM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000t3:,Demo 1,,,,,,,,,,10196,BAAAM-120,Implement frontend basics,In Progress,30/Sep/26 8:55 PM
+Appointments,BAAAM-123,10199,Subtask,In Development,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,30/Sep/26 5:42 PM,10/Oct/26 8:36 PM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000tb:,Demo 1,,,,,,,,,,10196,BAAAM-120,Implement frontend basics,In Progress,10/Oct/26 8:36 PM
+Notifications,BAAAM-124,10200,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,30/Sep/26 5:42 PM,10/Oct/26 8:36 PM,,10/Oct/26 8:36 PM,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000tj:,Demo 1,,,,,,,,,,10196,BAAAM-120,Implement frontend basics,Done,10/Oct/26 8:36 PM
+Settings,BAAAM-125,10201,Subtask,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,30/Sep/26 5:42 PM,10/Oct/26 8:37 PM,,10/Oct/26 8:37 PM,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000tr:,Demo 1,,,,,,,,,,10196,BAAAM-120,Implement frontend basics,Done,10/Oct/26 8:37 PM
+Statistics,BAAAM-126,10202,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,30/Sep/26 5:42 PM,30/Sep/26 5:42 PM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000tz:,Demo 1,,,,,,,,,,10196,BAAAM-120,Implement frontend basics,To Do,30/Sep/26 5:42 PM
+User page,BAAAM-127,10203,Subtask,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000u7:,Demo 1,,,,,,,,,,10067,BAAAM-23,Design wireframes and UI mockups for all screens (FIGMA),In Progress,01/Oct/26 9:32 AM
+Service provider page,BAAAM-128,10204,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000uf:,Demo 1,,,,,,,,,,10067,BAAAM-23,Design wireframes and UI mockups for all screens (FIGMA),To Do,01/Oct/26 9:32 AM
+Admin page,BAAAM-129,10205,Subtask,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000un:,Demo 1,,,,,,,,,,10067,BAAAM-23,Design wireframes and UI mockups for all screens (FIGMA),In Progress,01/Oct/26 9:32 AM
+Backend: Implement user and service provider registration and login,BAAAM-137,10245,Story,In Development,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,09/Oct/26 12:49 AM,09/Oct/26 1:20 AM,,,,0,,,,,"As a user, I'd like to register and log in so that I can securely access the booking system. This includes separate registration flows for regular users and service providers, with secure password handling and session management.
+
+Acceptance Criteria:
+
+* Users can register as either a regular user or service provider
+
+* Login validates credentials and creates a session
+
+* Passwords are hashed and stored securely
+
+* Invalid login attempts show appropriate error messages
+
+* Session expires after a defined timeout period",,Manoj Khadka,,712020:d30279c8-ce50-4163-a875-1320c647fae1,,,,,,,,,,,{},,,,0|i000ur:,Demo 1,,,,,,,,,,10051,BAAAM-7,User & Authentication System,In Progress,09/Oct/26 12:49 AM
+Finalize Database Collections and Models,BAAAM-130,10206,Story,In Development,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,Amelia Koch,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,01/Oct/26 10:55 AM,08/Oct/26 4:55 PM,,,,0,,,,,,,Amelia Koch,,712020:5ca236ff-2826-488f-aa01-d3b15d2807d8,,,,,,,,,,,{},,,,0|i000uv:,Demo 1,,,,,,,,,,,,,In Progress,08/Oct/26 4:55 PM
+Create Settings Page for UI,BAAAM-133,10241,Story,Done,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,Done,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,07/Oct/26 8:37 PM,08/Oct/26 5:07 PM,,08/Oct/26 5:07 PM,,0,,,,,"As a signed-in user, I want to manage my account information and personal preferences in one place so that my profile, calendar experience, and notifications reflect my needs.
+
+h2. Description
+
+Create a Settings page based on the supplied design while maintaining the current website’s theme. Include the existing primary navigation, a Settings heading and subtitle, and secondary tabs for Profile, Login & security, Preferences, and Privacy.
+
+The initial view should display editable profile information, calendar and notification preferences, a privacy/access summary, and a Save changes button. Match the reference’s spacious layout, rounded controls, muted background, and dark green primary action, using existing application styles wherever possible. The screenshot’s yellow highlights and circular “L” markers are annotations, not interface elements.
+
+h2. Acceptance criteria
+
+* Settings is accessible from the primary navigation and visibly identified as the active page.
+* Secondary navigation includes Profile, Login & security, Preferences, and Privacy, with a clear active state.
+* Users can edit their full name, email address, phone number, and time zone.
+* Users can select a default calendar view and independently enable or disable Medical, Beauty, and Fitness notifications.
+* Save changes validates inputs, persists supported changes, and provides loading, success, and error feedback.
+* The privacy section states that users can access and modify only their own personal and appointment data.
+* The page follows the current website’s styling, works on desktop and mobile, and supports keyboard navigation.
+* Screenshot sample values are replaced by the signed-in user’s data; yellow annotations are omitted.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,07/Oct/26 8:42 PM;6971f3f7-0510-4dc5-be01-b7e80dd83e13;Screenshot 2026-10-07 at 8.39.03 PM.png;https://baaa.atlassian.net/rest/api/3/attachment/content/10001,{},,,,0|i000uy:,Demo 1,,,,,,,"07/Oct/26 8:42 PM;712020:561627c7-6e04-4165-8d15-a503a75143c6;Attached is a screenshot reference of the conceptual idea of the settings page:
+
+!Screenshot 2026-10-07 at 8.39.03 PM.png|width=1039,alt=""Screenshot 2026-10-07 at 8.39.03 PM.png""!",,,,,,Done,08/Oct/26 5:07 PM
+Frontend: Implement user and service provider registration and login view,BAAAM-24,10068,Story,Pull Request,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,09/Oct/26 12:53 AM,,,,0,,,,,"h3. User Story
+
+As a user (client or service provider), I want dedicated, responsive registration and login screens so that I can easily sign up and securely access the booking system.
+
+h3. Description
+
+Implement the frontend client-facing UI, forms, and navigation for the authentication flow in BAAAM Scheduling. This ticket covers the visual layouts, client-side input validations, account type switching, dynamic form controls for service providers, and routing transitions.
+
+h3. Acceptance Criteria
+
+h4. Layout & Navigation:
+
+* Full-page authentication layout active on /login, /signup, and /signup/provider (main app navigation/header hidden).
+
+* Direct navigation links between Login and the appropriate Signup screen based on selected account type (selecting Service Provider routes to /signup/provider; selecting User routes to /signup).
+
+h4. Login Flow (/login):
+
+* Role toggle to switch between User and Service Provider.
+
+* Username and password inputs with client-side required field checks.
+
+* Password visibility toggle (eye icon) to show/hide plaintext.
+
+* UI state and alerts for invalid login attempts.
+
+h4. Standard User Registration (/signup):
+
+* Form fields: First Name, Last Name, Username, Email, Phone Number, Password, and Confirm Password.
+
+* Client-side validation: Required fields, valid email format, and password confirmation match.
+
+h4. Service Provider Registration (/signup/provider):
+
+* Includes all standard user registration fields.
+
+* Multi-select service category picker (Medical, Beauty, Fitness) requiring at least one selection.
+
+* Dynamic credential sections that expand based on selected service categories.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000v3:,Demo 1,,,,,,,,,,10051,BAAAM-7,User & Authentication System,In Progress,07/Oct/26 10:38 PM
+Create Notifications Page for UI,BAAAM-134,10242,Story,Pull Request,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,08/Oct/26 9:35 AM,08/Oct/26 10:36 AM,,,,0,,,,,"As a signed-in user, I want to view and manage my *notifications* in one place so that I can stay informed about relevant appointments and updates.
+
+h2. Description
+
+Create a Notifications page based on the supplied design while maintaining the current website’s theme. Include the existing primary navigation, a Notifications heading and subtitle, and controls for filtering and managing notifications.
+
+The initial view should display the signed-in user’s notifications, including a title, message, timestamp, and clear read or unread state. Users should be able to filter notifications by Medical, Beauty, and Fitness, mark individual notifications as read, and mark all notifications as read.
+
+Match the reference’s spacious layout, rounded controls, muted background, and dark green primary action, using existing application styles wherever possible. The screenshot’s yellow highlights and circular “L” markers are annotations, not interface elements.
+
+h2. Acceptance criteria
+
+* Notifications is accessible from the primary navigation and visibly identified as the active page.
+* Users can view only their own notifications, displayed with the newest first.
+* Each notification includes a title, message, timestamp, category, and clear read or unread state.
+* Users can filter notifications by All, Medical, Beauty, and Fitness, with a clear active filter state.
+* Users can mark individual notifications as read or mark all notifications as read.
+* Changes to read status persist and update any existing unread notification count.
+* Notifications associated with an appointment link to the relevant appointment details, where supported.
+* The page provides loading, empty, success, and error states appropriate to fetching notifications and updating read status.
+* The page follows the current website’s styling, works on desktop and mobile, and supports keyboard navigation.
+* Screenshot sample values are replaced by the signed-in user’s notification data; yellow annotations are omitted.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,08/Oct/26 9:41 AM;6971f3f7-0510-4dc5-be01-b7e80dd83e13;Screenshot 2026-10-08 at 9.38.33 AM.png;https://baaa.atlassian.net/rest/api/3/attachment/content/10002,{},,,,0|i000v8:,Demo 1,,,,,,,"08/Oct/26 9:41 AM;712020:561627c7-6e04-4165-8d15-a503a75143c6;I will be implementing the notifications page UI based on this Figma screenshot reference:
+
+!Screenshot 2026-10-08 at 9.38.33 AM.png|width=948,alt=""Screenshot 2026-10-08 at 9.38.33 AM.png""!",,,,,,In Progress,08/Oct/26 9:41 AM
+implement enhanced user profile,BAAAM-135,10243,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,08/Oct/26 10:01 AM,08/Oct/26 10:02 AM,10/Oct/26 7:01 PM,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000va:,Demo 1,,,,,,,,,,,,,To Do,08/Oct/26 10:01 AM
+Create a Backend Administration Page to visualize database entries,BAAAM-136,10244,Story,Pull Request,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,08/Oct/26 1:26 PM,08/Oct/26 5:06 PM,10/Oct/26 7:01 PM,,,0,,,,,"As an Admin or Website Developer, I’d like to have the ability to see the database content from an easy-to-understand page. The page should serve as a *lightweight backend-to-MongoDB viewer*, exposing connection status, live collection document counts, appointments by category, and an appointment entry list. All of these are to be fetched from live API endpoints implemented in a previous ticket.
+
+h2. Proposed Ideas I Came Up With
+
+* *Backend API*
+** {{DbHealthController}} — new endpoint at {{/api/dbhealth}} reporting MongoDB connectivity, latency, config source, collection names, and live document counts.
+** {{MongoDbContext}} — updated MongoDB context wiring.
+** {{Program.cs}} — serves the admin page at {{/db}} and falls back to {{db/index.html}} for non-file paths.
+* *Frontend / static assets*
+** New {{wwwroot/db/}} viewer (HTML, CSS, JS) for the DB admin page.
+** {{app.routes.ts}} — 1-line update to register the DB route.
+
+h2. Screenshot for Proof of Concept (Made with Pull Request)
+
+<img width=""1797"" height=""888"" alt=""Screenshot 2026-10-08 at 4 45 01 PM"" src=""[https://github.com/user-attachments/assets/0376e081-f6b7-46d9-b526-bc21227156bd|https://github.com/user-attachments/assets/0376e081-f6b7-46d9-b526-bc21227156bd] "" />
+
+* To see this for yourself, run the dev.sh script or run the backend script, then navigate here:
+** [http://localhost:5100/db/|http://localhost:5100/db/] 
+* Real data is returned only in environments where MongoDB is configured; otherwise the endpoint reports the in-memory fallback state.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000vj:,Demo 1,,,,,,,,,,10061,BAAAM-17,Team Process & Governance,In Progress,08/Oct/26 1:28 PM
+Backend: Admin approves service provider accounts,BAAAM-138,10246,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,10/Oct/26 9:03 PM,10/Oct/26 9:06 PM,10/Oct/26 9:11 PM,,,0,,,,,"* {{GET /api/admin/provider-requests?status=pending}} lists pending requests with the provider's name.
+* {{POST /api/admin/provider-requests/{id}/approve}} marks the request approved and sets {{Provider.IsApproved}} to true.
+* {{POST /api/admin/provider-requests/{id}/reject {notes}}} soft-deletes the request and saves the reason.
+
+Acceptance criteria: admins only; an unapproved provider can't create slots and doesn't appear to clients; tests.",,Andrew,,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,,,,,,,,,,,{},,,,0|i000vr:,Demo 1,,,,,,,,,,10057,BAAAM-13,Admin Console,To Do,10/Oct/26 9:03 PM
