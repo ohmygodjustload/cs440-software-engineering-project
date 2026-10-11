@@ -7,96 +7,76 @@
 -->
 
 <div class="home-container">
-  <header class="greeting">
-    <h1>{{ greeting }}</h1>
-    <p>{{ now | date:'EEEE, MMMM d, y' }}</p>
-  </header>
 
-  @if (loading) {
-    <p role="status">Loading your appointments…</p>
-  } @else if (error) {
-    <div class="error" role="alert">
-      <p>{{ error }}</p>
-      <button type="button" (click)="load()">Try again</button>
+  <!-- Greeting -->
+  <section class="greeting">
+    <h1>Good morning, [name]</h1>
+    <p>[date]</p>
+  </section>
+
+  <!-- Summary cards -->
+  <section class="stats">
+
+    <div class="stat-card today-card">
+      <p class="stat-title">Today</p>
+
+      <div class="stat-info">
+        <span class="stat-number">1</span>
+        <span class="stat-description">appointment today</span>
+      </div>
     </div>
-  } @else {
-    <section class="stats" aria-label="Appointment summary">
-      <div class="stat-card today-card">
-        <h2>Today</h2>
-        <div class="stat-info">
-          <span class="stat-number">{{ todayCount }}</span>
-          <span>appointment{{ todayCount === 1 ? '' : 's' }} today</span>
-        </div>
+
+    <div class="stat-card week-card">
+      <p class="stat-title">This week</p>
+
+      <div class="stat-info">
+        <span class="stat-number">3</span>
+        <span class="stat-description">appointments this week</span>
       </div>
-      <div class="stat-card week-card">
-        <h2>This week</h2>
-        <div class="stat-info">
-          <span class="stat-number">{{ weekCount }}</span>
-          <span>appointment{{ weekCount === 1 ? '' : 's' }} this week</span>
-        </div>
+    </div>
+
+    <div class="stat-card reminder-card">
+      <p class="stat-title">Reminders</p>
+
+      <div class="stat-info">
+        <span class="stat-number">2</span>
+        <span class="stat-description">reminders scheduled</span>
       </div>
-      <div class="stat-card reminder-card">
-        <h2>Reminders</h2>
-        <p class="unavailable">Unavailable</p>
-        <span>Reminders are not set up yet.</span>
+    </div>
+
+  </section>
+
+
+  <!-- Next appointment -->
+  <section class="next-appointment">
+    <h2>Next appointment</h2>
+
+    <div class="appointment-card">
+
+      <div class="appointment-content">
+
+        <div class="appointment-meta">
+          <span>MEDICAL</span>
+          <span class="dot">•</span>
+          <span>Today, 10:30 AM</span>
+        </div>
+
+        <h3>Annual physical</h3>
+
+        <div class="appointment-details">
+          <span>MEDICAL</span>
+          <span class="dot">•</span>
+          <span>Wembleh Hall</span>
+        </div>
+
       </div>
-    </section>
 
-    <section class="next-appointment">
-      <h2>Next appointment</h2>
-      @if (nextAppointment; as appointment) {
-        <div class="appointment-card">
-          <div>
-            <p class="appointment-meta">
-              {{ appointment.category }} · {{ appointment.startDateTime | date:'MMM d, h:mm a' }}
-            </p>
-            <h3>{{ appointment.title }}</h3>
-            <p class="appointment-details">
-              {{ appointment.providerName || 'Provider details pending' }}
-              @if (appointment.location) {
-                <span> · {{ appointment.location }}</span>
-              }
-            </p>
-          </div>
-          <button type="button" class="primary" (click)="selectedAppointment = appointment">
-            View details
-          </button>
-        </div>
-      } @else {
-        <div class="appointment-card">
-          <p>No upcoming appointments.</p>
-          <a class="primary" routerLink="/appointments">Book an appointment</a>
-        </div>
-      }
+      <button class="details-button">
+        View details
+      </button>
 
-      @if (selectedAppointment; as appointment) {
-        <section class="details-panel" aria-label="Appointment details">
-          <h3>{{ appointment.title }}</h3>
-          <dl>
-            <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
-            <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
-            <dt>Status</dt><dd>{{ appointment.status }}</dd>
-            <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
-            <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
-          </dl>
-          <button type="button" (click)="selectedAppointment = null">Close details</button>
-        </section>
-      }
-    </section>
+    </div>
 
-    <section class="recent">
-      <h2>Recent appointments</h2>
-      @for (appointment of recentAppointments; track appointment.id) {
-        <div class="activity-row">
-          <time>{{ appointment.startDateTime | date:'MMM d' }}</time>
-          <span>{{ appointment.title }}</span>
-          <span>{{ appointment.status }}</span>
-        </div>
-      } @empty {
-        <p class="empty">No recent appointments.</p>
-      }
-    </section>
-  }
+  </section>
 
-  <nav class="quick-links" aria-label="Dashboard actions"></nav>
 </div>
