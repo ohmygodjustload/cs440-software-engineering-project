@@ -1,1 +1,154 @@
-<p>notifications works!</p>
+<!-- Notifications page: heading + action, preference panel, schedule, history. -->
+<div class="notifications-page">
+  <header class="notifications-head">
+    <div class="notifications-head__titles">
+      <h1>Notifications</h1>
+      <p>Manage delivery preferences and review reminder status.</p>
+    </div>
+    <button
+      type="button"
+      class="notifications-mark"
+      (click)="markAllRead()"
+      [disabled]="!canMarkAllRead"
+      [attr.aria-disabled]="!canMarkAllRead"
+    >
+      {{ markAllReadSaving ? 'Marking…' : 'Mark all read' }}
+    </button>
+  </header>
+
+  @if (userState === 'error') {
+    <div class="notifications-alert notifications-alert--error" role="alert">
+      <p>{{ userError }}</p>
+      <button type="button" class="notifications-retry" (click)="retryUser()">Try again</button>
+    </div>
+  }
+
+  @if (markAllReadDone) {
+    <div class="notifications-alert notifications-alert--success" role="status">
+      <p>All notifications marked as read.</p>
+    </div>
+  }
+  @if (markAllReadError) {
+    <div class="notifications-alert notifications-alert--error" role="alert">
+      <p>{{ markAllReadError }}</p>
+    </div>
+  }
+
+  <section class="notifications-panel" aria-labelledby="inbrowser-heading">
+    <div class="notifications-panel__text">
+      <h2 id="inbrowser-heading">In-browser notifications</h2>
+      <p>Create, edit, and cancellation confirmations</p>
+    </div>
+    <div class="notifications-panel__control">
+      @if (prefsState === 'loading') {
+        <p class="notifications-status" role="status">Loading preferences…</p>
+      } @else if (prefsState === 'error') {
+        <div class="notifications-inline-error" role="alert">
+          <p>{{ prefsError }}</p>
+          <button type="button" class="notifications-retry" (click)="retryPreferences()">Try again</button>
+        </div>
+      } @else if (preferences) {
+        <button
+          type="button"
+          id="notifications-inbrowser"
+          class="notifications-switch"
+          role="switch"
+          [attr.aria-checked]="preferences.inBrowserEnabled"
+          [attr.aria-busy]="isSaving('inBrowserEnabled')"
+          [disabled]="isToggleBusy('inBrowserEnabled')"
+          [attr.aria-labelledby]="'inbrowser-heading'"
+          (click)="onToggle('inBrowserEnabled', !preferences.inBrowserEnabled)"
+        >
+          <span class="notifications-switch__track" aria-hidden="true">
+            <span class="notifications-switch__thumb"></span>
+          </span>
+          <span class="notifications-switch__label">{{
+            isSaving('inBrowserEnabled') ? 'Saving…' : stateLabel(preferences.inBrowserEnabled)
+          }}</span>
+        </button>
+      }
+    </div>
+    @if (saveError) {
+      <p class="notifications-field-error" role="alert">{{ saveError }}</p>
+    }
+  </section>
+
+  <section class="notifications-section" aria-labelledby="schedule-heading">
+    <h2 id="schedule-heading">Reminder schedule</h2>
+    @if (prefsState === 'loading') {
+      <p class="notifications-status" role="status">Loading reminder schedule…</p>
+    } @else if (prefsState === 'error') {
+      <div class="notifications-alert notifications-alert--error" role="alert">
+        <p>{{ prefsError }}</p>
+        <button type="button" class="notifications-retry" (click)="retryPreferences()">Try again</button>
+      </div>
+    } @else if (preferences) {
+      <ul class="notifications-schedule">
+        @for (row of reminderRows; track row.key) {
+          <li class="notifications-schedule__row">
+            <span class="notifications-schedule__timing" [id]="row.labelId">{{ row.timing }}</span>
+            <span class="notifications-schedule__status">{{ statusLabel(preferences[row.key]) }}</span>
+            <span class="notifications-schedule__recipient">{{ recipientSummary }}</span>
+            <span class="notifications-schedule__control">
+              <button
+                type="button"
+                [id]="row.controlId"
+                class="notifications-switch"
+                role="switch"
+                [attr.aria-checked]="preferences[row.key]"
+                [attr.aria-busy]="isSaving(row.key)"
+                [disabled]="isToggleBusy(row.key)"
+                [attr.aria-labelledby]="row.labelId"
+                (click)="onToggle(row.key, !preferences[row.key])"
+              >
+                <span class="notifications-switch__track" aria-hidden="true">
+                  <span class="notifications-switch__thumb"></span>
+                </span>
+                <span class="notifications-switch__label">{{
+                  isSaving(row.key) ? 'Saving…' : stateLabel(preferences[row.key])
+                }}</span>
+              </button>
+            </span>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="notifications-section" aria-labelledby="recent-heading">
+    <h2 id="recent-heading">Recent notifications</h2>
+    @if (historyState === 'loading') {
+      <p class="notifications-status" role="status">Loading notifications…</p>
+    } @else if (historyState === 'error') {
+      <div class="notifications-alert notifications-alert--error" role="alert">
+        <p>{{ historyError }}</p>
+        <button type="button" class="notifications-retry" (click)="retryHistory()">Try again</button>
+      </div>
+    } @else if (history.length === 0) {
+      <p class="notifications-empty" role="status">No notifications yet.</p>
+    } @else {
+      <ul class="notifications-history">
+        @for (item of history; track item.id) {
+          <li
+            class="notifications-history__row"
+            [class.notifications-history__row--unread]="!item.isRead"
+          >
+            <span class="notifications-history__event">
+              {{ eventLabel(item) }}
+              @if (!item.isRead) {
+                <span class="notifications-unread-dot" aria-label="Unread"></span>
+              }
+            </span>
+            <span class="notifications-history__message">
+              {{ item.message }} · {{ formatTimestamp(item.createdAt) }}
+              @if (!item.isRead) {
+                <span class="notifications-unread-tag">Unread</span>
+              }
+            </span>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>
+

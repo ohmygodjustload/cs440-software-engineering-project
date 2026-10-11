@@ -8,7 +8,7 @@
  */
 
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 /** A destination shown in the main navigation. */
 interface NavLink {
@@ -23,6 +23,8 @@ interface NavLink {
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  constructor(private readonly router: Router) {}
+
   readonly title = 'BAAAM Scheduling System';
 
   readonly navLinks: readonly NavLink[] = [
@@ -33,4 +35,8 @@ export class AppComponent {
     { label: 'Statistics', path: '/statistics' },
     { label: 'Settings', path: '/settings' }
   ];
+
+  get usesFullPageLayout(): boolean {
+    return ['/login', '/signup', '/signup/provider'].includes(this.router.url.split(/[?#]/)[0]);
+  }
 }

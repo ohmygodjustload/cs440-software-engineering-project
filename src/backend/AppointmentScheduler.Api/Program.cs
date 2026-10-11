@@ -12,7 +12,6 @@ builder.Services.AddControllers()
     // Numbers keep working (back-compat with the .http file); names fix the 400s.
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(
         new System.Text.Json.Serialization.JsonStringEnumConverter()));
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 // Register Swagger/OpenAPI generators so all controller endpoints are documented
@@ -112,6 +111,15 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = "swagger"; // UI at /swagger
     });
 }
+
+// Simple backend DB viewer (like Swagger UI but for data): static page at /db
+// that calls the live /api/dbhealth + /api/appointments endpoints. Real data only.
+// NOTE: Do NOT add app.MapGet("/db", ...) with a redirect — ASP.NET Core normalizes
+// trailing slashes and /db/ would redirect to itself forever (ERR_TOO_MANY_REDIRECTS).
+// UseStaticFiles() serves /db/index.html for /db/, and MapFallbackToFile serves it
+// for /db and any non-file /db/* path.
+app.UseStaticFiles();
+app.MapFallbackToFile("/db/{*path:nonfile}", "db/index.html");
 
 app.UseCors(AngularCorsPolicy);
 

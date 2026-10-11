@@ -22,6 +22,8 @@ import { UserSettingsService } from '../../core/services/user-settings.service';
 /** Full-name alphabet: Unicode letters/marks plus everyday punctuation. */
 const FULL_NAME_PATTERN = /^[\p{L}\p{M} .'\-]+$/u;
 
+type LoadState = 'loading' | 'loaded' | 'error';
+
 /**
  * Permissive phone check: empty is allowed (phone is optional); otherwise the
  * value must contain at least 7 digits and only telephone punctuation.
@@ -40,9 +42,6 @@ export function phoneValidator(): ValidatorFn {
     return null;
   };
 }
-
-type LoadState = 'loading' | 'loaded' | 'error';
-
 @Component({
   selector: 'app-settings',
   imports: [CommonModule, ReactiveFormsModule],
