@@ -1,248 +1,214 @@
-/* Main page container */
+:host {
+  display: block;
+  color: #344945;
+  background: #f7f5f1;
+}
 
 .home-container {
   max-width: 980px;
   margin: 0 auto;
-  padding: 52px 24px 80px;
-  color: #344b48;
+  padding: 12px 24px 80px;
 }
 
-
-/* --------------------------------
-   Greeting
--------------------------------- */
-
-.greeting h1 {
+h1 {
   margin: 0;
   font-size: 32px;
   font-weight: 500;
+  letter-spacing: -0.6px;
 }
 
 .greeting p {
-  margin: 10px 0 0;
+  margin: 18px 0 24px;
   font-size: 14px;
-  color: #526460;
 }
-
-
-/* --------------------------------
-   Summary cards
--------------------------------- */
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 28px;
-
-  margin-top: 24px;
+  max-width: 932px;
 }
 
 .stat-card {
+  box-sizing: border-box;
   min-height: 112px;
   padding: 20px;
-
-  border-radius: 20px;
-
-  box-sizing: border-box;
+  border-radius: 24px;
 }
 
-.today-card {
-  background: #dedbd2;
+.today-card, .appointment-card {
+  background: #e0dcd1;
 }
 
 .week-card {
-  background: #d4e4ea;
+  background: #d5e3e8;
 }
 
 .reminder-card {
-  background: #ebe8b8;
+  background: #e4e3bc;
 }
 
-.stat-title {
+h2 {
   margin: 0;
-
-  font-size: 14px;
-  color: #526460;
+  font-size: 15px;
+  font-weight: 400;
 }
 
 .stat-info {
   display: flex;
-  align-items: flex-end;
-  gap: 24px;
-
-  margin-top: 8px;
+  align-items: baseline;
+  gap: 18px;
 }
 
 .stat-number {
-  font-size: 38px;
-  line-height: 1;
-
-  color: #344b48;
+  font-size: 44px;
+  font-weight: 500;
 }
 
-.stat-description {
-  margin-bottom: 4px;
-
-  font-size: 11px;
-  color: #526460;
+.stat-info > span:last-child, .reminder-card > span {
+  font-size: 12px;
 }
 
-
-/* --------------------------------
-   Section headings
--------------------------------- */
-
-.next-appointment,
-.recent-activity {
-  margin-top: 40px;
+.unavailable {
+  margin: 10px 0 6px;
+  font-size: 20px;
 }
 
-.next-appointment h2,
-.recent-activity h2 {
-  margin: 0 0 18px;
-
-  font-size: 14px;
-  font-weight: 400;
-
-  color: #344b48;
+.next-appointment, .recent {
+  margin-top: 38px;
 }
-
-
-/* --------------------------------
-   Appointment card
--------------------------------- */
 
 .appointment-card {
-  min-height: 156px;
-
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
+  gap: 20px;
+  width: 100%;
+  max-width: 932px;
+  min-height: 156px;
+  margin-top: 20px;
   padding: 24px;
-
-  background: #dedbd2;
-
-  border-radius: 20px;
-
-  box-sizing: border-box;
-}
-
-.appointment-content {
-  display: flex;
-  flex-direction: column;
+  border-radius: 24px;
 }
 
 .appointment-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  font-size: 11px;
-  color: #344b48;
+  margin: 0;
+  font-size: 13px;
 }
 
 .appointment-card h3 {
-  margin: 24px 0 6px;
-
-  font-size: 23px;
+  margin: 22px 0 6px;
+  font-size: 26px;
   font-weight: 500;
-
-  color: #344b48;
+  overflow-wrap: anywhere;
 }
 
 .appointment-details {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  font-size: 13px;
-  color: #526460;
+  margin: 0;
+  font-size: 15px;
 }
 
-.dot {
-  font-size: 11px;
+button, a {
+  font: inherit;
+  color: inherit;
 }
 
-.details-button {
-  min-width: 180px;
-
-  padding: 13px 28px;
-
-  border: none;
-  border-radius: 999px;
-
-  background: #344f4b;
-  color: white;
-
-  font-size: 12px;
-
+button {
   cursor: pointer;
 }
 
-.details-button:hover {
-  background: #283f3b;
-}
-
-
-/* --------------------------------
-   Recent activity
--------------------------------- */
-
-.activity-table {
-  width: 100%;
-
-  padding: 8px 20px;
-
-  box-sizing: border-box;
+.primary {
+  flex-shrink: 0;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #344945;
+  color: #f7f5f1;
+  font-size: 14px;
+  text-decoration: none;
 }
 
 .activity-row {
   display: grid;
+  grid-template-columns: 70px minmax(0, 220px) 1fr;
+  gap: 12px;
+  padding: 18px 24px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
 
-  grid-template-columns:
-    70px
-    140px
-    1fr;
+.recent h2 {
+  margin-bottom: 18px;
+}
 
+.empty {
+  padding: 12px 24px;
+}
+
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-
-  min-height: 52px;
-
-  font-size: 13px;
+  gap: 24px;
+  margin-top: 32px;
+  font-size: 14px;
 }
 
-.activity-date {
-  color: #526460;
+.quick-links button, .details-panel button, .error button {
+  padding: 10px 18px;
+  border: 1px solid #344945;
+  border-radius: 999px;
+  background: transparent;
 }
 
-.activity-name {
-  color: #344b48;
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
 }
 
-.activity-status {
-  color: #526460;
+.details-panel {
+  max-width: 572px;
+  margin-top: 16px;
+  padding: 24px;
+  border: 1px solid #e0dcd1;
+  border-radius: 24px;
 }
 
+dl {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 12px;
+}
 
-/* --------------------------------
-   Smaller screens
--------------------------------- */
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
 
-@media (max-width: 800px) {
+.error {
+  padding: 20px;
+  background: #fbeceb;
+  border-radius: 16px;
+}
 
+@media (max-width: 760px) {
   .stats {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .appointment-card {
-    flex-direction: column;
     align-items: flex-start;
-    gap: 24px;
+    flex-direction: column;
   }
 
-  .details-button {
-    width: 100%;
+  .activity-row {
+    grid-template-columns: 60px minmax(0, 1fr);
+    padding: 16px 0;
   }
 
+  .activity-row > span:last-child {
+    grid-column: 2;
+  }
 }
