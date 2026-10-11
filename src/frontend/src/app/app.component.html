@@ -6,6 +6,7 @@
 
 -->
 
+@if (!usesFullPageLayout) {
 <header class="app-header">
   <span class="app-brand">{{ title }}</span>
 
@@ -25,7 +26,8 @@
     </ul>
   </nav>
 </header>
+}
 
-<main class="app-main">
+<main class="app-main" [class.app-main--full-page]="usesFullPageLayout">
   <router-outlet />
 </main>
