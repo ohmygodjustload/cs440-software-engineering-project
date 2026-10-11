@@ -145,7 +145,7 @@ Scenario 4: Security definition (JWT Bearer Auth - Optional/If Applicable)
   Given the API uses token-based authentication
   When a user clicks the ""Authorize"" button in Swagger UI and provides a valid Bearer token
   Then subsequent ""Try it out"" API requests should include the {{Authorization: Bearer <token>}} header.",,Manoj Khadka,,712020:d30279c8-ce50-4163-a875-1320c647fae1,,,,,,,,,,07/Oct/26 1:13 AM;ug:039cb636-1308-470b-94ab-c2e19176fad6;image-20261007-061309.png;https://baaa.atlassian.net/rest/api/3/attachment/content/10000,{},,,,0|i00085:,Demo 1,,,,,,,"07/Oct/26 1:13 AM;712020:d30279c8-ce50-4163-a875-1320c647fae1;!image-20261007-061309.png|width=598,alt=""image-20261007-061309.png""!",,,,,,Done,07/Oct/26 9:38 PM
-"Implement role-based access control (user, provider, admin)",BAAAM-25,10069,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,High,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,07/Oct/26 9:16 AM,10/Oct/26 9:45 PM,,,0,,,,,"As an administrator, I'd like to implement role-based access control so that users, providers, and admins have appropriate permissions. This ensures each user type can only access features and data relevant to their role.
+"Implement role-based access control (user, provider, admin)",BAAAM-25,10069,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,High,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,07/Oct/26 9:16 AM,10/Oct/26 9:07 PM,,,0,,,,,"As an administrator, I'd like to implement role-based access control so that users, providers, and admins have appropriate permissions. This ensures each user type can only access features and data relevant to their role.
 
 Acceptance Criteria:
 
@@ -158,6 +158,19 @@ Acceptance Criteria:
 - Backend API endpoints enforce role-based authorization
 
 - Default role is assigned on registration",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i00087:,Demo 1,,,,,,,,,,10051,BAAAM-7,User & Authentication System,To Do,16/Sep/26 9:29 AM
+Implement user profile management and session handling,BAAAM-26,10070,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,07/Oct/26 9:16 AM,10/Oct/26 9:07 PM,,,0,,,,,"As a user, I'd like to manage my profile and maintain my session so that my information is up to date and I stay logged in. This includes viewing and editing personal details as well as secure session persistence across the application.
+
+Acceptance Criteria:
+
+- Users can view and edit their profile information
+
+- Profile changes are validated and saved
+
+- Session is maintained across page navigations
+
+- Users can log out to end their session
+
+- Profile page shows relevant fields based on user role",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0008f:,Demo 1,,,,,,,,,,10051,BAAAM-7,User & Authentication System,To Do,16/Sep/26 9:29 AM
 Implement provider view of their own appointments and users,BAAAM-27,10071,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,06/Oct/26 10:22 AM,,,,0,,,,,"As a service provider, I'd like to view my appointments and users so that I can manage my schedule. This view is restricted to only the provider's own appointments, ensuring data privacy between providers.
 
 Acceptance Criteria:
@@ -229,20 +242,33 @@ Acceptance Criteria:
 - Results are paginated for large result sets
 
 - Empty state is shown when no providers match the search",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009b:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:31 AM
-Implement user profile management and session handling,BAAAM-26,10070,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:29 AM,10/Oct/26 9:47 PM,10/Oct/26 10:55 PM,,,0,,,,,"As a user, I'd like to manage my profile and maintain my session so that my information is up to date and I stay logged in. This includes viewing and editing personal details as well as secure session persistence across the application.
+Implement slot availability display and real-time fetching,BAAAM-31,10075,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:31 AM,10/Oct/26 8:57 PM,10/Oct/26 9:10 PM,,,0,,,,,"As a user, I'd like to see available time slots in real time so that I can select a slot that is currently open. This ensures users see the most up-to-date availability before attempting to book.
 
 Acceptance Criteria:
 
-- Users can view and edit their profile information
+- Available slots are displayed in a calendar or list view
 
-- Profile changes are validated and saved
+- Slot availability is fetched in real time from the backend
 
-- Session is maintained across page navigations
+- Booked slots are visually distinguished from available ones
 
-- Users can log out to end their session
+- Loading indicator is shown while fetching
 
-- Profile page shows relevant fields based on user role",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009n:,Demo 2,,,,,,,,,,10051,BAAAM-7,User & Authentication System,To Do,16/Sep/26 9:29 AM
-Implement conflict prevention and first-come-first-serve booking logic,BAAAM-33,10077,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:32 AM,10/Oct/26 8:57 PM,10/Oct/26 9:36 PM,,,0,,,,,"As a user, I'd like the system to prevent double-booking so that each appointment slot is reserved for only one user. The system should enforce first-come-first-serve logic without holds or pre-reservations.
+- Slots are filtered by date range",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009j:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:31 AM
+Implement appointment creation and booking confirmation,BAAAM-32,10076,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:32 AM,10/Oct/26 8:57 PM,10/Oct/26 9:09 PM,,,0,,,,,"As a user, I'd like to create an appointment and receive a confirmation so that my booking is secured. The system should create a record in the database and immediately display confirmation details to the user.
+
+Acceptance Criteria:
+
+- User can select an available slot and confirm the booking
+
+- Booking creates an appointment record in the database
+
+- Confirmation screen shows appointment details
+
+- Confirmation is displayed immediately after booking
+
+- User receives a notification of the confirmed appointment",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i0009r:,Demo 2,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:32 AM
+Implement conflict prevention and first-come-first-serve booking logic,BAAAM-33,10077,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:32 AM,10/Oct/26 8:57 PM,10/Oct/26 9:02 PM,,,0,,,,,"As a user, I'd like the system to prevent double-booking so that each appointment slot is reserved for only one user. The system should enforce first-come-first-serve logic without holds or pre-reservations.
 
 Acceptance Criteria:
 
@@ -537,71 +563,31 @@ Design wireframes and UI mockups for all screens,BAAAM-59,10102,Subtask,In Progr
 Implement frontend role-based routing and access guards,BAAAM-58,10103,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,10/Oct/26 7:08 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000fr:,Demo 1,,,,,,,,,,10069,BAAAM-25,"Implement role-based access control (user, provider, admin)",To Do,16/Sep/26 12:18 PM
 Implement backend auth API and user/provider DB schema (C#),BAAAM-61,10104,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000fz:,Demo 1,,,,,,,,,,10068,BAAAM-24,Frontend: Implement user and service provider registration and login view,To Do,16/Sep/26 12:18 PM
 Build frontend registration and login screens (Angular),BAAAM-60,10105,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:18 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000g7:,Demo 1,,,,,,,,,,10068,BAAAM-24,Frontend: Implement user and service provider registration and login view,To Do,16/Sep/26 12:18 PM
-Build frontend user profile management UI,BAAAM-62,10106,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,10/Oct/26 7:11 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gf:,Demo 2,,,,,,,,,,10070,BAAAM-26,Implement user profile management and session handling,To Do,16/Sep/26 12:19 PM
-Implement backend RBAC middleware and role assignment (C#),BAAAM-63,10107,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,10/Oct/26 9:45 PM,10/Oct/26 9:45 PM,,,0,,,,,"Add role and approval checks to the Demo 1 endpoints.
-
-* Clients: book slots (BAAAM-76)
-* Approved providers: create, edit, and delete their own slots (BAAAM-70)
-* Admins: approve and reject providers (BAAAM-138 subtask)
-* Until login (BAAAM-137) is merged, a development-only setting picks which seeded user a request acts as
-
-Acceptance Criteria:
-
-* No user: 401. Wrong role or unapproved provider: 403
-* Tests",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gn:,Demo 1,,,,,,,,,,10069,BAAAM-25,"Implement role-based access control (user, provider, admin)",To Do,16/Sep/26 12:19 PM
+Build frontend user profile management UI,BAAAM-62,10106,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,10/Oct/26 7:11 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gf:,Demo 1,,,,,,,,,,10070,BAAAM-26,Implement user profile management and session handling,To Do,16/Sep/26 12:19 PM
+Implement backend RBAC middleware and role assignment (C#),BAAAM-63,10107,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,10/Oct/26 9:07 PM,10/Oct/26 9:07 PM,,,0,,,,,"Role checks on tickets 1–4. Clients book, providers create slots, admins approve.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gn:,Demo 1,,,,,,,,,,10069,BAAAM-25,"Implement role-based access control (user, provider, admin)",To Do,16/Sep/26 12:19 PM
 Build frontend provider appointment and user list view,BAAAM-64,10108,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000gv:,Demo 1,,,,,,,,,,10071,BAAAM-27,Implement provider view of their own appointments and users,To Do,16/Sep/26 12:19 PM
 Implement backend provider appointment query API (C#),BAAAM-65,10109,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000h3:,Demo 1,,,,,,,,,,10071,BAAAM-27,Implement provider view of their own appointments and users,To Do,16/Sep/26 12:19 PM
-Implement backend profile and session APIs (C#),BAAAM-66,10110,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,10/Oct/26 7:12 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hb:,Demo 2,,,,,,,,,,10070,BAAAM-26,Implement user profile management and session handling,To Do,16/Sep/26 12:19 PM
+Implement backend profile and session APIs (C#),BAAAM-66,10110,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:19 PM,22/Sep/26 9:49 AM,10/Oct/26 7:12 PM,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hb:,Demo 1,,,,,,,,,,10070,BAAAM-26,Implement user profile management and session handling,To Do,16/Sep/26 12:19 PM
 Build frontend provider profile setup UI (Angular),BAAAM-67,10111,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hj:,Demo 1,,,,,,,,,,10072,BAAAM-28,Implement provider category and business profile setup,To Do,16/Sep/26 12:20 PM
 Implement backend provider profile/category API (C#),BAAAM-68,10112,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hr:,Demo 1,,,,,,,,,,10072,BAAAM-28,Implement provider category and business profile setup,To Do,16/Sep/26 12:20 PM
 Build frontend slot management UI (Angular),BAAAM-69,10113,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000hz:,Demo 1,,,,,,,,,,10073,BAAAM-29,Implement provider slot creation and management,To Do,16/Sep/26 12:20 PM
-Backend: Provider slot creation API,BAAAM-70,10114,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,10/Oct/26 9:37 PM,10/Oct/26 9:37 PM,,,0,,,,,"A slot is an Appointment whose status is ""Available"". An approved provider creates slots from one of their own appointment types.
+Backend: Provider slot creation API,BAAAM-70,10114,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,10/Oct/26 9:10 PM,10/Oct/26 9:09 PM,,,0,,,,,"A slot is an Appointment whose status is ""Available"". An approved provider creates slots from one of their own appointment types.
 
 * {{POST /api/slots {appointmentTypeId, startTime}}} creates an Available appointment. The end time is the start time plus the type's duration.
 * {{GET /api/slots/mine}} returns the provider's own slots.
 * {{DELETE /api/slots/{id}}} soft-deletes a slot, but only if it's still Available.
 * Add {{Available}} to the status list the API understands, so open slots stop showing as Scheduled.
-* {{PUT /api/slots/{id}}} changes a slot's start time or appointment type, only while it is still Available
-* Angular: core/models/slot.ts, plus create/getMine/update/delete in core/services/slots.service.ts
 
 Acceptance criteria: the provider must be approved and must own the appointment type; reject a start time in the past; reject overlap with the provider's existing appointments; tests for each.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000i7:,Demo 1,,,,,,,,,,10073,BAAAM-29,Implement provider slot creation and management,To Do,16/Sep/26 12:20 PM
 Build frontend category browse and search UI (Angular),BAAAM-71,10115,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:20 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000if:,Demo 2,,,,,,,,,,10074,BAAAM-30,Implement category browse and provider search for booking,To Do,16/Sep/26 12:20 PM
 Implement backend search API for providers by category (C#),BAAAM-72,10116,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000in:,Demo 2,,,,,,,,,,10074,BAAAM-30,Implement category browse and provider search for booking,To Do,16/Sep/26 12:21 PM
-Build frontend slot availability display (Angular),BAAAM-73,10117,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000iv:,Demo 1,,,,,,,,,,10075,BAAAM-31,Implement slot availability display and real-time fetching,To Do,16/Sep/26 12:21 PM
-Backend: Available slots API,BAAAM-74,10118,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,10/Oct/26 9:37 PM,10/Oct/26 9:37 PM,,,0,,,,,"Return the open slots a client can choose from.
+Build frontend slot availability display (Angular),BAAAM-73,10117,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000iv:,Demo 2,,,,,,,,,,10075,BAAAM-31,Implement slot availability display and real-time fetching,To Do,16/Sep/26 12:21 PM
+Backend: Available slots API,BAAAM-74,10118,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,10/Oct/26 9:10 PM,10/Oct/26 9:10 PM,,,0,,,,,"* {{POST /api/slots/{id}/book {notes?}}} sets {{UserId}} to the client and the status to Scheduled.
 
-* {{GET /api/slots?category=&providerId=&from=&to=}}
-
-Acceptance Criteria:
-
-* Returns only Available, future, non-deleted slots
-* Only includes slots from approved providers
-* Filters by category, provider, and date range
-* Each slot includes provider name, service name, location, start and end time
-* Angular: getAvailable() in core/services/slots.service.ts
-* Tests",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000j3:,Demo 1,,,,,,,,,,10075,BAAAM-31,Implement slot availability display and real-time fetching,To Do,16/Sep/26 12:21 PM
-Build frontend booking confirmation flow (Angular),BAAAM-75,10119,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jb:,Demo 1,,,,,,,,,,10076,BAAAM-32,Implement appointment creation and booking confirmation,To Do,16/Sep/26 12:21 PM
-Backend: Book an available slot,BAAAM-76,10120,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,10/Oct/26 9:38 PM,10/Oct/26 9:38 PM,,,0,,,,,"Let a client book an open slot.
-
-* {{POST /api/slots/{id}/book { notes? }}}
-
-Acceptance Criteria:
-
-* Only clients can book
-* Sets the appointment's UserId to the client and its status to Booked
-* Returns 409 Conflict if the slot is no longer Available
-* Rejects the booking if it overlaps another appointment the client already has
-* Response includes what the confirmation screen needs: provider, service, location, time
-* Angular: book() in core/services/slots.service.ts
-* Tests",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jj:,Demo 1,,,,,,,,,,10076,BAAAM-32,Implement appointment creation and booking confirmation,To Do,16/Sep/26 12:21 PM
-Backend: Concurrent booking safety and next-slot suggestion,BAAAM-77,10121,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:22 PM,10/Oct/26 9:36 PM,10/Oct/26 9:36 PM,,,0,,,,,"Make sure two clients can never book the same slot, and help the client who loses.
-
-Acceptance Criteria:
-
-* Booking is a single atomic update that only succeeds if the slot is still Available (no holds or pre-reservations)
-* When two bookings race for the same slot, exactly one succeeds and the other gets 409
-* The 409 response includes the provider's next available slot, if there is one
-* Test that simulates two simultaneous bookings",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jr:,Demo 2,,,,,,,,,,10077,BAAAM-33,Implement conflict prevention and first-come-first-serve booking logic,To Do,16/Sep/26 12:22 PM
+Acceptance criteria: clients only; the booking happens as one step that succeeds only if the slot is still Available; the second person to book gets 409 Conflict; a test where two bookings race for the same slot.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000j3:,Demo 2,,,,,,,,,,10075,BAAAM-31,Implement slot availability display and real-time fetching,To Do,16/Sep/26 12:21 PM
+Build frontend booking confirmation flow (Angular),BAAAM-75,10119,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,22/Sep/26 9:49 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jb:,Demo 2,,,,,,,,,,10076,BAAAM-32,Implement appointment creation and booking confirmation,To Do,16/Sep/26 12:21 PM
+"Backend: Book a slot, first-come-first-serve",BAAAM-76,10120,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:21 PM,10/Oct/26 9:02 PM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jj:,Demo 2,,,,,,,,,,10076,BAAAM-32,Implement appointment creation and booking confirmation,To Do,16/Sep/26 12:21 PM
+"Backend: Book a slot, first-come-first-serve",BAAAM-77,10121,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:22 PM,10/Oct/26 9:02 PM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jr:,Demo 2,,,,,,,,,,10077,BAAAM-33,Implement conflict prevention and first-come-first-serve booking logic,To Do,16/Sep/26 12:22 PM
 Build frontend conflict error handling and booking feedback (Angular),BAAAM-78,10122,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:24 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000jz:,Demo 2,,,,,,,,,,10077,BAAAM-33,Implement conflict prevention and first-come-first-serve booking logic,To Do,16/Sep/26 12:24 PM
 Build frontend modify/cancel appointment UI (Angular),BAAAM-79,10123,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:24 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000k7:,Demo 2,,,,,,,,,,10078,BAAAM-34,Implement appointment modify and cancel functionality,To Do,16/Sep/26 12:24 PM
 Implement backend modify/cancel appointment API (C#),BAAAM-80,10124,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,,,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 12:25 PM,22/Sep/26 9:50 AM,,,,0,,,,,,,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000kf:,Demo 2,,,,,,,,,,10078,BAAAM-34,Implement appointment modify and cancel functionality,To Do,16/Sep/26 12:25 PM
@@ -716,32 +702,6 @@ Statistics,BAAAM-126,10202,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,
 User page,BAAAM-127,10203,Subtask,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000u7:,Demo 1,,,,,,,,,,10067,BAAAM-23,Design wireframes and UI mockups for all screens (FIGMA),In Progress,01/Oct/26 9:32 AM
 Service provider page,BAAAM-128,10204,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000uf:,Demo 1,,,,,,,,,,10067,BAAAM-23,Design wireframes and UI mockups for all screens (FIGMA),To Do,01/Oct/26 9:32 AM
 Admin page,BAAAM-129,10205,Subtask,In Progress,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,Andree Lin,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,01/Oct/26 9:32 AM,01/Oct/26 9:32 AM,,,,0,,,,,,,Andree Lin,,712020:e42fef53-89d1-40e1-8115-bd65a9bee5d1,,,,,,,,,,,{},,,,0|i000un:,Demo 1,,,,,,,,,,10067,BAAAM-23,Design wireframes and UI mockups for all screens (FIGMA),In Progress,01/Oct/26 9:32 AM
-Implement slot availability display and real-time fetching,BAAAM-31,10075,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:31 AM,10/Oct/26 9:46 PM,10/Oct/26 9:44 PM,,,0,,,,,"As a user, I'd like to see available time slots in real time so that I can select a slot that is currently open. This ensures users see the most up-to-date availability before attempting to book.
-
-Acceptance Criteria:
-
-- Available slots are displayed in a calendar or list view
-
-- Slot availability is fetched in real time from the backend
-
-- Booked slots are visually distinguished from available ones
-
-- Loading indicator is shown while fetching
-
-- Slots are filtered by date range",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000up:,Demo 1,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:31 AM
-Implement appointment creation and booking confirmation,BAAAM-32,10076,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,16/Sep/26 9:32 AM,10/Oct/26 9:47 PM,10/Oct/26 9:38 PM,,,0,,,,,"As a user, I'd like to create an appointment and receive a confirmation so that my booking is secured. The system should create a record in the database and immediately display confirmation details to the user.
-
-Acceptance Criteria:
-
-- User can select an available slot and confirm the booking
-
-- Booking creates an appointment record in the database
-
-- Confirmation screen shows appointment details
-
-- Confirmation is displayed immediately after booking
-
-- User receives a notification of the confirmed appointment",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000uq:,Demo 1,,,,,,,,,,10054,BAAAM-10,Appointment Booking & Scheduling,To Do,16/Sep/26 9:32 AM
 Backend: Implement user and service provider registration and login,BAAAM-137,10245,Story,In Development,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Highest,,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,Manoj Khadka,712020:d30279c8-ce50-4163-a875-1320c647fae1,09/Oct/26 12:49 AM,09/Oct/26 1:20 AM,,,,0,,,,,"As a user, I'd like to register and log in so that I can securely access the booking system. This includes separate registration flows for regular users and service providers, with secure password handling and session management.
 
 Acceptance Criteria:
@@ -859,23 +819,8 @@ h2. Screenshot for Proof of Concept (Made with Pull Request)
 * To see this for yourself, run the dev.sh script or run the backend script, then navigate here:
 ** [http://localhost:5100/db/|http://localhost:5100/db/] 
 * Real data is returned only in environments where MongoDB is configured; otherwise the endpoint reports the in-memory fallback state.",,Brendan Lambrecht,,712020:561627c7-6e04-4165-8d15-a503a75143c6,,,,,,,,,,,{},,,,0|i000vj:,Demo 1,,,,,,,,,,10061,BAAAM-17,Team Process & Governance,In Progress,08/Oct/26 1:28 PM
-Admin approves service provider accounts,BAAAM-138,10246,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,10/Oct/26 9:03 PM,10/Oct/26 9:39 PM,10/Oct/26 10:55 PM,,,0,,,,,"As an admin, I'd like to review and approve service provider accounts so that only verified providers can offer appointments.
+Backend: Admin approves service provider accounts,BAAAM-138,10246,Story,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,10/Oct/26 9:03 PM,10/Oct/26 9:06 PM,10/Oct/26 9:11 PM,,,0,,,,,"* {{GET /api/admin/provider-requests?status=pending}} lists pending requests with the provider's name.
+* {{POST /api/admin/provider-requests/{id}/approve}} marks the request approved and sets {{Provider.IsApproved}} to true.
+* {{POST /api/admin/provider-requests/{id}/reject {notes}}} soft-deletes the request and saves the reason.
 
-Acceptance Criteria:
-
-* Admin can see a list of pending provider requests
-* Each request shows the provider's name, categories, and submitted qualifications
-* Admin can approve or reject a request, with an optional note
-* Approved providers can create slots; unapproved or rejected providers cannot
-* Slots from unapproved providers are never shown to clients",,Andrew,,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,,,,,,,,,,,{},,,,0|i000vr:,Demo 1,,,,,,,,,,10057,BAAAM-13,Admin Console,To Do,10/Oct/26 9:03 PM
-Implement backend provider approval API (C#),BAAAM-139,10247,Subtask,To Do,BAAAM,BAAAM Scheduling System,software,Brendan Lambrecht,712020:561627c7-6e04-4165-8d15-a503a75143c6,,Medium,,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,Andrew,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,10/Oct/26 9:42 PM,10/Oct/26 10:56 PM,10/Oct/26 10:55 PM,,,0,,,,,"* {{GET /api/admin/provider-requests?status=pending}} lists requests that are not yet reviewed, with the provider's name, categories, and qualification text
-* {{POST /api/admin/provider-requests/{id}/approve}} sets IsReviewed = true and IsApproved = true on the request, and sets Provider.IsApproved = true
-* {{POST /api/admin/provider-requests/{id}/reject { notes }}} sets IsReviewed = true and IsApproved = false on the request, and saves the reason in Notes
-
-Acceptance Criteria:
-
-* Admins only
-* A request that is already reviewed can't be approved or rejected again (409)
-* Requests missing IsReviewed are treated as not reviewed
-* Angular: core/services/admin-providers.service.ts with one method per endpoint
-* Tests",,Andrew,,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,,,,,,,,,,,{},,,,0|i000w6:,Demo 1,,,,,,,,,,10246,BAAAM-138,Admin approves service provider accounts,To Do,10/Oct/26 9:42 PM
+Acceptance criteria: admins only; an unapproved provider can't create slots and doesn't appear to clients; tests.",,Andrew,,712020:36f63a2f-9fd6-4652-b599-74cf45bfaf12,,,,,,,,,,,{},,,,0|i000vr:,Demo 1,,,,,,,,,,10057,BAAAM-13,Admin Console,To Do,10/Oct/26 9:03 PM
