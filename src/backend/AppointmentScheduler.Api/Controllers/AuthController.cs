@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduler.Api.Controllers;
 
+/// <summary>
+/// Handles username/password authentication, account registration, and JWT issuance.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public sealed class AuthController : ControllerBase
@@ -13,6 +16,12 @@ public sealed class AuthController : ControllerBase
     private readonly PasswordHasher _passwordHasher;
     private readonly JwtTokenService _tokens;
 
+    /// <summary>
+    /// Creates a controller that can read/write users, verify password hashes, and issue JWTs.
+    /// </summary>
+    /// <param name="users">User persistence boundary used for username lookup and registration.</param>
+    /// <param name="passwordHasher">Password hashing service used to hash and verify credentials.</param>
+    /// <param name="tokens">JWT token service used to create successful authentication responses.</param>
     public AuthController(IUserStore users, PasswordHasher passwordHasher, JwtTokenService tokens)
     {
         _users = users;
@@ -20,6 +29,14 @@ public sealed class AuthController : ControllerBase
         _tokens = tokens;
     }
 
+    /// <summary>
+    /// Authenticate an active account with username and password.
+    /// </summary>
+    /// <param name="request">Login payload containing the username and plaintext password supplied by the user.</param>
+    /// <returns>
+    /// 200 OK with a JWT, expiration timestamp, and public user payload when credentials are valid;
+    /// 401 Unauthorized when credentials are invalid or the account is pending approval.
+    /// </returns>
     [HttpPost("login")]
     [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -40,6 +57,15 @@ public sealed class AuthController : ControllerBase
         return Ok(_tokens.CreateToken(user));
     }
 
+    /// <summary>
+    /// Register a normal client account and sign it in immediately.
+    /// </summary>
+    /// <param name="request">
+    /// Registration payload containing required name, username, and password fields plus optional contact information.
+    /// </param>
+    /// <returns>
+    /// 201 Created with the created public user payload and JWT; 409 Conflict when the username is already taken.
+    /// </returns>
     [HttpPost("register")]
     [ProducesResponseType<RegisterResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -67,6 +93,17 @@ public sealed class AuthController : ControllerBase
         return CreatedAtAction(nameof(UsersController.GetById), "Users", new { id = created.Id }, response);
     }
 
+    /// <summary>
+    /// Register a service provider account for later admin approval.
+    /// </summary>
+    /// <param name="request">
+    /// Registration payload containing base account fields, at least one service type, and optional credential details.
+    /// </param>
+    /// <returns>
+    /// 201 Created with the pending provider account and <c>RequiresApproval = true</c>;
+    /// 400 Bad Request when no service type is selected;
+    /// 409 Conflict when the username is already taken.
+    /// </returns>
     [HttpPost("register/provider")]
     [ProducesResponseType<RegisterResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
