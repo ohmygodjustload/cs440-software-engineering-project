@@ -149,7 +149,7 @@ public class Location : BaseEntity
     public string State { get; set; }
     public int ZIP { get; set; }
     public bool IsDeleted {get; set; } = false; 
-    public DateTimeOffset DeletedAt { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
 }
 
 public class Status
