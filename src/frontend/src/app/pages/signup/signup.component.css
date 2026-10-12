@@ -215,6 +215,11 @@ input {
   opacity: 0.9;
 }
 
+.signup-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .signup-submit:focus-visible,
 .signup-link:focus-visible {
   outline: 2px solid var(--signup-foreground);

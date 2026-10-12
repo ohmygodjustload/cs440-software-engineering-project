@@ -92,7 +92,13 @@
           </a>
         </div>
 
-        <button class="login-submit" type="submit">Sign in</button>
+        @if (errorMessage) {
+          <p class="login-form__error" role="alert">{{ errorMessage }}</p>
+        }
+
+        <button class="login-submit" type="submit" [disabled]="loading">
+          {{ loading ? 'Signing in...' : 'Sign in' }}
+        </button>
 
         <p class="login-form__signup">
           New here? <a class="login-link" [routerLink]="createAccountRoute">Create an account</a>

@@ -7,6 +7,10 @@ import {
   Validators
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+
+import { ServiceCredentialRequest, ServiceType } from '../../core/models/auth';
+import { AuthService } from '../../core/services/auth.service';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -34,9 +38,12 @@ function serviceTypeValidator(control: AbstractControl): ValidationErrors | null
   styleUrl: '../signup/signup.component.css'
 })
 export class SignupProviderComponent {
+  private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
 
   confirmPasswordVisible = false;
+  errorMessage: string | null = null;
+  loading = false;
   passwordVisible = false;
   submitMessage: string | null = null;
 
@@ -94,6 +101,7 @@ export class SignupProviderComponent {
   }
 
   onSubmit(): void {
+    this.errorMessage = null;
     this.submitMessage = null;
 
     if (this.form.invalid) {
@@ -101,7 +109,48 @@ export class SignupProviderComponent {
       return;
     }
 
-    this.submitMessage = 'Service provider account details are ready for admin approval.';
+    const value = this.form.getRawValue();
+    this.loading = true;
+    this.authService
+      .registerProvider({
+        firstName: value.firstName,
+        lastName: value.lastName,
+        username: value.username,
+        email: this.normalizeOptional(value.email),
+        phone: this.normalizeOptional(value.phone),
+        password: value.password,
+        serviceTypes: this.toServiceTypes(value.services),
+        medicalCredentials: value.services.medical
+          ? this.toCredential({
+              qualification: value.medicalCredentials.qualification,
+              institution: value.medicalCredentials.school,
+              licenseNumber: value.medicalCredentials.licenseNumber
+            })
+          : null,
+        beautyCredentials: value.services.beauty
+          ? this.toCredential({
+              qualification: value.beautyCredentials.certification,
+              licenseNumber: value.beautyCredentials.licenseNumber,
+              specialties: value.beautyCredentials.specialties
+            })
+          : null,
+        fitnessCredentials: value.services.fitness
+          ? this.toCredential({
+              qualification: value.fitnessCredentials.certification,
+              licenseNumber: value.fitnessCredentials.certificationNumber,
+              specialties: value.fitnessCredentials.specialties
+            })
+          : null
+      })
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          this.submitMessage = 'Service provider account submitted for admin approval.';
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.authService.getErrorMessage(error);
+        }
+      });
   }
 
   togglePasswordVisibility(): void {
@@ -110,5 +159,33 @@ export class SignupProviderComponent {
 
   toggleConfirmPasswordVisibility(): void {
     this.confirmPasswordVisible = !this.confirmPasswordVisible;
+  }
+
+  private toServiceTypes(services: { medical: boolean; beauty: boolean; fitness: boolean }): ServiceType[] {
+    const selected: ServiceType[] = [];
+    if (services.medical) {
+      selected.push('Medical');
+    }
+    if (services.beauty) {
+      selected.push('Beauty');
+    }
+    if (services.fitness) {
+      selected.push('Fitness');
+    }
+    return selected;
+  }
+
+  private toCredential(credential: ServiceCredentialRequest): ServiceCredentialRequest {
+    return {
+      qualification: this.normalizeOptional(credential.qualification ?? ''),
+      institution: this.normalizeOptional(credential.institution ?? ''),
+      licenseNumber: this.normalizeOptional(credential.licenseNumber ?? ''),
+      specialties: this.normalizeOptional(credential.specialties ?? '')
+    };
+  }
+
+  private normalizeOptional(value: string): string | null {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
   }
 }

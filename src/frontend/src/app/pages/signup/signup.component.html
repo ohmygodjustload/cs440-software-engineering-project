@@ -130,11 +130,17 @@
         }
       </div>
 
-      <button class="signup-submit" type="submit">Create account</button>
-
       @if (submitMessage) {
         <p class="signup-form__message">{{ submitMessage }}</p>
       }
+
+      @if (errorMessage) {
+        <p class="signup-field__error" role="alert">{{ errorMessage }}</p>
+      }
+
+      <button class="signup-submit" type="submit" [disabled]="loading">
+        {{ loading ? 'Creating account...' : 'Create account' }}
+      </button>
 
       <p class="signup-form__login">
         Already have an account? <a class="signup-link" routerLink="/login">Sign in</a>

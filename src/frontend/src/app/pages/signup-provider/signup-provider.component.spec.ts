@@ -1,15 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
 import { SignupProviderComponent } from './signup-provider.component';
 
 describe('SignupProviderComponent', () => {
   let fixture: ComponentFixture<SignupProviderComponent>;
+  let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['getErrorMessage', 'registerProvider']);
+    authService.registerProvider.and.returnValue(
+      of({ user: {} as never, requiresApproval: true })
+    );
+
     await TestBed.configureTestingModule({
       imports: [SignupProviderComponent],
-      providers: [provideRouter([])]
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: authService }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SignupProviderComponent);
@@ -69,7 +80,7 @@ describe('SignupProviderComponent', () => {
     expect(component.form.hasError('passwordsMismatch')).toBeTrue();
   });
 
-  it('should show an approval message for valid provider details', () => {
+  it('should register valid provider details for approval', () => {
     const component = fixture.componentInstance;
 
     component.form.patchValue({
@@ -82,8 +93,30 @@ describe('SignupProviderComponent', () => {
       confirmPassword: 'password123'
     });
     component.form.controls.services.controls.medical.setValue(true);
+    component.form.controls.medicalCredentials.patchValue({
+      qualification: 'MD',
+      school: 'BAAAM University',
+      licenseNumber: 'MED-123'
+    });
     component.onSubmit();
 
+    expect(authService.registerProvider).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        firstName: 'Sam',
+        lastName: 'Provider',
+        username: 'SamProvider',
+        email: 'sam@example.com',
+        phone: '555-123-4567',
+        password: 'password123',
+        serviceTypes: ['Medical'],
+        medicalCredentials: {
+          qualification: 'MD',
+          institution: 'BAAAM University',
+          licenseNumber: 'MED-123',
+          specialties: null
+        }
+      })
+    );
     expect(component.submitMessage).toContain('admin approval');
   });
 });

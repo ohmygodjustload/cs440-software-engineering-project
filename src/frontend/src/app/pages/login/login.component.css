@@ -288,6 +288,13 @@ input {
   outline-offset: 4px;
 }
 
+.login-form__error {
+  margin: 24px 0 0;
+  color: #9a3412;
+  font-size: 13px;
+  line-height: 18px;
+}
+
 .login-submit {
   display: flex;
   align-items: center;

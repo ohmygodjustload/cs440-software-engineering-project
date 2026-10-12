@@ -7,6 +7,9 @@ import {
   Validators
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+
+import { AuthService } from '../../core/services/auth.service';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -24,9 +27,12 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
   styleUrl: './signup.component.css'
 })
 export class SignupComponent {
+  private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
 
   confirmPasswordVisible = false;
+  errorMessage: string | null = null;
+  loading = false;
   passwordVisible = false;
   submitMessage: string | null = null;
 
@@ -35,8 +41,8 @@ export class SignupComponent {
       firstName: ['', [Validators.required, Validators.maxLength(100)]],
       lastName: ['', [Validators.required, Validators.maxLength(100)]],
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(320)]],
-      phone: ['', [Validators.required, Validators.maxLength(50)]],
+      email: ['', [Validators.email, Validators.maxLength(320)]],
+      phone: ['', [Validators.maxLength(50)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]]
     },
@@ -48,6 +54,7 @@ export class SignupComponent {
   }
 
   onSubmit(): void {
+    this.errorMessage = null;
     this.submitMessage = null;
 
     if (this.form.invalid) {
@@ -55,7 +62,26 @@ export class SignupComponent {
       return;
     }
 
-    this.submitMessage = 'Account details are ready. Backend registration will be connected later.';
+    const value = this.form.getRawValue();
+    this.loading = true;
+    this.authService
+      .registerUser({
+        firstName: value.firstName,
+        lastName: value.lastName,
+        username: value.username,
+        email: this.normalizeOptional(value.email),
+        phone: this.normalizeOptional(value.phone),
+        password: value.password
+      })
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          this.submitMessage = 'Account created. You are signed in.';
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.authService.getErrorMessage(error);
+        }
+      });
   }
 
   togglePasswordVisibility(): void {
@@ -64,5 +90,10 @@ export class SignupComponent {
 
   toggleConfirmPasswordVisibility(): void {
     this.confirmPasswordVisible = !this.confirmPasswordVisible;
+  }
+
+  private normalizeOptional(value: string): string | null {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
   }
 }

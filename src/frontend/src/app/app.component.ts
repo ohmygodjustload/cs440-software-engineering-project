@@ -28,7 +28,7 @@ export class AppComponent {
   readonly title = 'BAAAM Scheduling System';
 
   readonly navLinks: readonly NavLink[] = [
-    { label: 'Home', path: '/' },
+    { label: 'Home', path: '/home' },
     { label: 'Calendar', path: '/calendar' },
     { label: 'Appointments', path: '/appointments' },
     { label: 'Notifications', path: '/notifications' },

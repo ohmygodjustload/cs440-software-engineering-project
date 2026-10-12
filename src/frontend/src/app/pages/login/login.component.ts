@@ -1,6 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
+
+import { AuthService } from '../../core/services/auth.service';
 
 type LoginAccountType = 'client' | 'serviceProvider';
 
@@ -10,9 +13,14 @@ type LoginAccountType = 'client' | 'serviceProvider';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
+  errorMessage: string | null = null;
+  loading = false;
   passwordVisible = false;
 
   readonly form = this.formBuilder.nonNullable.group({
@@ -28,13 +36,39 @@ export class LoginComponent {
       : '/signup';
   }
 
+  ngOnInit(): void {
+    if (this.route.snapshot.queryParamMap.get('reason') === 'auth') {
+      this.errorMessage = 'Please sign in first.';
+    }
+  }
+
   onSubmit(): void {
+    this.errorMessage = null;
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    // Authentication will be connected here when the backend exposes a login endpoint.
+    const value = this.form.getRawValue();
+    this.loading = true;
+    this.authService
+      .login(
+        {
+          username: value.username,
+          password: value.password
+        },
+        value.remember
+      )
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          void this.router.navigateByUrl(this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home');
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.authService.getErrorMessage(error);
+        }
+      });
   }
 
   togglePasswordVisibility(): void {
