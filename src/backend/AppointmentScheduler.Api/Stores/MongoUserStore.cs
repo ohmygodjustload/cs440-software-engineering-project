@@ -7,8 +7,8 @@ using MongoDB.Driver;
 namespace AppointmentScheduler.Api.Stores;
 
 /// <summary>
-/// Reads the existing team BAAAM.User collection. READ-ONLY and NEVER returns
-/// Password. New documents are never created here.
+/// Reads and writes users in the existing team BAAAM.User collection.
+/// Password hashes are stored for authentication, but never returned by the API.
 /// </summary>
 public sealed class MongoUserStore : IUserStore
 {
@@ -34,6 +34,47 @@ public sealed class MongoUserStore : IUserStore
         return doc is null || IsDeleted(doc) ? null : Map(doc);
     }
 
+    public User? GetByUsername(string username)
+    {
+        var filter = Builders<BsonDocument>.Filter.Regex(
+            "Username",
+            new BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(username.Trim())}$", "i"));
+        var doc = _raw.Find(filter).FirstOrDefault();
+        return doc is null || IsDeleted(doc) ? null : Map(doc);
+    }
+
+    public User Add(User user)
+    {
+        if (GetByUsername(user.Username) is not null)
+        {
+            throw new InvalidOperationException("Username already exists.");
+        }
+
+        var id = ObjectId.GenerateNewId();
+        var doc = new BsonDocument
+        {
+            ["_id"] = id,
+            ["FirstName"] = user.FirstName,
+            ["LastName"] = user.LastName,
+            ["Username"] = user.Username,
+            ["Email"] = BsonValue.Create(user.Email),
+            ["Phone"] = BsonValue.Create(user.Phone),
+            ["IsClient"] = user.IsClient,
+            ["IsServiceProvider"] = user.IsServiceProvider,
+            ["IsAdmin"] = user.IsAdmin,
+            ["IsActive"] = user.IsActive,
+            ["PasswordHash"] = user.PasswordHash,
+            ["ServiceTypes"] = new BsonArray(user.ServiceTypes.Select(value => value.ToString())),
+        };
+
+        AddCredential(doc, "MedicalCredentials", user.MedicalCredentials);
+        AddCredential(doc, "BeautyCredentials", user.BeautyCredentials);
+        AddCredential(doc, "FitnessCredentials", user.FitnessCredentials);
+
+        _raw.InsertOne(doc);
+        return Map(doc);
+    }
+
     private static User Map(BsonDocument d) => new()
     {
         Id = ReadId(d, "_id") ?? Guid.NewGuid().ToString("N"),
@@ -46,7 +87,63 @@ public sealed class MongoUserStore : IUserStore
         IsActive = ReadBool(d, "IsActive", fallback: true),
         IsServiceProvider = ReadBool(d, "IsServiceProvider", "IsProvider"),
         IsAdmin = ReadBool(d, "IsAdmin", "IsAdministrator"),
+        ServiceTypes = ReadServiceTypes(d),
+        MedicalCredentials = ReadCredential(d, "MedicalCredentials"),
+        BeautyCredentials = ReadCredential(d, "BeautyCredentials"),
+        FitnessCredentials = ReadCredential(d, "FitnessCredentials"),
+        PasswordHash = ReadString(d, "PasswordHash") ?? string.Empty,
     };
+
+    private static void AddCredential(BsonDocument doc, string key, ServiceCredential? credential)
+    {
+        if (credential is null)
+        {
+            return;
+        }
+
+        doc[key] = new BsonDocument
+        {
+            ["Qualification"] = BsonValue.Create(credential.Qualification),
+            ["Institution"] = BsonValue.Create(credential.Institution),
+            ["LicenseNumber"] = BsonValue.Create(credential.LicenseNumber),
+            ["Specialties"] = BsonValue.Create(credential.Specialties),
+        };
+    }
+
+    private static List<AppointmentCategory> ReadServiceTypes(BsonDocument doc)
+    {
+        var element = FindElement(doc, "ServiceTypes");
+        if (element is null || !element.Value.Value.IsBsonArray)
+        {
+            return [];
+        }
+
+        return element.Value.Value.AsBsonArray
+            .Select(value => value.IsString ? value.AsString : value.ToString())
+            .Select(value => Enum.TryParse<AppointmentCategory>(value, true, out var category) ? category : (AppointmentCategory?)null)
+            .Where(category => category.HasValue)
+            .Select(category => category!.Value)
+            .Distinct()
+            .ToList();
+    }
+
+    private static ServiceCredential? ReadCredential(BsonDocument doc, string key)
+    {
+        var element = FindElement(doc, key);
+        if (element is null || !element.Value.Value.IsBsonDocument)
+        {
+            return null;
+        }
+
+        var credential = element.Value.Value.AsBsonDocument;
+        return new ServiceCredential
+        {
+            Qualification = ReadString(credential, "Qualification"),
+            Institution = ReadString(credential, "Institution"),
+            LicenseNumber = ReadString(credential, "LicenseNumber"),
+            Specialties = ReadString(credential, "Specialties"),
+        };
+    }
 
     private static BsonDocument? FindById(IMongoCollection<BsonDocument> collection, string id)
     {
