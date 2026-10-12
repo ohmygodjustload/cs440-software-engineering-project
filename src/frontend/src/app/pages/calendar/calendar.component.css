@@ -5,3 +5,204 @@
   placeholder.
 
 */
+
+:host { 
+  display: block; 
+  color: #344b48; 
+}
+
+.calendar-page { 
+  max-width: 960px; 
+  margin: 0 auto; 
+  padding: 0 24px 56px; 
+  background: #faf9f6; 
+  border-radius: 24px; 
+}
+
+h1 { 
+  margin: 0; 
+  font-size: 30px; 
+  font-weight: 500; 
+  letter-spacing: -.8px; 
+}
+
+header p { 
+  margin: 6px 0 20px; 
+  font-size: 13px; 
+}
+
+.calendar-toolbar { 
+  display: flex; 
+  align-items: center; 
+  gap: 16px; 
+  padding: 5px 12px; 
+  border-radius: 999px; 
+  background: #e0ddd3; 
+}
+
+h2 { 
+  flex: 1; 
+  margin: 0; 
+  font-size: 14px; 
+  font-weight: 400; 
+}
+
+button { 
+  border: 0; 
+  background: transparent; 
+  color: inherit; 
+  cursor: pointer; 
+  font: inherit; 
+  border-radius: 999px; 
+}
+
+.calendar-toolbar button { 
+  min-width: 36px; 
+  min-height: 36px; 
+  font-size: 24px; 
+}
+
+.calendar-toolbar .today-button { 
+  padding: 0 16px; 
+  font-size: 13px; 
+}
+
+button:hover { 
+  background: #d3d0c6; 
+}
+
+button:focus-visible { 
+  outline: 2px solid #344b48; 
+  outline-offset: 3px; 
+}
+
+.calendar-status { 
+  min-height: 24px; 
+  font-size: 12px; 
+  padding-top: 4px; 
+}
+
+.calendar-row { 
+  display: grid; 
+  grid-template-columns: repeat(7, minmax(0, 1fr)); 
+}
+
+.weekdays { 
+  padding: 0 0 10px; 
+  font-size: 12px; 
+}
+
+.weekdays > div { 
+  padding-left: 12px; 
+}
+
+.calendar-day { 
+  min-height: 78px; 
+  padding: 8px 4px; 
+}
+
+.day-number { 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  width: 26px; 
+  height: 26px; 
+  font-size: 12px; 
+}
+
+.outside-month .day-number { 
+  color: #8b9591; 
+}
+
+.is-today { 
+  background: #344b48; 
+  color: #faf9f6; 
+  border-radius: 50%; 
+}
+
+.appointment { 
+  margin-top: 4px; 
+  padding: 10px; 
+  border-radius: 13px; 
+  font-size: 11px; 
+  overflow-wrap: anywhere; 
+}
+
+.appointment time, .appointment span { 
+  display: block; 
+}
+
+.appointment time { 
+  font-size: 10px; 
+  margin-bottom: 2px; 
+}
+
+.medical { 
+  background: #dfddd3; 
+}
+
+.beauty { 
+  background: #e5e6ba; 
+}
+
+.fitness { 
+  background: #d6e5eb; 
+}
+
+.calendar-legend { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 20px; 
+  padding: 0; 
+  margin: 44px 0 0; 
+  list-style: none; 
+  font-size: 12px; 
+}
+
+.calendar-legend li { 
+  display: flex; 
+  align-items: center; 
+  gap: 6px; 
+}
+
+.swatch { 
+  width: 10px; 
+  height: 10px; 
+  border-radius: 3px; 
+}
+
+@media (max-width: 600px) {
+  .calendar-page { 
+    padding: 0 4px 28px; 
+  }
+
+  h1 { 
+    font-size: 26px; 
+  }
+
+  .calendar-toolbar { 
+    gap: 4px; 
+  }
+
+  .calendar-day { 
+    min-height: 72px; 
+    padding: 5px 2px; 
+  }
+
+  .weekdays > div { 
+    padding-left: 4px; 
+    font-size: 11px; 
+  }
+
+  .appointment { 
+    padding: 5px; 
+    border-radius: 8px; 
+    font-size: 10px; 
+  }
+
+  .calendar-legend { 
+    gap: 12px; 
+    font-size: 11px; 
+  }
+  
+}

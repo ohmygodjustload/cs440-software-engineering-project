@@ -6,4 +6,63 @@
 
 -->
 
-<h1>Calendar Here!</h1>
+<section class="calendar-page" aria-labelledby="calendar-heading">
+
+  <header>
+    <h1 id="calendar-heading">Calendar</h1>
+    <p>Plan around appointments and upcoming events.</p>
+  </header>
+
+  <div class="calendar-toolbar" aria-label="Calendar controls">
+    <button type="button" aria-label="Previous month" (click)="previousMonth()">‹</button>
+    <h2 aria-live="polite">{{ monthLabel }}</h2>
+    <button type="button" class="today-button" (click)="goToToday()">Today</button>
+    <button type="button" aria-label="Next month" (click)="nextMonth()">›</button>
+  </div>
+
+  <div class="calendar-status" aria-live="polite">
+    @if (loading) {
+      <span>Loading appointments…</span>
+    }
+    @if (error) {
+      <span role="alert">{{ error }} <button type="button" (click)="refresh()">Retry</button></span>
+    }
+  </div>
+
+  <div class="calendar-grid" role="table" [attr.aria-label]="monthLabel" [attr.aria-busy]="loading">
+
+    <div class="calendar-row weekdays" role="row">
+      @for (weekday of weekdays; track weekday) {
+        <div role="columnheader">{{ weekday }}</div>
+      }
+    </div>
+
+    @for (week of [0, 1, 2, 3, 4, 5]; track week) {
+      @if (days.length > week * 7) {
+        <div class="calendar-row" role="row">
+          @for (day of days.slice(week * 7, week * 7 + 7); track day.date.getTime()) {
+            <div class="calendar-day" role="cell" [class.outside-month]="!day.isCurrentMonth"
+              [attr.aria-label]="day.date | date:'fullDate'">
+              <span class="day-number" [class.is-today]="day.isToday" [attr.aria-current]="day.isToday ? 'date' : null">{{ day.date.getDate() }}</span>
+              @for (item of day.items; track item.id) {
+                <div class="appointment" [class.medical]="item.category === 'Medical'"
+                  [class.beauty]="item.category === 'Beauty'" [class.fitness]="item.category === 'Fitness'"
+                  [attr.title]="item.title + ' · ' + (item.startDateTime | date:'shortTime')">
+                  <time [attr.datetime]="item.startDateTime">{{ item.startDateTime | date:'shortTime' }}</time>
+                  <span>{{ item.title }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <ul class="calendar-legend" aria-label="Appointment categories">
+    <li><span class="swatch medical"></span>Medical · Physical</li>
+    <li><span class="swatch beauty"></span>Beauty · Haircut</li>
+    <li><span class="swatch fitness"></span>Fitness · Yoga</li>
+  </ul>
+</section>
+
