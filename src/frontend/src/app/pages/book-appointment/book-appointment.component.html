@@ -1,0 +1,174 @@
+<section class="appointments-page" aria-labelledby="page-title">
+  <header class="page-header">
+    <h1 id="page-title">
+      Book appointment
+    </h1>
+    <p>
+      Choose your service, provider, and a time that works for you.
+    </p>
+  </header>
+  @if (success) {
+    <p class="success-message" role="status">
+      {{ success }}
+    </p>
+  }
+  <p><a routerLink="/appointments">Back to appointments</a></p>
+  <form #bookingForm="ngForm" (ngSubmit)="save(bookingForm)">
+    <fieldset [disabled]="saving" class="booking-grid">
+      <div class="field category-field">
+        <label for="category">
+          Category
+        </label>
+        <select id="category" name="category" [(ngModel)]="draft.category" (ngModelChange)="categoryChanged()" required>
+          @for (category of categories; track category) {
+            <option [value]="category">
+              {{ category }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="field title-field">
+        <label for="title">
+          Service
+        </label>
+        <select id="title" name="title" [(ngModel)]="draft.title" required>
+          <option value="" disabled>Choose a service</option>
+          @for (service of serviceOptions; track service) {
+            <option [value]="service">{{ service }}</option>
+          }
+        </select>
+        <p class="field-help">Example service list — your team can update these names.</p>
+      </div>
+      <div class="field date-field">
+        <div class="date-heading">
+          <span id="date-label">
+            Select date · {{ dateLabel }}
+          </span>
+          <label class="date-jump" for="date-jump">
+            Change date
+          </label>
+        </div>
+        <div class="date-strip" role="group" aria-labelledby="date-label">
+          @for (option of dateOptions; track option.key) {
+            <button
+              type="button"
+              class="date-choice"
+              [class.selected]="selectedDate === option.key"
+              [attr.aria-pressed]="selectedDate === option.key"
+              [attr.aria-label]="option.date | date:'fullDate'"
+              (click)="chooseDate(option.key)"
+            >
+              <span class="weekday">
+                {{ option.date | date:'EEE' }}
+              </span>
+              <span class="day-number">
+                {{ option.date | date:'d' }}
+              </span>
+            </button>
+          }
+        </div>
+        <input
+          class="date-input"
+          id="date-jump"
+          name="date"
+          type="date"
+          [ngModel]="selectedDate"
+          (ngModelChange)="chooseDate($event)"
+          required
+          aria-label="Choose any appointment date"
+        >
+      </div>
+      <div class="field time-field">
+        <span id="time-label" class="field-label">
+          Start time · {{ durationMinutes }}-minute duration
+        </span>
+        <div class="time-grid" role="group" aria-labelledby="time-label">
+          @for (time of startTimes; track time) {
+            <button
+              type="button"
+              class="time-choice"
+              [class.selected]="selectedTime === time"
+              [attr.aria-pressed]="selectedTime === time"
+              (click)="chooseTime(time)"
+            >
+              {{ timeLabel(time) }}
+            </button>
+          }
+        </div>
+        <input type="hidden" name="start" [(ngModel)]="draft.start" required>
+        <input type="hidden" name="end" [(ngModel)]="draft.end" required>
+      </div>
+      <div class="field provider-field">
+        <label for="provider">
+          Service provider
+        </label>
+        <select id="provider" name="providerId" [(ngModel)]="draft.providerId" required
+          [disabled]="providersLoading">
+          <option value="" disabled>Select a provider</option>
+          @for (provider of filteredProviders; track provider.id) {
+            <option [value]="provider.id">{{ provider.name }}</option>
+          }
+        </select>
+        @if (providersLoading) {
+          <p class="field-help" role="status">Loading providers…</p>
+        } @else if (!filteredProviders.length && !providerError) {
+          <p class="field-help">No providers are mapped to this category. Choose another category or update the provider mapping.</p>
+        }
+        @if (providerError) {
+          <p class="error-message" role="alert">
+            {{ providerError }}
+            <button
+              type="button"
+              class="text-button"
+              (click)="loadProviders()"
+              [disabled]="providersLoading"
+            >
+              Retry
+            </button>
+          </p>
+        }
+      </div>
+      <div class="field location-field">
+        <label for="location">
+          Location
+        </label>
+        <input
+          id="location"
+          name="location"
+          [(ngModel)]="draft.location"
+          maxlength="300"
+          placeholder="e.g. Studio 2"
+        >
+      </div>
+      <div class="field notes-field">
+        <label for="notes">
+          Notes / access instructions (optional)
+        </label>
+        <textarea
+          id="notes"
+          name="notes"
+          [(ngModel)]="draft.notes"
+          maxlength="2000"
+          rows="3"
+          placeholder="Anything your provider should know"
+        >
+        </textarea>
+      </div>
+      <p class="booking-reminder">
+        Times use your device’s local timezone. Suggested times are not verified availability.
+      </p>
+      @if (formError) {
+        <p class="error-message form-error" role="alert">
+          {{ formError }}
+        </p>
+      }
+      <div class="booking-actions">
+        <a routerLink="/appointments" class="secondary-button"
+          [class.disabled-link]="saving" [attr.tabindex]="saving ? -1 : null">Cancel</a>
+        <button type="submit" class="primary-button">
+          {{ saving ? 'Booking…' : 'Book appointment' }}
+        </button>
+      </div>
+    </fieldset>
+  </form>
+</section>

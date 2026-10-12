@@ -32,9 +32,10 @@ export const routes: Routes = [
       )
   },
   {
-    path: '',
+    path: 'home',
     title: 'Home · BAAAM Scheduling System',
-    loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent)
+    loadComponent: () =>
+      import('./pages/home/home.component').then((m) => m.HomeComponent)
   },
   {
     path: 'calendar',
@@ -68,5 +69,16 @@ export const routes: Routes = [
       import('./pages/settings/settings.component')
         .then(m => m.SettingsComponent)
   },
-  { path: '**', redirectTo: '' }
+  {
+    path: 'book-appointment',
+    title: 'Book appointment · BAAAM',
+    loadComponent: () =>
+      import('./pages/book-appointment/book-appointment.component')
+        .then((m) => m.BookAppointmentComponent)
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
 ];

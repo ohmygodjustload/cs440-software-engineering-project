@@ -5,3 +5,160 @@
   placeholder.
 
 */
+
+:host {
+  display: block;
+  background: #f7f5f1;
+  color: #344945;
+}
+
+.overview {
+  max-width: 985px;
+  margin: 0 auto;
+  padding: 12px 24px 80px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+}
+
+.month-group {
+  margin-top: 44px;
+}
+
+.month-group:first-of-type {
+  margin-top: 16px;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+}
+
+.appointment-card {
+  box-sizing: border-box;
+  padding: 22px 38px;
+  margin-bottom: 24px;
+  border-radius: 24px;
+  background: #e0dcd1;
+}
+
+.fitness {
+  background: #d5e3e8;
+}
+
+.beauty {
+  background: #e4e3bc;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 112px;
+}
+
+.meta {
+  margin: 0;
+  font-size: 13px;
+}
+
+h3 {
+  margin: 24px 0 6px;
+  font-size: 26px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.provider {
+  margin: 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+button, a {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.primary {
+  display: inline-block;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #344945;
+  color: #f7f5f1;
+  text-align: center;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.new-appointment {
+  min-width: 210px;
+}
+
+.details-button {
+  min-width: 222px;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #34494533;
+  font-size: 14px;
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.refresh, .error button {
+  padding: 10px 18px;
+  border: 1px solid #344945;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.error {
+  margin-top: 24px;
+  padding: 20px;
+  background: #fbeceb;
+  border-radius: 16px;
+}
+
+@media (max-width: 760px) {
+  header, .card-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .appointment-card {
+    padding: 24px;
+  }
+
+  .details-button {
+    min-width: 0;
+  }
+}
