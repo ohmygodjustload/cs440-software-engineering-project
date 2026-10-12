@@ -205,3 +205,4 @@ appsettings.Local.json
 appsettings.*.Local.json
 
 /src/frontend/node_modules.backup-*/
+/src/frontend/angular.json
