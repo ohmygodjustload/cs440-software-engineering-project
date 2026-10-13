@@ -10,13 +10,22 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
+import { AuthService } from './core/services/auth.service';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
+  let authService: jasmine.SpyObj<AuthService>;
+
   beforeEach(async () => {
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['clearToken', 'getCurrentUser']);
+    authService.getCurrentUser.and.returnValue(null);
+
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [provideRouter([])]
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: authService }
+      ]
     }).compileComponents();
   });
 
@@ -64,5 +73,33 @@ describe('AppComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('router-outlet')).not.toBeNull();
+  });
+
+  it('should render signed-in account initials and display name', () => {
+    authService.getCurrentUser.and.returnValue({
+      id: 'user-id',
+      firstName: 'Jane',
+      lastName: 'Porter',
+      username: 'JanePorter123',
+      isClient: true,
+      isServiceProvider: false,
+      isAdmin: false
+    });
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    const account = fixture.nativeElement.querySelector('.app-account') as HTMLElement | null;
+
+    expect(account?.textContent).toContain('JP');
+    expect(account?.textContent).toContain('Jane Porter');
+    expect(account?.textContent).toContain('Sign out');
+  });
+
+  it('should clear auth state when signing out', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+
+    fixture.componentInstance.signOut();
+
+    expect(authService.clearToken).toHaveBeenCalled();
   });
 });

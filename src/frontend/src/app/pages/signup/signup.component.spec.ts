@@ -1,18 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
 import { SignupComponent } from './signup.component';
 
 describe('SignupComponent', () => {
   let fixture: ComponentFixture<SignupComponent>;
+  let authService: jasmine.SpyObj<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['getErrorMessage', 'registerUser']);
+    authService.registerUser.and.returnValue(
+      of({ token: 'token', expiresAt: '2099-01-01T00:00:00Z', user: {} as never, requiresApproval: false })
+    );
+
     await TestBed.configureTestingModule({
       imports: [SignupComponent],
-      providers: [provideRouter([])]
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: authService }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SignupComponent);
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -23,7 +37,7 @@ describe('SignupComponent', () => {
   it('should render the normal user create account copy', () => {
     const page = fixture.nativeElement as HTMLElement;
 
-    expect(page.textContent).toContain('Create an account');
+    expect(page.textContent).toContain('Create a Client account');
     expect(page.textContent).toContain('First name');
     expect(page.textContent).toContain('Last name');
     expect(page.textContent).toContain('Username');
@@ -74,7 +88,7 @@ describe('SignupComponent', () => {
     expect(component.confirmPasswordVisible).toBeTrue();
   });
 
-  it('should show a frontend-only success message for valid details', () => {
+  it('should register valid user details', () => {
     const component = fixture.componentInstance;
 
     component.form.setValue({
@@ -88,6 +102,16 @@ describe('SignupComponent', () => {
     });
     component.onSubmit();
 
-    expect(component.submitMessage).toContain('Backend registration will be connected later.');
+    expect(authService.registerUser).toHaveBeenCalledWith({
+      firstName: 'Jane',
+      lastName: 'Porter',
+      username: 'JanePorter123',
+      email: 'jane@example.com',
+      phone: '555-123-4567',
+      password: 'password123'
+    });
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], {
+      queryParams: { reason: 'registered' }
+    });
   });
 });

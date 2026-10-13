@@ -1,5 +1,9 @@
 using System.Reflection;
 using System.IO;
+using System.Text;
+using AppointmentScheduler.Api.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 const string AngularCorsPolicy = "AngularClient";
 
@@ -68,6 +72,46 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowAnyMethod()));
 
+var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
+jwtOptions.SigningKey = builder.Configuration["Jwt:SigningKey"]
+    ?? Environment.GetEnvironmentVariable("JWT_SIGNING_KEY")
+    ?? jwtOptions.SigningKey;
+
+if (string.IsNullOrWhiteSpace(jwtOptions.SigningKey) && builder.Environment.IsDevelopment())
+{
+    jwtOptions.SigningKey = "BAAAM-development-signing-key-change-before-production";
+}
+
+if (Encoding.UTF8.GetByteCount(jwtOptions.SigningKey) < 32)
+{
+    throw new InvalidOperationException("JWT signing key must be at least 32 bytes. Set Jwt:SigningKey or JWT_SIGNING_KEY.");
+}
+
+builder.Services.Configure<JwtOptions>(options =>
+{
+    options.Issuer = jwtOptions.Issuer;
+    options.Audience = jwtOptions.Audience;
+    options.SigningKey = jwtOptions.SigningKey;
+    options.ExpirationMinutes = jwtOptions.ExpirationMinutes;
+});
+builder.Services.AddSingleton<PasswordHasher>();
+builder.Services.AddSingleton<JwtTokenService>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromMinutes(1)
+        };
+    });
+
 var app = builder.Build();
 
 // Global safety net: a Mongo outage must surface as 503 with NO stack trace,
@@ -123,6 +167,7 @@ app.MapFallbackToFile("/db/{*path:nonfile}", "db/index.html");
 
 app.UseCors(AngularCorsPolicy);
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

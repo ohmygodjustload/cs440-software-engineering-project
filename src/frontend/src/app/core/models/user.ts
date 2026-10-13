@@ -36,4 +36,8 @@ export interface User {
   isServiceProvider: boolean;
   /** True when the account may manage any user's information. */
   isAdmin: boolean;
+  /** False for accounts waiting on admin approval. */
+  isActive?: boolean;
+  /** Provider service categories, when applicable. */
+  serviceTypes?: string[] | null;
 }
