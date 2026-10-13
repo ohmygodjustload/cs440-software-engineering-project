@@ -38,6 +38,24 @@ export const routes: Routes = [
       import('./pages/home/home.component').then((m) => m.HomeComponent)
   },
   {
+    path: 'home-admin',
+    title: 'Home · BAAAM Scheduling System',
+    loadComponent: () =>
+      import('./pages/home-admin/home-admin.component').then((m) => m.HomeAdminComponent)
+  },
+  {
+    path: 'requests',
+    title: 'Requests · BAAAM Scheduling System',
+    loadComponent: () =>
+      import('./pages/requests/requests.component').then((m) => m.RequestsComponent)
+  },
+  {
+    path: 'review-request',
+    title: 'Review Request · BAAAM Scheduling System',
+    loadComponent: () =>
+      import('./pages/review-request/review-request.component').then((m) => m.ReviewRequestComponent)
+  },
+  {
     path: 'calendar',
     title: 'Calendar · BAAAM Scheduling System',
     loadComponent: () =>
@@ -48,6 +66,18 @@ export const routes: Routes = [
     title: 'Appointments · BAAAM Scheduling System',
     loadComponent: () =>
       import('./pages/appointments/appointments.component').then((m) => m.AppointmentsComponent)
+  },
+  {
+    path: 'accounts',
+    title: 'Accounts · BAAAM Scheduling System',
+    loadComponent: () =>
+      import('./pages/accounts/accounts.component').then((m) => m.AccountsComponent)
+  },
+  {
+    path: 'appointments-admin',
+    title: 'Appointments · BAAAM Scheduling System',
+    loadComponent: () =>
+      import('./pages/appointments-admin/appointments-admin.component').then((m) => m.AppointmentsAdminComponent)
   },
   {
     path: 'notifications',

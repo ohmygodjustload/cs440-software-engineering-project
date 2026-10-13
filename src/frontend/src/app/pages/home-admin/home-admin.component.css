@@ -1,0 +1,225 @@
+:host {
+  display: block;
+  color: #344945;
+  background: #f7f5f1;
+}
+
+.admin-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 12px 24px 80px;
+}
+
+.top-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.brand {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.page-picker {
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  background: #e0dcd1;
+  border-radius: 999px;
+}
+
+.page-picker a {
+  padding: 12px 17px;
+  border-radius: 999px;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.page-picker a.active {
+  background: #d5e3e8;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+}
+
+.greeting p {
+  margin: 18px 0 24px;
+  font-size: 14px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  max-width: 932px;
+}
+
+.stat-card {
+  box-sizing: border-box;
+  min-height: 112px;
+  padding: 20px;
+  border-radius: 24px;
+}
+
+.pending-card {
+  background: #e4e3bc;
+}
+
+.providers-card {
+  background: #d5e3e8;
+}
+
+.booked-card {
+  background: #e0dcd1;
+}
+
+h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.stat-info {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+
+.stat-number {
+  font-size: 44px;
+  font-weight: 500;
+}
+
+.stat-info > span:last-child {
+  font-size: 12px;
+}
+
+.needs-review,
+.recent {
+  margin-top: 38px;
+}
+
+.review-card {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  max-width: 932px;
+  min-height: 156px;
+  margin-top: 20px;
+  padding: 24px;
+  border-radius: 24px;
+  background: #d5e3e8;
+}
+
+.review-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-list strong,
+.review-list span {
+  display: block;
+}
+
+.review-list strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.review-list span {
+  font-size: 13px;
+}
+
+.recent h2 {
+  margin-bottom: 18px;
+}
+
+.activity-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 12px;
+  padding: 18px 24px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  padding: 12px 24px;
+}
+
+button,
+a {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.primary {
+  flex-shrink: 0;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #344945;
+  color: #f7f5f1;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.error {
+  padding: 20px;
+  background: #fbeceb;
+  border-radius: 16px;
+}
+
+.error button {
+  padding: 10px 18px;
+  border: 1px solid #344945;
+  border-radius: 999px;
+  background: transparent;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+@media (max-width: 760px) {
+  .top-bar {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    justify-items: start;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .review-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .activity-row {
+    grid-template-columns: 60px minmax(0, 1fr);
+    padding: 16px 0;
+  }
+}

@@ -33,7 +33,7 @@ export interface User {
   /** True when the account books appointments as a client. */
   isClient: boolean;
   /** True when the account provides services. */
-  isServiceProvider: boolean;
+  isProvider: boolean;
   /** True when the account may manage any user's information. */
   isAdmin: boolean;
 }

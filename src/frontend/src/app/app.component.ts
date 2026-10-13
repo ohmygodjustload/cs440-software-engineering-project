@@ -7,14 +7,40 @@
  *
  */
 
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { User } from './core/models/user';
+import { UserSettingsService } from './core/services/user-settings.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /** A destination shown in the main navigation. */
 interface NavLink {
   readonly label: string;
   readonly path: string;
 }
+
+const CLIENT_NAV: readonly NavLink[] = [
+  { label: 'Home', path: '/' },
+  { label: 'Calendar', path: '/calendar' },
+  { label: 'Appointments', path: '/appointments' },
+  { label: 'Notifications', path: '/notifications' },
+  { label: 'Statistics', path: '/statistics' },
+  { label: 'Settings', path: '/settings' }
+];
+const ADMIN_NAV: readonly NavLink[] = [
+  { label: 'Home', path: '/home-admin' },
+  { label: 'Requests', path: '/requests' },
+  { label: 'Accounts', path: '/accounts' },
+  { label: 'Appointments', path: '/appointments-admin' }
+];
+const PROVIDER_NAV: readonly NavLink[] = [
+  { label: 'Home', path: '/' },
+  { label: 'Calendar', path: '/calendar' },
+  { label: 'Create Appointments', path: '/appointments' },
+  { label: 'Notifications', path: '/notifications' },
+  { label: 'Statistics', path: '/statistics' },
+  { label: 'Settings', path: '/settings' }
+];
 
 @Component({
   selector: 'app-root',
@@ -24,19 +50,20 @@ interface NavLink {
 })
 export class AppComponent {
   constructor(private readonly router: Router) {}
+  // private readonly router = inject(Router);
+  private readonly settingsService = inject(UserSettingsService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly title = 'BAAAM Scheduling System';
 
-  readonly navLinks: readonly NavLink[] = [
-    { label: 'Home', path: '/' },
-    { label: 'Calendar', path: '/calendar' },
-    { label: 'Appointments', path: '/appointments' },
-    { label: 'Notifications', path: '/notifications' },
-    { label: 'Statistics', path: '/statistics' },
-    { label: 'Settings', path: '/settings' }
-  ];
+  get navLinks(): readonly NavLink[] {
+    return ADMIN_NAV; // TODO: replace with dynamic nav based on user role
+  }
 
   get usesFullPageLayout(): boolean {
-    return ['/login', '/signup', '/signup/provider'].includes(this.router.url.split(/[?#]/)[0]);
+    return ['/login', '/signup', '/signup/provider'].includes(
+      this.router.url.split(/[?#]/)[0]
+    );
+    
   }
 }

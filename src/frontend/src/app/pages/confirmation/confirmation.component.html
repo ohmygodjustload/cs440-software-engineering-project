@@ -1,0 +1,34 @@
+<dialog #actionModal id="actionModal" class="modal">
+  <!-- Ensure the styling class is explicitly on this wrapping section tag -->
+  <section class="confirmation-prompt" aria-label="Confirmation">
+    <h2 class="confirmation-prompt__question">
+      Are you sure you want to <strong>{{ actionLabel }}</strong><br />
+      {{ personName }}?
+    </h2>
+
+    <div class="confirmation-prompt__responses">
+      <button
+        id="confirm-dialog-btn"
+        type="button"
+        class="confirmation-prompt__button confirmation-prompt__button--confirm"
+        [class.confirmation-prompt__button--reject]="action === 'reject'"
+        [disabled]="disabled"
+        (click)="confirm()"
+        routerLink="/requests"
+      >
+        Yes, {{ action }}
+      </button>
+
+      <button
+        id="back-dialog-btn"
+        type="button"
+        class="confirmation-prompt__button confirmation-prompt__button--back"
+        [disabled]="disabled"
+        (click)="goBack()"
+        routerLink="/review-request"
+      >
+        No, go back
+      </button>
+    </div>
+  </section>
+</dialog>
