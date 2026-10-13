@@ -57,14 +57,20 @@ export class AppComponent {
 
   readonly title = 'BAAAM Scheduling System';
 
-  readonly navLinks: readonly NavLink[] = [
-    { label: 'Home', path: '/home' },
-    { label: 'Calendar', path: '/calendar' },
-    { label: 'Appointments', path: '/appointments' },
-    { label: 'Notifications', path: '/notifications' },
-    { label: 'Statistics', path: '/statistics' },
-    { label: 'Settings', path: '/settings' }
-  ];
+  /** Role-aware navigation: the admin, provider, and client menus differ per app.routes.ts. */
+  get navLinks(): readonly NavLink[] {
+    const user = this.signedInUser;
+
+    if (user?.isAdmin) {
+      return ADMIN_NAV;
+    }
+
+    if (user?.isServiceProvider) {
+      return PROVIDER_NAV;
+    }
+
+    return CLIENT_NAV;
+  }
 
   get usesFullPageLayout(): boolean {
     return ['/login', '/signup', '/signup/user', '/signup/provider'].includes(

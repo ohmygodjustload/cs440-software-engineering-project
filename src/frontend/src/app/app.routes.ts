@@ -8,7 +8,7 @@
 
 import { Routes } from '@angular/router';
 
-import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { adminGuard, authGuard, guestGuard } from './core/guards/auth.guard';
 
 /**
  * Application routes. Each page is loaded lazily so the initial bundle only contains the shell
@@ -55,20 +55,30 @@ export const routes: Routes = [
   {
     path: 'home-admin',
     title: 'Home · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./pages/home-admin/home-admin.component').then((m) => m.HomeAdminComponent)
   },
   {
     path: 'requests',
     title: 'Requests · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./pages/requests/requests.component').then((m) => m.RequestsComponent)
   },
   {
     path: 'review-request',
     title: 'Review Request · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./pages/review-request/review-request.component').then((m) => m.ReviewRequestComponent)
+  },
+  {
+    path: 'confirmation',
+    title: 'Confirmation · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/confirmation/confirmation.component').then((m) => m.ConfirmationPromptComponent)
   },
   {
     path: 'calendar',
@@ -87,12 +97,14 @@ export const routes: Routes = [
   {
     path: 'accounts',
     title: 'Accounts · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./pages/accounts/accounts.component').then((m) => m.AccountsComponent)
   },
   {
     path: 'appointments-admin',
     title: 'Appointments · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
     loadComponent: () =>
       import('./pages/appointments-admin/appointments-admin.component').then((m) => m.AppointmentsAdminComponent)
   },

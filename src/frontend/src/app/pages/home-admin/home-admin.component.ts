@@ -1,17 +1,15 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+
+import { ProviderRequest } from '../../core/models/provider-request';
+import { ProviderRequestsService } from '../../core/services/provider-requests.service';
 
 export interface AdminReviewItem {
   id: string;
   name: string;
   categories: string;
-}
-
-export interface AdminActivityItem {
-  id: string;
-  at: Date;
-  summary: string;
 }
 
 export function greetingFor(date: Date): string {
@@ -29,15 +27,15 @@ export function greetingFor(date: Date): string {
   styleUrl: './home-admin.component.css',
 })
 export class HomeAdminComponent implements OnInit {
+  private readonly service = inject(ProviderRequestsService);
+  private readonly destroyRef = inject(DestroyRef);
+
   now = new Date();
   loading = true;
   error: string | null = null;
 
   pendingApprovals = 0;
-  activeProviders = 0;
-  bookedToday = 0;
   reviews: AdminReviewItem[] = [];
-  activity: AdminActivityItem[] = [];
 
   get greeting(): string {
     return greetingFor(this.now);
@@ -52,36 +50,26 @@ export class HomeAdminComponent implements OnInit {
     this.error = null;
     this.now = new Date();
 
-    // Replace this stub with the admin overview API when it is available.
-    try {
-      this.pendingApprovals = 3;
-      this.activeProviders = 12;
-      this.bookedToday = 24;
-      this.reviews = [
-        { id: 'pr-104', name: 'Ava Brooks', categories: 'Beauty, Fitness' },
-        { id: 'pr-105', name: 'Sally Smith', categories: 'Medical' },
-      ];
-      this.activity = [
-        {
-          id: 'act-1',
-          at: new Date(2026, 8, 22, 10, 42),
-          summary: 'Andrew Peirce marked appointment #A-208 Completed',
+    this.service.list('pending')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (requests) => {
+          this.pendingApprovals = requests.length;
+          this.reviews = requests.slice(0, 4).map((request) => this.toReviewItem(request));
+          this.loading = false;
         },
-        {
-          id: 'act-2',
-          at: new Date(2026, 8, 22, 10, 18),
-          summary: 'Maya Chen created an Available slot',
-        },
-        {
-          id: 'act-3',
-          at: new Date(2026, 8, 22, 9, 56),
-          summary: 'Ava Brooks submitted credentials for review',
-        },
-      ];
-      this.loading = false;
-    } catch {
-      this.error = 'Could not load the admin overview.';
-      this.loading = false;
-    }
+        error: () => {
+          this.error = 'Could not load the admin overview.';
+          this.loading = false;
+        }
+      });
+  }
+
+  private toReviewItem(request: ProviderRequest): AdminReviewItem {
+    return {
+      id: request.id,
+      name: request.providerName,
+      categories: request.serviceTypes?.length ? request.serviceTypes.join(', ') : 'Not specified'
+    };
   }
 }

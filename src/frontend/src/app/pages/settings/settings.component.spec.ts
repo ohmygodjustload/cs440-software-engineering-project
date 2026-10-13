@@ -134,7 +134,7 @@ describe('SettingsComponent', () => {
     component.selectTab('privacy');
     fixture.detectChanges();
     expect(root.querySelector('#settings-panel-privacy')).not.toBeNull();
-    expect(root.textContent).toContain('no security boundary');
+    expect(root.textContent).toContain('How your information is handled in this application.');
 
     // Active tab is exposed via aria-selected on the vertical sidebar item.
     const active = root.querySelector('#settings-tab-privacy') as HTMLElement;

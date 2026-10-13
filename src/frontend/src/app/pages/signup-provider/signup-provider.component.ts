@@ -46,6 +46,8 @@ export class SignupProviderComponent {
   errorMessage: string | null = null;
   loading = false;
   passwordVisible = false;
+  successMessage: string | null = null;
+  private successTimer: any = null;
 
   readonly form = this.formBuilder.nonNullable.group(
     {
@@ -96,6 +98,7 @@ export class SignupProviderComponent {
 
   onSubmit(): void {
     this.errorMessage = null;
+    this.successMessage = null;
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -126,12 +129,21 @@ export class SignupProviderComponent {
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: () => {
-          void this.router.navigate(['/login'], { queryParams: { reason: 'provider-pending' } });
+          this.loading = false;
+          this.successMessage =
+            'Your request has been submitted for approval. Please check back soon for the status of your request.';
+          setTimeout(() => this.goToLogin(), 3000);
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);
         }
       });
+  }
+
+  goToLogin(): void {
+    clearTimeout(this.successTimer);
+    this.successTimer = null;
+    void this.router.navigate(['/login'], { queryParams: { reason: 'provider-pending' } });
   }
 
   togglePasswordVisibility(): void {

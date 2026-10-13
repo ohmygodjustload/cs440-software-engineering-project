@@ -61,8 +61,10 @@ export class LoginComponent implements OnInit {
       )
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: () => {
-          void this.router.navigateByUrl(this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home');
+        next: (response) => {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          const home = response.user.isAdmin ? '/home-admin' : '/home';
+          void this.router.navigateByUrl(returnUrl ?? home);
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);

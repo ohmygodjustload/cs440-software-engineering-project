@@ -1,6 +1,7 @@
 using AppointmentScheduler.Api.Controllers;
 using AppointmentScheduler.Api.Models;
 using AppointmentScheduler.Api.Stores;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduler.Api.Tests.Controllers;
@@ -148,5 +149,69 @@ public class AppointmentsControllerTests
         var payload = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(updated.Result).Value);
 
         Assert.Equal("Custom name", payload.ProviderName);
+    }
+
+    [Fact]
+    public void Create_RejectsUnapprovedProvider()
+    {
+        var appointmentStore = new InMemoryAppointmentStore();
+        var providerStore = new InMemoryProviderStore();
+        var unapproved = providerStore.GetAll()[0];
+        unapproved.IsApproved = false;
+        var controller = new AppointmentsController(appointmentStore, providerStore);
+
+        var dto = ValidDto();
+        dto.ProviderId = unapproved.Id;
+
+        var result = controller.Create(dto);
+
+        Assert.Equal(StatusCodes.Status403Forbidden, Assert.IsType<ObjectResult>(result.Result).StatusCode);
+        Assert.Empty(appointmentStore.GetAll());
+    }
+
+    [Fact]
+    public void List_HidesSlotsFromUnapprovedProviders()
+    {
+        var appointmentStore = new InMemoryAppointmentStore();
+        var providerStore = new InMemoryProviderStore();
+        var approved = providerStore.GetAll()[0];
+        var unapproved = providerStore.GetAll()[1];
+        unapproved.IsApproved = false;
+        var controller = new AppointmentsController(appointmentStore, providerStore);
+
+        var visible = ValidDto();
+        visible.Title = "Visible slot";
+        visible.ProviderId = approved.Id;
+        controller.Create(visible);
+
+        var hidden = ValidDto();
+        hidden.Title = "Hidden slot";
+        hidden.ProviderId = unapproved.Id;
+        controller.Create(hidden);
+
+        var result = controller.List(null, null, null, null, null);
+
+        var payload = Assert.IsType<PagedResult<Appointment>>(Assert.IsType<OkObjectResult>(result.Result).Value);
+        var item = Assert.Single(payload.Items);
+        Assert.Equal("Visible slot", item.Title);
+        Assert.Equal(approved.Id, item.ProviderId);
+    }
+
+    [Fact]
+    public void List_ShowsAppointmentsOfApprovedProviders()
+    {
+        var appointmentStore = new InMemoryAppointmentStore();
+        var providerStore = new InMemoryProviderStore();
+        var approved = providerStore.GetAll()[0];
+        var controller = new AppointmentsController(appointmentStore, providerStore);
+
+        var dto = ValidDto();
+        dto.ProviderId = approved.Id;
+        controller.Create(dto);
+
+        var result = controller.List(null, null, null, null, null);
+
+        var payload = Assert.IsType<PagedResult<Appointment>>(Assert.IsType<OkObjectResult>(result.Result).Value);
+        Assert.Single(payload.Items);
     }
 }

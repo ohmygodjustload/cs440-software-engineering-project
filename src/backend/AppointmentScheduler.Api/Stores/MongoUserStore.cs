@@ -75,6 +75,55 @@ public sealed class MongoUserStore : IUserStore
         return Map(doc);
     }
 
+    public bool Update(User user)
+    {
+        var existing = FindById(_raw, user.Id);
+        if (existing is null)
+        {
+            return false;
+        }
+
+        var replacement = new BsonDocument
+        {
+            ["_id"] = existing["_id"],
+            ["FirstName"] = user.FirstName,
+            ["LastName"] = user.LastName,
+            ["Username"] = user.Username,
+            ["Email"] = BsonValue.Create(user.Email),
+            ["Phone"] = BsonValue.Create(user.Phone),
+            ["IsClient"] = user.IsClient,
+            ["IsServiceProvider"] = user.IsServiceProvider,
+            ["IsAdmin"] = user.IsAdmin,
+            ["IsActive"] = user.IsActive,
+            ["PasswordHash"] = string.IsNullOrWhiteSpace(user.PasswordHash)
+                ? ReadString(existing, "PasswordHash") ?? string.Empty
+                : user.PasswordHash,
+            ["ServiceTypes"] = new BsonArray(user.ServiceTypes.Select(value => value.ToString())),
+        };
+
+        AddCredential(replacement, "MedicalCredentials", user.MedicalCredentials);
+        AddCredential(replacement, "BeautyCredentials", user.BeautyCredentials);
+        AddCredential(replacement, "FitnessCredentials", user.FitnessCredentials);
+
+        // Carry over soft-delete fields that are not part of the API shape.
+        var isDeleted = FindElement(existing, "IsDeleted");
+        if (isDeleted.HasValue)
+        {
+            replacement["IsDeleted"] = isDeleted.Value.Value;
+        }
+
+        var deletedAt = FindElement(existing, "DeletedAt");
+        if (deletedAt.HasValue)
+        {
+            replacement["DeletedAt"] = deletedAt.Value.Value;
+        }
+
+        var result = _raw.ReplaceOne(
+            Builders<BsonDocument>.Filter.Eq("_id", existing["_id"]),
+            replacement);
+        return result.MatchedCount > 0;
+    }
+
     private static User Map(BsonDocument d) => new()
     {
         Id = ReadId(d, "_id") ?? Guid.NewGuid().ToString("N"),

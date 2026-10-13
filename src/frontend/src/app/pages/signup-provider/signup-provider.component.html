@@ -121,8 +121,16 @@
         {{ loading ? 'Submitting...' : 'Submit for approval' }}
       </button>
 
+      @if (successMessage) {
+        <p class="signup-form__message" role="status">{{ successMessage }}</p>
+      }
+
       <p class="signup-form__login">
-        Already have an account? <a class="signup-link" routerLink="/login">Sign in</a>
+        @if (successMessage) {
+          <a class="signup-link" (click)="goToLogin()">Continue to sign in</a>
+        } @else {
+          Already have an account? <a class="signup-link" routerLink="/login">Sign in</a>
+        }
       </p>
     </form>
   </section>

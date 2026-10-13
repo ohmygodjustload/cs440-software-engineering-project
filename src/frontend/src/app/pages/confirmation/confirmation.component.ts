@@ -7,7 +7,6 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 export type ConfirmationAction = 'accept' | 'reject';
 
@@ -19,7 +18,6 @@ export interface ConfirmationDecision {
 @Component({
   selector: 'app-confirmation-prompt',
   standalone: true,
-  imports: [RouterLink],
   templateUrl: './confirmation.component.html',
   styleUrls: ['./confirmation.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

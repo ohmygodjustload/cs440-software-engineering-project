@@ -82,6 +82,11 @@ public sealed class AppointmentsController : ControllerBase
             query = query.Where(a => a.ProviderId == providerId);
         }
 
+        // Slots and appointments from providers that are known but not yet approved by an
+        // admin are never shown to clients (see BAAAM-138). Unknown provider ids (for
+        // example legacy seed data with no Provider row) are left visible.
+        query = query.Where(a => IsProviderVisible(a.ProviderId));
+
         var ordered = query.OrderBy(a => a.StartDateTime).ToList();
         var items = ordered.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
@@ -122,15 +127,25 @@ public sealed class AppointmentsController : ControllerBase
             return BadRequest("EndDateTime must be after StartDateTime.");
         }
 
+        // Only approved providers may create appointments/slots (BAAAM-138). Unknown
+        // provider ids pass through so demo flows without a Provider row keep working.
+        var providerId = dto.ProviderId.Trim();
+        var provider = _providers?.GetById(providerId);
+        if (provider is { IsApproved: false })
+        {
+            return StatusCode(StatusCodes.Status403Forbidden,
+                "This service provider has not been approved by an admin yet.");
+        }
+
         var appointment = new Appointment
         {
             Title = dto.Title.Trim(),
             Category = dto.Category!.Value,
             StartDateTime = dto.StartDateTime.Value,
             EndDateTime = dto.EndDateTime.Value,
-            ProviderId = dto.ProviderId.Trim(),
+            ProviderId = providerId,
             ProviderName = string.IsNullOrWhiteSpace(dto.ProviderName)
-                ? ResolveProviderName(dto.ProviderId.Trim())
+                ? provider?.Name
                 : dto.ProviderName.Trim(),
             UserId = string.IsNullOrWhiteSpace(dto.UserId) ? "demo-user" : dto.UserId.Trim(),
             Location = string.IsNullOrWhiteSpace(dto.Location) ? null : dto.Location.Trim(),
@@ -261,4 +276,11 @@ public sealed class AppointmentsController : ControllerBase
     /// </summary>
     private string? ResolveProviderName(string providerId) =>
         _providers?.GetById(providerId)?.Name;
+
+    /// <summary>
+    /// False only when the provider id maps to a known provider that is not approved.
+    /// Unknown ids stay visible so legacy/demo data is not hidden by accident.
+    /// </summary>
+    private bool IsProviderVisible(string providerId) =>
+        _providers?.GetById(providerId) is not { IsApproved: false };
 }

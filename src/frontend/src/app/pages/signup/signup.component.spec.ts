@@ -37,7 +37,7 @@ describe('SignupComponent', () => {
   it('should render the normal user create account copy', () => {
     const page = fixture.nativeElement as HTMLElement;
 
-    expect(page.textContent).toContain('Create a Client account');
+    expect(page.textContent).toContain('Create a Client Account');
     expect(page.textContent).toContain('First name');
     expect(page.textContent).toContain('Last name');
     expect(page.textContent).toContain('Username');

@@ -29,6 +29,7 @@
   @if (signedInUser) {
     <div class="app-account" aria-label="Signed-in account">
       <span class="app-account__initials" aria-hidden="true">{{ accountInitials }}</span>
+      <span class="app-account__name">{{ accountDisplayName }}</span>
       <button class="app-account__signout" type="button" (click)="signOut()">Sign out</button>
     </div>
   }

@@ -13,6 +13,7 @@ namespace AppointmentScheduler.Api.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly IUserStore _users;
+    private readonly IProviderRequestStore _providerRequests;
     private readonly PasswordHasher _passwordHasher;
     private readonly JwtTokenService _tokens;
 
@@ -20,11 +21,17 @@ public sealed class AuthController : ControllerBase
     /// Creates a controller that can read/write users, verify password hashes, and issue JWTs.
     /// </summary>
     /// <param name="users">User persistence boundary used for username lookup and registration.</param>
+    /// <param name="providerRequests">Provider request persistence boundary used to file approval requests.</param>
     /// <param name="passwordHasher">Password hashing service used to hash and verify credentials.</param>
     /// <param name="tokens">JWT token service used to create successful authentication responses.</param>
-    public AuthController(IUserStore users, PasswordHasher passwordHasher, JwtTokenService tokens)
+    public AuthController(
+        IUserStore users,
+        IProviderRequestStore providerRequests,
+        PasswordHasher passwordHasher,
+        JwtTokenService tokens)
     {
         _users = users;
+        _providerRequests = providerRequests;
         _passwordHasher = passwordHasher;
         _tokens = tokens;
     }
@@ -51,7 +58,7 @@ public sealed class AuthController : ControllerBase
 
         if (!user.IsActive)
         {
-            return Unauthorized("Account is pending approval.");
+            return Unauthorized(GetInactiveAccountMessage(user));
         }
 
         return Ok(_tokens.CreateToken(user));
@@ -131,6 +138,21 @@ public sealed class AuthController : ControllerBase
             return Conflict("Username is already taken.");
         }
 
+        // File an open provider request so admins can review and approve/reject it.
+        _providerRequests.Add(new ProviderRequest
+        {
+            UserId = created.Id,
+            ProviderName = $"{created.FirstName} {created.LastName}".Trim(),
+            ServiceTypes = serviceTypes,
+            MedicalCredentials = created.MedicalCredentials,
+            BeautyCredentials = created.BeautyCredentials,
+            FitnessCredentials = created.FitnessCredentials,
+            IsReviewed = false,
+            IsApproved = false,
+            Notes = string.Empty,
+            SubmittedAt = DateTimeOffset.UtcNow
+        });
+
         var response = new RegisterResponse
         {
             User = created,
@@ -138,6 +160,28 @@ public sealed class AuthController : ControllerBase
         };
 
         return CreatedAtAction(nameof(UsersController.GetById), "Users", new { id = created.Id }, response);
+    }
+
+    /// <summary>
+    /// Explains why a provider cannot sign in yet. Rejected accounts surface the admin's
+    /// rejection note; everything else is treated as waiting on review.
+    /// </summary>
+    private string GetInactiveAccountMessage(User user)
+    {
+        if (user.IsServiceProvider)
+        {
+            var latest = _providerRequests.GetLatestByUserId(user.Id);
+            if (latest is { IsReviewed: true, IsApproved: false })
+            {
+                return string.IsNullOrWhiteSpace(latest.Notes)
+                    ? "Your service provider request was rejected by an admin. Please contact an administrator for details."
+                    : $"Your service provider request was rejected by an admin. Reason: {latest.Notes}";
+            }
+
+            return "Your request is yet to be reviewed by an admin. Please try again later.";
+        }
+
+        return "Account is pending approval.";
     }
 
     private User BuildUser(RegisterUserRequest request) => new()
