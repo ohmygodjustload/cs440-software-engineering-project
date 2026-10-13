@@ -14,5 +14,9 @@
     "AppointmentsCollection": "Appointment",
     "ProvidersCollection": "Provider",
     "UsersCollection": "User"
+  },
+  "Jwt": {
+    // Prefer user-secrets or JWT_SIGNING_KEY for real environments.
+    "SigningKey": "<at-least-32-character-dev-signing-key>"
   }
 }

@@ -7,4 +7,6 @@ public interface IUserStore
 {
     IReadOnlyList<User> GetAll();
     User? GetById(string id);
+    User? GetByUsername(string username);
+    User Add(User user);
 }

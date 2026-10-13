@@ -88,56 +88,6 @@ input {
   width: 100%;
 }
 
-.login-role {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  min-inline-size: 0;
-
-  margin: 0 0 26px;
-  padding: 4px;
-
-  border: 1px solid var(--login-border);
-  border-radius: var(--login-input-radius);
-}
-
-.login-role__legend {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
-
-.login-role__option {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 42px;
-  border-radius: 10px;
-  color: var(--login-foreground);
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 17px;
-}
-
-.login-role__input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.login-role__option:has(.login-role__input:checked) {
-  background: var(--login-foreground);
-  color: var(--login-background);
-}
-
-.login-role__option:has(.login-role__input:focus-visible) {
-  outline: 2px solid var(--login-foreground);
-  outline-offset: 4px;
-}
-
 .login-field + .login-field {
   margin-top: 26px;
 }
@@ -286,6 +236,20 @@ input {
 .login-remember__checkbox:focus-visible {
   outline: 2px solid var(--login-foreground);
   outline-offset: 4px;
+}
+
+.login-form__error {
+  margin: 24px 0 0;
+  color: #9a3412;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.login-form__message {
+  margin: 24px 0 0;
+  color: #276749;
+  font-size: 13px;
+  line-height: 18px;
 }
 
 .login-submit {

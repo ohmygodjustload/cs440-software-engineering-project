@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  color: #344945;
+  background: #f7f5f1;
+}
+
+.greeting p {
+  margin: 18px 0 24px;
+  font-size: 14px;
+}
+
+.admin-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 12px 24px 80px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+}
