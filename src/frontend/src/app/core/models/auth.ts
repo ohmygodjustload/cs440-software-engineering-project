@@ -17,10 +17,7 @@ export interface RegisterUserRequest {
 export type ServiceType = 'Medical' | 'Beauty' | 'Fitness';
 
 export interface ServiceCredentialRequest {
-  qualification?: string | null;
-  institution?: string | null;
-  licenseNumber?: string | null;
-  specialties?: string | null;
+  info?: string | null;
 }
 
 export interface RegisterProviderRequest extends RegisterUserRequest {

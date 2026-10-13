@@ -53,11 +53,5 @@ public sealed class User
 
 public sealed class ServiceCredential
 {
-    public string? Qualification { get; set; }
-
-    public string? Institution { get; set; }
-
-    public string? LicenseNumber { get; set; }
-
-    public string? Specialties { get; set; }
+    public string? Info { get; set; }
 }

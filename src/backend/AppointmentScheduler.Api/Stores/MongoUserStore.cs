@@ -103,10 +103,7 @@ public sealed class MongoUserStore : IUserStore
 
         doc[key] = new BsonDocument
         {
-            ["Qualification"] = BsonValue.Create(credential.Qualification),
-            ["Institution"] = BsonValue.Create(credential.Institution),
-            ["LicenseNumber"] = BsonValue.Create(credential.LicenseNumber),
-            ["Specialties"] = BsonValue.Create(credential.Specialties),
+            ["Info"] = BsonValue.Create(credential.Info),
         };
     }
 
@@ -138,10 +135,7 @@ public sealed class MongoUserStore : IUserStore
         var credential = element.Value.Value.AsBsonDocument;
         return new ServiceCredential
         {
-            Qualification = ReadString(credential, "Qualification"),
-            Institution = ReadString(credential, "Institution"),
-            LicenseNumber = ReadString(credential, "LicenseNumber"),
-            Specialties = ReadString(credential, "Specialties"),
+            Info = ReadString(credential, "Info"),
         };
     }
 

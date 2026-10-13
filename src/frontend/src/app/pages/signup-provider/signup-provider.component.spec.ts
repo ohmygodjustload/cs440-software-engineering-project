@@ -62,8 +62,9 @@ describe('SignupProviderComponent', () => {
 
     const page = fixture.nativeElement as HTMLElement;
     expect(page.textContent).toContain('Medical credentials');
-    expect(page.textContent).toContain('Medical qualification');
-    expect(page.textContent).toContain('License number');
+
+    const info = page.querySelector('#medicalInfo') as HTMLInputElement | null;
+    expect(info?.placeholder).toBe('Qualifications: Graduated from [Medical School], [Year].');
   });
 
   it('should require matching passwords', () => {
@@ -97,9 +98,7 @@ describe('SignupProviderComponent', () => {
     });
     component.form.controls.services.controls.medical.setValue(true);
     component.form.controls.medicalCredentials.patchValue({
-      qualification: 'MD',
-      school: 'BAAAM University',
-      licenseNumber: 'MED-123'
+      info: 'Qualifications: Graduated from BAAAM Medical School, 2015.'
     });
     component.onSubmit();
 
@@ -113,10 +112,7 @@ describe('SignupProviderComponent', () => {
         password: 'password123',
         serviceTypes: ['Medical'],
         medicalCredentials: {
-          qualification: 'MD',
-          institution: 'BAAAM University',
-          licenseNumber: 'MED-123',
-          specialties: null
+          info: 'Qualifications: Graduated from BAAAM Medical School, 2015.'
         }
       })
     );

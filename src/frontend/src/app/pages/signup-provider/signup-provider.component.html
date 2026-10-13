@@ -89,19 +89,8 @@
       @if (medicalSelected) {
         <fieldset class="signup-section" formGroupName="medicalCredentials">
           <legend class="signup-section__title">Medical credentials</legend>
-          <div class="signup-form__row">
-            <div class="signup-field">
-              <label class="signup-field__label" for="medicalQualification">Medical qualification</label>
-              <input class="signup-field__input" id="medicalQualification" type="text" formControlName="qualification" />
-            </div>
-            <div class="signup-field">
-              <label class="signup-field__label" for="medicalSchool">University or school</label>
-              <input class="signup-field__input" id="medicalSchool" type="text" formControlName="school" />
-            </div>
-          </div>
           <div class="signup-field">
-            <label class="signup-field__label" for="medicalLicense">License number</label>
-            <input class="signup-field__input" id="medicalLicense" type="text" formControlName="licenseNumber" />
+            <input class="signup-field__input" id="medicalInfo" type="text" maxlength="500" formControlName="info" aria-label="Medical qualifications" placeholder="Qualifications: Graduated from [Medical School], [Year]." />
           </div>
         </fieldset>
       }
@@ -109,19 +98,8 @@
       @if (beautySelected) {
         <fieldset class="signup-section" formGroupName="beautyCredentials">
           <legend class="signup-section__title">Beauty credentials</legend>
-          <div class="signup-form__row">
-            <div class="signup-field">
-              <label class="signup-field__label" for="beautyCertification">Certification or training</label>
-              <input class="signup-field__input" id="beautyCertification" type="text" formControlName="certification" />
-            </div>
-            <div class="signup-field">
-              <label class="signup-field__label" for="beautyLicense">License or certificate number</label>
-              <input class="signup-field__input" id="beautyLicense" type="text" formControlName="licenseNumber" />
-            </div>
-          </div>
           <div class="signup-field">
-            <label class="signup-field__label" for="beautySpecialties">Specialties</label>
-            <input class="signup-field__input" id="beautySpecialties" type="text" formControlName="specialties" placeholder="Hair, nails, skincare, makeup" />
+            <input class="signup-field__input" id="beautyInfo" type="text" maxlength="500" formControlName="info" aria-label="Beauty qualifications" placeholder="Qualifications: Graduated from [Beauty Academy], [Year]." />
           </div>
         </fieldset>
       }
@@ -129,19 +107,8 @@
       @if (fitnessSelected) {
         <fieldset class="signup-section" formGroupName="fitnessCredentials">
           <legend class="signup-section__title">Fitness credentials</legend>
-          <div class="signup-form__row">
-            <div class="signup-field">
-              <label class="signup-field__label" for="fitnessCertification">Certification organization</label>
-              <input class="signup-field__input" id="fitnessCertification" type="text" formControlName="certification" />
-            </div>
-            <div class="signup-field">
-              <label class="signup-field__label" for="fitnessNumber">Certification number</label>
-              <input class="signup-field__input" id="fitnessNumber" type="text" formControlName="certificationNumber" />
-            </div>
-          </div>
           <div class="signup-field">
-            <label class="signup-field__label" for="fitnessSpecialties">Specialties</label>
-            <input class="signup-field__input" id="fitnessSpecialties" type="text" formControlName="specialties" placeholder="Strength, yoga, cardio, rehab" />
+            <input class="signup-field__input" id="fitnessInfo" type="text" maxlength="500" formControlName="info" aria-label="Fitness qualifications" placeholder="Qualifications: Graduated from [Fitness Institute], [Year]." />
           </div>
         </fieldset>
       }

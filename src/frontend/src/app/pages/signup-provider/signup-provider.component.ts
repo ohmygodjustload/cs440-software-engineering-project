@@ -62,19 +62,13 @@ export class SignupProviderComponent {
         fitness: [false]
       }),
       medicalCredentials: this.formBuilder.nonNullable.group({
-        qualification: [''],
-        school: [''],
-        licenseNumber: ['']
+        info: ['']
       }),
       beautyCredentials: this.formBuilder.nonNullable.group({
-        certification: [''],
-        licenseNumber: [''],
-        specialties: ['']
+        info: ['']
       }),
       fitnessCredentials: this.formBuilder.nonNullable.group({
-        certification: [''],
-        certificationNumber: [''],
-        specialties: ['']
+        info: ['']
       })
     },
     { validators: [passwordsMatchValidator, serviceTypeValidator] }
@@ -120,25 +114,13 @@ export class SignupProviderComponent {
         password: value.password,
         serviceTypes: this.toServiceTypes(value.services),
         medicalCredentials: value.services.medical
-          ? this.toCredential({
-              qualification: value.medicalCredentials.qualification,
-              institution: value.medicalCredentials.school,
-              licenseNumber: value.medicalCredentials.licenseNumber
-            })
+          ? this.toCredential({ info: value.medicalCredentials.info })
           : null,
         beautyCredentials: value.services.beauty
-          ? this.toCredential({
-              qualification: value.beautyCredentials.certification,
-              licenseNumber: value.beautyCredentials.licenseNumber,
-              specialties: value.beautyCredentials.specialties
-            })
+          ? this.toCredential({ info: value.beautyCredentials.info })
           : null,
         fitnessCredentials: value.services.fitness
-          ? this.toCredential({
-              qualification: value.fitnessCredentials.certification,
-              licenseNumber: value.fitnessCredentials.certificationNumber,
-              specialties: value.fitnessCredentials.specialties
-            })
+          ? this.toCredential({ info: value.fitnessCredentials.info })
           : null
       })
       .pipe(finalize(() => (this.loading = false)))
@@ -176,10 +158,7 @@ export class SignupProviderComponent {
 
   private toCredential(credential: ServiceCredentialRequest): ServiceCredentialRequest {
     return {
-      qualification: this.normalizeOptional(credential.qualification ?? ''),
-      institution: this.normalizeOptional(credential.institution ?? ''),
-      licenseNumber: this.normalizeOptional(credential.licenseNumber ?? ''),
-      specialties: this.normalizeOptional(credential.specialties ?? '')
+      info: this.normalizeOptional(credential.info ?? '')
     };
   }
 

@@ -176,10 +176,7 @@ public sealed class AuthController : ControllerBase
 
         return new ServiceCredential
         {
-            Qualification = NormalizeOptional(request.Qualification),
-            Institution = NormalizeOptional(request.Institution),
-            LicenseNumber = NormalizeOptional(request.LicenseNumber),
-            Specialties = NormalizeOptional(request.Specialties),
+            Info = NormalizeOptional(request.Info),
         };
     }
 

@@ -45,15 +45,6 @@ public sealed class RegisterProviderRequest : RegisterUserRequest
 
 public sealed class ServiceCredentialRequest
 {
-    [MaxLength(200)]
-    public string? Qualification { get; set; }
-
-    [MaxLength(200)]
-    public string? Institution { get; set; }
-
-    [MaxLength(100)]
-    public string? LicenseNumber { get; set; }
-
-    [MaxLength(300)]
-    public string? Specialties { get; set; }
+    [MaxLength(500)]
+    public string? Info { get; set; }
 }
