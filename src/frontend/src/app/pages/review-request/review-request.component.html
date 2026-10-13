@@ -1,0 +1,83 @@
+<div class="review-page" [attr.aria-busy]="submitting">
+  <main class="review-content">
+    <a class="action-button button return-button primary" [routerLink]="['/requests']">
+      Return to Requests
+    </a>
+
+    <h1>Review {{ applicantName }}</h1>
+
+    <p class="request-meta">
+      Request · Service Provider · {{ status }}
+    </p>
+
+    <div class="review-sections">
+      <section class="review-card beauty" aria-labelledby="beauty-heading">
+        <h2 id="beauty-heading">Beauty</h2>
+        <p>
+          License: {{ beautyLicense }}<br />
+          {{ beautyExperience }}
+        </p>
+      </section>
+
+      <section class="review-card fitness" aria-labelledby="fitness-heading">
+        <h2 id="fitness-heading">Fitness</h2>
+        <p>
+          Certification: {{ fitnessCertification }}<br />
+          {{ fitnessExperience }}
+        </p>
+      </section>
+
+      <section class="review-card medical" aria-labelledby="medical-heading">
+        <h2 id="medical-heading">Medical</h2>
+        <p>
+          {{ medicalCredentials }}
+        </p>
+      </section>
+
+      <section class="review-card comments-card">
+        <label class="comments-label" for="review-comments">Comments</label>
+        <textarea
+          id="review-comments"
+          name="reviewComments"
+          rows="4"
+          placeholder="Add reviewer notes, questions, or approval/disapproval context here…"
+          [ngModel]="comments"
+          (ngModelChange)="updateComments($event)"
+          [disabled]="submitting"
+        ></textarea>
+      </section>
+    </div>
+
+    <!-- FIXED: Changed 'accept' to 'approve' to perfectly match your TS definition -->
+    <div class="review-actions" aria-label="Review actions">
+      <button
+        id="approve-action-btn"
+        type="button"
+        class="action-button approve"
+        [disabled]="submitting"
+        (click)="openDialog('approve')"
+      >
+        Approve
+      </button>
+
+      <button
+        id="reject-action-btn"
+        type="button"
+        class="action-button reject"
+        [disabled]="submitting"
+        (click)="openDialog('reject')"
+      >
+        Reject
+      </button>
+    </div>
+  </main>
+</div>
+
+<app-confirmation-prompt
+  #confirmationPrompt
+  [action]="currentAction"
+  [personName]="applicantName"
+  [disabled]="submitting"
+  (confirmed)="handleDialogConfirmed($event)"
+>
+</app-confirmation-prompt>

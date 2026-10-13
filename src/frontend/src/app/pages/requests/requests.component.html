@@ -1,0 +1,35 @@
+<div class="admin-container">
+  <header class="greeting">
+    <h1>Requests</h1>
+    <p>Review pending provider requests</p>
+  </header>
+
+  @if (loading) {
+    <p role="status">Loading provider requests…</p>
+  } @else if (error) {
+    <div class="error" role="alert">
+      <p>{{ error }}</p>
+      <button type="button" (click)="load()">Try again</button>
+    </div>
+  } @else {
+    <section class="request-list" aria-label="Pending requests">
+      <h2>Pending requests</h2>
+
+      @for (request of requests; track request.id) {
+        <div class="request-card">
+          <div>
+            <h3>{{ request.name }}</h3>
+            <p class="request-meta">
+              {{ request.status }} · Provider type: {{ request.providerType || 'Not specified' }}
+            </p>
+          </div>
+          <a class="primary" [routerLink]="['/review-request']">Review</a>
+        </div>
+      } @empty {
+        <div class="request-card">
+          <p class="empty">No pending provider requests.</p>
+        </div>
+      }
+    </section>
+  }
+</div>

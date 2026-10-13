@@ -1,0 +1,83 @@
+<!--
+  admin-overview.component.html — the AdminOverviewComponent template
+  (the screen shown at the admin home / Overview route).
+
+  Purpose: Admin dashboard matching BAAAM-UI “Admin · Overview”.
+  Shows summary stats, provider requests that need review, and recent activity.
+  Handles loading and error the same way as HomeComponent so routing, build,
+  and tests can be verified before live admin APIs are wired.
+-->
+
+<div class="admin-container">
+  <header class="greeting">
+    <h1>{{ greeting }}</h1>
+    <p>{{ now | date:'EEEE, MMMM d, y' }}</p>
+  </header>
+
+  @if (loading) {
+    <p role="status">Loading admin overview…</p>
+  } @else if (error) {
+    <div class="error" role="alert">
+      <p>{{ error }}</p>
+      <button type="button" (click)="load()">Try again</button>
+    </div>
+  } @else {
+    <section class="stats" aria-label="Admin summary">
+      <div class="stat-card pending-card">
+        <h2>Pending approvals</h2>
+        <div class="stat-info">
+          <span class="stat-number">{{ pendingApprovals }}</span>
+          <span>request{{ pendingApprovals === 1 ? '' : 's' }} waiting</span>
+        </div>
+      </div>
+      <div class="stat-card providers-card">
+        <h2>Active providers</h2>
+        <div class="stat-info">
+          <span class="stat-number">{{ activeProviders }}</span>
+          <span>provider{{ activeProviders === 1 ? '' : 's' }} approved</span>
+        </div>
+      </div>
+      <div class="stat-card booked-card">
+        <h2>Booked today</h2>
+        <div class="stat-info">
+          <span class="stat-number">{{ bookedToday }}</span>
+          <span>booking{{ bookedToday === 1 ? '' : 's' }} today</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="needs-review">
+      <h2>Needs your review</h2>
+      @if (reviews.length) {
+        <div class="review-card">
+          <ul class="review-list">
+            @for (request of reviews; track request.id) {
+              <li>
+                <strong>{{ request.name }}</strong>
+                <span>Requested Categories: {{ request.categories }}</span>
+              </li>
+            }
+          </ul>
+          <a class="primary" routerLink="/requests">Review Provider Requests</a>
+        </div>
+      } @else {
+        <div class="review-card">
+          <p>No provider requests need review.</p>
+          <a class="primary" routerLink="/requests">View requests</a>
+        </div>
+      }
+    </section>
+
+    <section class="recent">
+      <h2>Recent activity</h2>
+      @for (item of activity; track item.id) {
+        <div class="activity-row">
+          <time>{{ item.at | date:'h:mm a' }}</time>
+          <span>{{ item.summary }}</span>
+        </div>
+      } @empty {
+        <p class="empty">No recent activity.</p>
+      }
+    </section>
+  }
+</div>
