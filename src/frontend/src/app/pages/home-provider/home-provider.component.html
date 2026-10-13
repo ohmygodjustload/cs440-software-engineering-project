@@ -8,11 +8,6 @@
     <a class="primary" routerLink="/create-slots">+ Create appointment slots</a>
   </header>
 
-  <nav class="home-pills" aria-label="Home views">
-    <a routerLink="/home">Client</a>
-    <a class="active" routerLink="/home-provider" aria-current="page">Service provider</a>
-  </nav>
-
   @if (loading) {
     <p role="status">Loading your appointments…</p>
   } @else if (error) {

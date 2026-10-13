@@ -207,23 +207,3 @@ footer {
     flex-wrap: wrap;
   }
 }
-
-.home-pills {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 6px;
-  margin: 24px 0;
-  border: 1px solid #dedad0;
-  border-radius: 999px;
-}
-
-.home-pills a {
-  padding: 10px 18px;
-  border-radius: 999px;
-  text-decoration: none;
-}
-
-.home-pills .active {
-  background: #d5e3e8;
-}
