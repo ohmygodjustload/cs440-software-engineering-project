@@ -9,10 +9,12 @@ import {
   RegisterResponse,
   RegisterUserRequest
 } from '../models/auth';
+import { User } from '../models/user';
 
 const AUTH_ENDPOINT = '/api/auth';
 const TOKEN_KEY = 'baaam.auth.token';
 const EXPIRES_AT_KEY = 'baaam.auth.expiresAt';
+const USER_KEY = 'baaam.auth.user';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +24,7 @@ export class AuthService {
 
   login(request: LoginRequest, remember: boolean): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${AUTH_ENDPOINT}/login`, request).pipe(
-      tap((response) => this.saveToken(response.token, response.expiresAt, remember))
+      tap((response) => this.saveAuth(response.token, response.expiresAt, response.user, remember))
     );
   }
 
@@ -30,7 +32,7 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${AUTH_ENDPOINT}/register`, request).pipe(
       tap((response) => {
         if (response.token && response.expiresAt) {
-          this.saveToken(response.token, response.expiresAt, false);
+          this.saveAuth(response.token, response.expiresAt, response.user, false);
         }
       })
     );
@@ -45,6 +47,24 @@ export class AuthService {
       return null;
     }
     return this.getStoredToken();
+  }
+
+  getCurrentUser(): User | null {
+    if (!this.isAuthenticated()) {
+      return null;
+    }
+
+    const raw = localStorage.getItem(USER_KEY) ?? sessionStorage.getItem(USER_KEY);
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw) as User;
+    } catch {
+      this.clearToken();
+      return null;
+    }
   }
 
   isAuthenticated(): boolean {
@@ -67,8 +87,10 @@ export class AuthService {
   clearToken(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(EXPIRES_AT_KEY);
+    localStorage.removeItem(USER_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(EXPIRES_AT_KEY);
+    sessionStorage.removeItem(USER_KEY);
   }
 
   getErrorMessage(error: unknown): string {
@@ -87,11 +109,12 @@ export class AuthService {
     return 'Something went wrong. Please try again.';
   }
 
-  private saveToken(token: string, expiresAt: string, remember: boolean): void {
+  private saveAuth(token: string, expiresAt: string, user: User, remember: boolean): void {
     this.clearToken();
     const storage = remember ? localStorage : sessionStorage;
     storage.setItem(TOKEN_KEY, token);
     storage.setItem(EXPIRES_AT_KEY, expiresAt);
+    storage.setItem(USER_KEY, JSON.stringify(user));
   }
 
   private getStoredToken(): string | null {

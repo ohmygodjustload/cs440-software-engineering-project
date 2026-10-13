@@ -38,6 +38,7 @@ describe('AuthService', () => {
     });
 
     expect(localStorage.getItem('baaam.auth.token')).toBe('jwt-token');
+    expect(service.getCurrentUser()?.username).toBe('JanePorter123');
   });
 
   it('should register users through the auth endpoint', () => {
@@ -62,6 +63,7 @@ describe('AuthService', () => {
     });
 
     expect(sessionStorage.getItem('baaam.auth.token')).toBe('jwt-token');
+    expect(service.getCurrentUser()?.username).toBe('JanePorter123');
   });
 
   it('should register providers through the provider endpoint without storing a token', () => {
@@ -85,6 +87,19 @@ describe('AuthService', () => {
     });
 
     expect(service.getToken()).toBeNull();
+  });
+
+  it('should clear the stored user on sign out', () => {
+    service.login({ username: 'JanePorter123', password: 'password123' }, false).subscribe();
+    http.expectOne('/api/auth/login').flush({
+      token: 'jwt-token',
+      expiresAt: '2099-01-01T00:00:00Z',
+      user: userResponse('JanePorter123')
+    });
+
+    service.clearToken();
+
+    expect(service.getCurrentUser()).toBeNull();
   });
 
   it('should clear expired tokens', () => {
