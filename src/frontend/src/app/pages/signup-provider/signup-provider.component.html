@@ -1,7 +1,8 @@
 <main class="signup-page">
   <section class="signup-card signup-card--wide" aria-labelledby="signup-provider-title">
-    <p class="signup-card__brand">BAAAM Scheduling</p>
-    <h1 id="signup-provider-title" class="signup-card__title">Create a service provider account</h1>
+    <p class="signup-card__brand">BAAAM Scheduling System</p>
+    <a class="signup-back" routerLink="/signup">&larr; Back to account type</a>
+    <h1 id="signup-provider-title" class="signup-card__title">Create a Service Provider Account</h1>
     <p class="signup-card__lede">Service provider accounts are subject to admin approval.</p>
 
     <form class="signup-form" [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -20,7 +21,6 @@
       <div class="signup-field">
         <label class="signup-field__label" for="username">Username</label>
         <input class="signup-field__input" id="username" name="username" type="text" autocomplete="username" placeholder="Choose a unique username" formControlName="username" required />
-        <p class="signup-field__hint">Usernames will be checked for uniqueness when backend registration is connected.</p>
       </div>
 
       <div class="signup-form__row">
@@ -144,10 +144,6 @@
             <input class="signup-field__input" id="fitnessSpecialties" type="text" formControlName="specialties" placeholder="Strength, yoga, cardio, rehab" />
           </div>
         </fieldset>
-      }
-
-      @if (submitMessage) {
-        <p class="signup-form__message">{{ submitMessage }}</p>
       }
 
       @if (errorMessage) {

@@ -41,7 +41,7 @@ describe('AuthService', () => {
     expect(service.getCurrentUser()?.username).toBe('JanePorter123');
   });
 
-  it('should register users through the auth endpoint', () => {
+  it('should register users through the auth endpoint without storing a token', () => {
     service
       .registerUser({
         firstName: 'Jane',
@@ -62,8 +62,7 @@ describe('AuthService', () => {
       requiresApproval: false
     });
 
-    expect(sessionStorage.getItem('baaam.auth.token')).toBe('jwt-token');
-    expect(service.getCurrentUser()?.username).toBe('JanePorter123');
+    expect(service.getToken()).toBeNull();
   });
 
   it('should register providers through the provider endpoint without storing a token', () => {

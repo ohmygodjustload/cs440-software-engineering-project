@@ -1,7 +1,8 @@
 <main class="signup-page">
   <section class="signup-card" aria-labelledby="signup-title">
-    <p class="signup-card__brand">BAAAM Scheduling</p>
-    <h1 id="signup-title" class="signup-card__title">Create an account</h1>
+    <p class="signup-card__brand">BAAAM Scheduling System</p>
+    <a class="signup-back" routerLink="/signup">&larr; Back to account type</a>
+    <h1 id="signup-title" class="signup-card__title">Create a Client Account</h1>
     <p class="signup-card__lede">Manage your appointments in one place.</p>
 
     <form class="signup-form" [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -45,7 +46,6 @@
           formControlName="username"
           required
         />
-        <p class="signup-field__hint">Usernames will be checked for uniqueness when backend registration is connected.</p>
       </div>
 
       <div class="signup-form__row">
@@ -129,10 +129,6 @@
           <p class="signup-field__error">Passwords must match.</p>
         }
       </div>
-
-      @if (submitMessage) {
-        <p class="signup-form__message">{{ submitMessage }}</p>
-      }
 
       @if (errorMessage) {
         <p class="signup-field__error" role="alert">{{ errorMessage }}</p>

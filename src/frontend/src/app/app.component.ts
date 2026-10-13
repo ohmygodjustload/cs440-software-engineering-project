@@ -43,7 +43,9 @@ export class AppComponent {
   ];
 
   get usesFullPageLayout(): boolean {
-    return ['/login', '/signup', '/signup/provider'].includes(this.router.url.split(/[?#]/)[0]);
+    return ['/login', '/signup', '/signup/user', '/signup/provider'].includes(
+      this.router.url.split(/[?#]/)[0]
+    );
   }
 
   get signedInUser(): User | null {

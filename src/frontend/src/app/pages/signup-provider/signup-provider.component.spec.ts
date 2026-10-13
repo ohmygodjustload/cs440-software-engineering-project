@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -8,6 +8,7 @@ import { SignupProviderComponent } from './signup-provider.component';
 describe('SignupProviderComponent', () => {
   let fixture: ComponentFixture<SignupProviderComponent>;
   let authService: jasmine.SpyObj<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['getErrorMessage', 'registerProvider']);
@@ -24,6 +25,8 @@ describe('SignupProviderComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(SignupProviderComponent);
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -34,7 +37,7 @@ describe('SignupProviderComponent', () => {
   it('should render service provider account fields', () => {
     const page = fixture.nativeElement as HTMLElement;
 
-    expect(page.textContent).toContain('Create a service provider account');
+    expect(page.textContent).toContain('Create a Service Provider Account');
     expect(page.textContent).toContain('Email');
     expect(page.textContent).toContain('Phone number');
     expect(page.textContent).toContain('Service type');
@@ -117,6 +120,8 @@ describe('SignupProviderComponent', () => {
         }
       })
     );
-    expect(component.submitMessage).toContain('admin approval');
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], {
+      queryParams: { reason: 'provider-pending' }
+    });
   });
 });

@@ -29,13 +29,7 @@ export class AuthService {
   }
 
   registerUser(request: RegisterUserRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${AUTH_ENDPOINT}/register`, request).pipe(
-      tap((response) => {
-        if (response.token && response.expiresAt) {
-          this.saveAuth(response.token, response.expiresAt, response.user, false);
-        }
-      })
-    );
+    return this.http.post<RegisterResponse>(`${AUTH_ENDPOINT}/register`, request);
   }
 
   registerProvider(request: RegisterProviderRequest): Observable<RegisterResponse> {

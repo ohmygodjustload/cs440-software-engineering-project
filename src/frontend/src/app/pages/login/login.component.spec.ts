@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -32,18 +32,12 @@ describe('LoginComponent', () => {
   it('should render the supplied login copy', () => {
     const page = fixture.nativeElement as HTMLElement;
 
-    expect(page.textContent).toContain('BAAAM Scheduling');
+    expect(page.textContent).toContain('BAAAM Scheduling System');
     expect(page.textContent).toContain('Your time, beautifully organized');
     expect(page.textContent).toContain('Welcome back');
-    expect(page.textContent).toContain('User');
-    expect(page.textContent).toContain('Service provider');
     expect(page.textContent).toContain('Remember me');
     expect(page.textContent).toContain('Forgot password?');
     expect(page.textContent).toContain('New here? Create an account');
-  });
-
-  it('should default to user login', () => {
-    expect(fixture.componentInstance.form.controls.accountType.value).toBe('client');
   });
 
   it('should toggle password visibility', () => {
@@ -54,14 +48,32 @@ describe('LoginComponent', () => {
     expect(component.passwordVisible).toBeTrue();
   });
 
-  it('should route create account based on selected account type', () => {
-    const component = fixture.componentInstance;
+  describe('when arriving after creating an account', () => {
+    beforeEach(async () => {
+      await TestBed.resetTestingModule()
+        .configureTestingModule({
+          imports: [LoginComponent],
+          providers: [
+            provideRouter([]),
+            {
+              provide: ActivatedRoute,
+              useValue: {
+                snapshot: { queryParamMap: convertToParamMap({ reason: 'registered' }) }
+              }
+            },
+            { provide: AuthService, useValue: authService }
+          ]
+        })
+        .compileComponents();
 
-    expect(component.createAccountRoute).toBe('/signup');
+      fixture = TestBed.createComponent(LoginComponent);
+      fixture.detectChanges();
+    });
 
-    component.form.controls.accountType.setValue('serviceProvider');
-
-    expect(component.createAccountRoute).toBe('/signup/provider');
+    it('should show the account created confirmation instead of signing in', () => {
+      expect(fixture.componentInstance.successMessage).toContain('Account created.');
+      expect(fixture.componentInstance.errorMessage).toBeNull();
+    });
   });
 
   it('should require username and password before submission can proceed', () => {

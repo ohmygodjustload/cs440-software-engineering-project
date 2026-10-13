@@ -5,8 +5,6 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 
-type LoginAccountType = 'client' | 'serviceProvider';
-
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
@@ -22,23 +20,24 @@ export class LoginComponent implements OnInit {
   errorMessage: string | null = null;
   loading = false;
   passwordVisible = false;
+  successMessage: string | null = null;
 
   readonly form = this.formBuilder.nonNullable.group({
-    accountType: ['client' as LoginAccountType, [Validators.required]],
     username: ['', [Validators.required, Validators.maxLength(100)]],
     password: ['', [Validators.required]],
     remember: [false]
   });
 
-  get createAccountRoute(): string {
-    return this.form.controls.accountType.value === 'serviceProvider'
-      ? '/signup/provider'
-      : '/signup';
-  }
-
   ngOnInit(): void {
-    if (this.route.snapshot.queryParamMap.get('reason') === 'auth') {
+    const reason = this.route.snapshot.queryParamMap.get('reason');
+
+    if (reason === 'auth') {
       this.errorMessage = 'Please sign in first.';
+    } else if (reason === 'registered') {
+      this.successMessage = 'Account created. Sign in with your new credentials.';
+    } else if (reason === 'provider-pending') {
+      this.successMessage =
+        'Service provider account submitted for admin approval. You can sign in once approved.';
     }
   }
 

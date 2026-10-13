@@ -6,7 +6,7 @@ import {
   ValidationErrors,
   Validators
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { ServiceCredentialRequest, ServiceType } from '../../core/models/auth';
@@ -40,12 +40,12 @@ function serviceTypeValidator(control: AbstractControl): ValidationErrors | null
 export class SignupProviderComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   confirmPasswordVisible = false;
   errorMessage: string | null = null;
   loading = false;
   passwordVisible = false;
-  submitMessage: string | null = null;
 
   readonly form = this.formBuilder.nonNullable.group(
     {
@@ -102,7 +102,6 @@ export class SignupProviderComponent {
 
   onSubmit(): void {
     this.errorMessage = null;
-    this.submitMessage = null;
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -145,7 +144,7 @@ export class SignupProviderComponent {
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: () => {
-          this.submitMessage = 'Service provider account submitted for admin approval.';
+          void this.router.navigate(['/login'], { queryParams: { reason: 'provider-pending' } });
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);

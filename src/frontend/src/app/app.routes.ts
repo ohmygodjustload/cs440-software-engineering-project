@@ -25,6 +25,15 @@ export const routes: Routes = [
     path: 'signup',
     title: 'Create account · BAAAM Scheduling System',
     canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./pages/signup-selection/signup-selection.component').then(
+        (m) => m.SignupSelectionComponent
+      )
+  },
+  {
+    path: 'signup/user',
+    title: 'Create user account · BAAAM Scheduling System',
+    canActivate: [guestGuard],
     loadComponent: () => import('./pages/signup/signup.component').then((m) => m.SignupComponent)
   },
   {

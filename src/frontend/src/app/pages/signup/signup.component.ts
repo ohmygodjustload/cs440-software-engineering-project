@@ -6,7 +6,7 @@ import {
   ValidationErrors,
   Validators
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -29,12 +29,12 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
 export class SignupComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly router = inject(Router);
 
   confirmPasswordVisible = false;
   errorMessage: string | null = null;
   loading = false;
   passwordVisible = false;
-  submitMessage: string | null = null;
 
   readonly form = this.formBuilder.nonNullable.group(
     {
@@ -55,7 +55,6 @@ export class SignupComponent {
 
   onSubmit(): void {
     this.errorMessage = null;
-    this.submitMessage = null;
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -76,7 +75,7 @@ export class SignupComponent {
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: () => {
-          this.submitMessage = 'Account created. You are signed in.';
+          void this.router.navigate(['/login'], { queryParams: { reason: 'registered' } });
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);

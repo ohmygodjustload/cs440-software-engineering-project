@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -8,6 +8,7 @@ import { SignupComponent } from './signup.component';
 describe('SignupComponent', () => {
   let fixture: ComponentFixture<SignupComponent>;
   let authService: jasmine.SpyObj<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['getErrorMessage', 'registerUser']);
@@ -24,6 +25,8 @@ describe('SignupComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(SignupComponent);
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -34,7 +37,7 @@ describe('SignupComponent', () => {
   it('should render the normal user create account copy', () => {
     const page = fixture.nativeElement as HTMLElement;
 
-    expect(page.textContent).toContain('Create an account');
+    expect(page.textContent).toContain('Create a Client account');
     expect(page.textContent).toContain('First name');
     expect(page.textContent).toContain('Last name');
     expect(page.textContent).toContain('Username');
@@ -107,6 +110,8 @@ describe('SignupComponent', () => {
       phone: '555-123-4567',
       password: 'password123'
     });
-    expect(component.submitMessage).toContain('Account created.');
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], {
+      queryParams: { reason: 'registered' }
+    });
   });
 });
