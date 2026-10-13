@@ -6,20 +6,19 @@
 */
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .app-header {
-  height: 86px;
-
+  height: 5rem;
   display: flex;
   align-items: center;
-
-  padding: 0 40px;
-
+  padding: 0 4rem;
   position: relative;
-
   background: #faf9f6;
+  aspect-ratio: 16/9;
 }
 
 
@@ -58,7 +57,7 @@
   border: 1px solid #dedbd2;
   border-radius: 999px;
 
-  background: #faf9f6;
+  background: #f7f5f1;
 }
 
 
@@ -155,7 +154,9 @@
 /* Main page */
 
 .app-main {
-  padding: 1.5rem;
+  padding: 0;
+  background: #f7f5f1;
+  flex-grow: 1;
 }
 
 .app-main--full-page {

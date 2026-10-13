@@ -7,8 +7,11 @@
  *
  */
 
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { User } from './core/models/user';
+import { UserSettingsService } from './core/services/user-settings.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { User } from './core/models/user';
 import { AuthService } from './core/services/auth.service';
@@ -18,6 +21,29 @@ interface NavLink {
   readonly label: string;
   readonly path: string;
 }
+
+const CLIENT_NAV: readonly NavLink[] = [
+  { label: 'Home', path: '/' },
+  { label: 'Calendar', path: '/calendar' },
+  { label: 'Appointments', path: '/appointments' },
+  { label: 'Notifications', path: '/notifications' },
+  { label: 'Statistics', path: '/statistics' },
+  { label: 'Settings', path: '/settings' }
+];
+const ADMIN_NAV: readonly NavLink[] = [
+  { label: 'Home', path: '/home-admin' },
+  { label: 'Requests', path: '/requests' },
+  { label: 'Accounts', path: '/accounts' },
+  { label: 'Appointments', path: '/appointments-admin' }
+];
+const PROVIDER_NAV: readonly NavLink[] = [
+  { label: 'Home', path: '/' },
+  { label: 'Calendar', path: '/calendar' },
+  { label: 'Create Appointments', path: '/appointments' },
+  { label: 'Notifications', path: '/notifications' },
+  { label: 'Statistics', path: '/statistics' },
+  { label: 'Settings', path: '/settings' }
+];
 
 @Component({
   selector: 'app-root',

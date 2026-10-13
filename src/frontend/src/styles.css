@@ -15,10 +15,17 @@
   --color-surface-muted: #f4f7fb;
   --color-border: #d9e2ec;
   --radius: 8px;
+  --display: block;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  height: 100%;
+  padding: 0;
 }
 
 body {
@@ -27,4 +34,6 @@ body {
   background-color: var(--color-surface-muted);
   font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.5;
+  height: 100%;
+  padding: 0;
 }
