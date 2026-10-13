@@ -77,6 +77,13 @@ export const routes: Routes = [
         .then((m) => m.BookAppointmentComponent)
   },
   {
+    path: 'home-provider',
+    title: 'Service provider home · BAAAM',
+    loadComponent: () =>
+      import('./pages/home-provider/home-provider.component')
+        .then(m => m.ProviderHomeComponent)
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
