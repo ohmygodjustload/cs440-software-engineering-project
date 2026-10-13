@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
-type LoginAccountType = 'client' | 'serviceProvider';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -10,31 +11,63 @@ type LoginAccountType = 'client' | 'serviceProvider';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
+  errorMessage: string | null = null;
+  loading = false;
   passwordVisible = false;
+  successMessage: string | null = null;
 
   readonly form = this.formBuilder.nonNullable.group({
-    accountType: ['client' as LoginAccountType, [Validators.required]],
     username: ['', [Validators.required, Validators.maxLength(100)]],
     password: ['', [Validators.required]],
     remember: [false]
   });
 
-  get createAccountRoute(): string {
-    return this.form.controls.accountType.value === 'serviceProvider'
-      ? '/signup/provider'
-      : '/signup';
+  ngOnInit(): void {
+    const reason = this.route.snapshot.queryParamMap.get('reason');
+
+    if (reason === 'auth') {
+      this.errorMessage = 'Please sign in first.';
+    } else if (reason === 'registered') {
+      this.successMessage = 'Account created. Sign in with your new credentials.';
+    } else if (reason === 'provider-pending') {
+      this.successMessage =
+        'Service provider account submitted for admin approval. You can sign in once approved.';
+    }
   }
 
   onSubmit(): void {
+    this.errorMessage = null;
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    // Authentication will be connected here when the backend exposes a login endpoint.
+    const value = this.form.getRawValue();
+    this.loading = true;
+    this.authService
+      .login(
+        {
+          username: value.username,
+          password: value.password
+        },
+        value.remember
+      )
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          void this.router.navigateByUrl(this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home');
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.authService.getErrorMessage(error);
+        }
+      });
   }
 
   togglePasswordVisibility(): void {

@@ -41,6 +41,25 @@ input {
   font-weight: 500;
 }
 
+.signup-back {
+  display: inline-block;
+  margin: 14px 0 0;
+  color: var(--signup-foreground);
+  font-size: 13px;
+  line-height: 18px;
+  text-decoration: none;
+}
+
+.signup-back:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.signup-back:focus-visible {
+  outline: 2px solid var(--signup-foreground);
+  outline-offset: 4px;
+}
+
 .signup-card__title {
   margin: 26px 0 0;
   font-size: 38px;
@@ -213,6 +232,11 @@ input {
 
 .signup-submit:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.signup-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .signup-submit:focus-visible,

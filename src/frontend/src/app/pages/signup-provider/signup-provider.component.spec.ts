@@ -1,18 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
 import { SignupProviderComponent } from './signup-provider.component';
 
 describe('SignupProviderComponent', () => {
   let fixture: ComponentFixture<SignupProviderComponent>;
+  let authService: jasmine.SpyObj<AuthService>;
+  let router: Router;
 
   beforeEach(async () => {
+    authService = jasmine.createSpyObj<AuthService>('AuthService', ['getErrorMessage', 'registerProvider']);
+    authService.registerProvider.and.returnValue(
+      of({ user: {} as never, requiresApproval: true })
+    );
+
     await TestBed.configureTestingModule({
       imports: [SignupProviderComponent],
-      providers: [provideRouter([])]
+      providers: [
+        provideRouter([]),
+        { provide: AuthService, useValue: authService }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(SignupProviderComponent);
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -23,7 +37,7 @@ describe('SignupProviderComponent', () => {
   it('should render service provider account fields', () => {
     const page = fixture.nativeElement as HTMLElement;
 
-    expect(page.textContent).toContain('Create a service provider account');
+    expect(page.textContent).toContain('Create a Service Provider Account');
     expect(page.textContent).toContain('Email');
     expect(page.textContent).toContain('Phone number');
     expect(page.textContent).toContain('Service type');
@@ -48,8 +62,9 @@ describe('SignupProviderComponent', () => {
 
     const page = fixture.nativeElement as HTMLElement;
     expect(page.textContent).toContain('Medical credentials');
-    expect(page.textContent).toContain('Medical qualification');
-    expect(page.textContent).toContain('License number');
+
+    const info = page.querySelector('#medicalInfo') as HTMLInputElement | null;
+    expect(info?.placeholder).toBe('Qualifications: Graduated from [Medical School], [Year].');
   });
 
   it('should require matching passwords', () => {
@@ -69,7 +84,7 @@ describe('SignupProviderComponent', () => {
     expect(component.form.hasError('passwordsMismatch')).toBeTrue();
   });
 
-  it('should show an approval message for valid provider details', () => {
+  it('should register valid provider details for approval', () => {
     const component = fixture.componentInstance;
 
     component.form.patchValue({
@@ -82,8 +97,27 @@ describe('SignupProviderComponent', () => {
       confirmPassword: 'password123'
     });
     component.form.controls.services.controls.medical.setValue(true);
+    component.form.controls.medicalCredentials.patchValue({
+      info: 'Qualifications: Graduated from BAAAM Medical School, 2015.'
+    });
     component.onSubmit();
 
-    expect(component.submitMessage).toContain('admin approval');
+    expect(authService.registerProvider).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        firstName: 'Sam',
+        lastName: 'Provider',
+        username: 'SamProvider',
+        email: 'sam@example.com',
+        phone: '555-123-4567',
+        password: 'password123',
+        serviceTypes: ['Medical'],
+        medicalCredentials: {
+          info: 'Qualifications: Graduated from BAAAM Medical School, 2015.'
+        }
+      })
+    );
+    expect(router.navigate).toHaveBeenCalledWith(['/login'], {
+      queryParams: { reason: 'provider-pending' }
+    });
   });
 });
