@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -36,4 +37,21 @@ public sealed class User
     public bool IsAdmin { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    public List<AppointmentCategory> ServiceTypes { get; set; } = [];
+
+    public ServiceCredential? MedicalCredentials { get; set; }
+
+    public ServiceCredential? BeautyCredentials { get; set; }
+
+    public ServiceCredential? FitnessCredentials { get; set; }
+
+    [JsonIgnore]
+    [BsonIgnore]
+    public string PasswordHash { get; set; } = string.Empty;
+}
+
+public sealed class ServiceCredential
+{
+    public string? Info { get; set; }
 }
