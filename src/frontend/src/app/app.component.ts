@@ -12,8 +12,6 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { User } from './core/models/user';
 import { UserSettingsService } from './core/services/user-settings.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-import { User } from './core/models/user';
 import { AuthService } from './core/services/auth.service';
 
 /** A destination shown in the main navigation. */
