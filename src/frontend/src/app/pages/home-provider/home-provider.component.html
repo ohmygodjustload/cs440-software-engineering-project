@@ -1,0 +1,65 @@
+<main class="dashboard">
+  <header>
+    <div>
+      <h1>Service provider home</h1>
+      <p>{{ now | date:'EEEE, MMMM d, y' }}</p>
+      <p>Manage your schedule and upcoming bookings.</p>
+    </div>
+    <a class="primary" routerLink="/create-slots">+ Create appointment slots</a>
+  </header>
+
+  @if (loading) {
+    <p role="status">Loading your appointments…</p>
+  } @else if (error) {
+    <div role="alert"><p>{{ error }}</p><button (click)="load()">Try again</button></div>
+  } @else if (providerId) {
+    <section class="stats" aria-label="Appointment summary">
+      <article class="stat"><h2>Today</h2><strong>{{ todayCount }}</strong><p>booked appointments</p></article>
+      <article class="stat blue"><h2>This week</h2><strong>{{ weekCount }}</strong><p>booked appointments · Monday–Sunday</p></article>
+      <article class="stat yellow"><h2>Availability</h2><p>Manage the slots clients can book.</p><a routerLink="/create-slots">Create slots</a></article>
+    </section>
+
+    <section>
+      <h2>Next appointment</h2>
+      @if (nextAppointment; as appointment) {
+        <article class="appointment-card">
+          <div>
+            <p>{{ appointment.category }} · {{ appointment.startDateTime | date:'MMM d, h:mm a' }}</p>
+            <h3>{{ appointment.title }}</h3>
+            <p>Client ID: {{ appointment.userId || 'Not provided' }}</p>
+            <p>{{ appointment.location || 'Location not provided' }}</p>
+          </div>
+          <button class="primary" (click)="selectedAppointment = appointment">View details</button>
+        </article>
+      } @else { <p>No upcoming booked appointments.</p> }
+    </section>
+
+    @if (selectedAppointment; as appointment) {
+      <section class="details" aria-label="Appointment details">
+        <h2>{{ appointment.title }}</h2>
+        <dl>
+          <dt>Client ID</dt><dd>{{ appointment.userId || 'Not provided' }}</dd>
+          <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
+          <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
+          <dt>Status</dt><dd>{{ appointment.status }}</dd>
+          <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
+          <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
+        </dl>
+        <button (click)="selectedAppointment = null">Close details</button>
+      </section>
+    }
+
+    <section>
+      <h2>Recent appointments</h2>
+      @for (appointment of recentAppointments; track appointment.id) {
+        <div class="recent-row">
+          <span>{{ appointment.startDateTime | date:'MMM d' }}</span>
+          <span>{{ appointment.title }}</span>
+          <span>{{ appointment.status }}</span>
+          <button (click)="selectedAppointment = appointment">View details</button>
+        </div>
+      } @empty { <p>No recent appointments.</p> }
+    </section>
+    <footer><a routerLink="/provider">Manage appointments</a><button (click)="load()">Refresh</button></footer>
+  } @else { <p>Your service provider profile is not connected yet.</p> }
+</main>

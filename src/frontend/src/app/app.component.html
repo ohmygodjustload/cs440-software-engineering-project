@@ -7,8 +7,8 @@
 -->
 
 @if (!usesFullPageLayout) {
-<header class="app-header">
-  <span class="app-brand">{{ title }}</span>
+  <header class="app-header" [class.app-header--provider]="isProviderWorkspace">
+    <span class="app-brand">{{ title }}</span>
 
   <nav class="app-nav" aria-label="Main">
     <ul class="app-nav__list">
@@ -18,7 +18,8 @@
             class="app-nav__link"
             [routerLink]="link.path"
             routerLinkActive="app-nav__link--active"
-            [routerLinkActiveOptions]="{ exact: link.path === '/' }"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: true }"
             >{{ link.label }}</a
           >
         </li>

@@ -41,5 +41,21 @@ export const guestGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  return authService.isAuthenticated() ? router.createUrlTree(['/home']) : true;
+  const user = authService.getCurrentUser();
+  const home = user?.isAdmin ? '/home-admin' : user?.isServiceProvider ? '/home-provider' : '/home';
+  return authService.isAuthenticated() ? router.createUrlTree([home]) : true;
+};
+/** Allows the provider workspace only for active, signed-in provider accounts. */
+export const providerGuard: CanActivateFn = (_route, state) => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  if (!auth.isAuthenticated()) {
+    return router.createUrlTree(['/login'], {
+      queryParams: { reason: 'auth', returnUrl: state.url }
+    });
+  }
+  const user = auth.getCurrentUser();
+  return user?.isServiceProvider && user.isActive !== false
+    ? true
+    : router.createUrlTree([user?.isAdmin ? '/home-admin' : '/home']);
 };
