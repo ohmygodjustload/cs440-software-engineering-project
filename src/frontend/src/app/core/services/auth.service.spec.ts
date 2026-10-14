@@ -88,6 +88,29 @@ describe('AuthService', () => {
     expect(service.getToken()).toBeNull();
   });
 
+  it('should re-submit a rejected provider application without storing a token', () => {
+    service
+      .resubmitProvider({
+        firstName: 'Sam',
+        lastName: 'Provider',
+        username: 'SamProvider',
+        email: 'sam@example.com',
+        phone: '555-123-4567',
+        password: 'password123',
+        serviceTypes: ['Medical']
+      })
+      .subscribe();
+
+    const request = http.expectOne('/api/auth/resubmit/provider');
+    expect(request.request.method).toBe('POST');
+    request.flush({
+      user: userResponse('SamProvider'),
+      requiresApproval: true
+    });
+
+    expect(service.getToken()).toBeNull();
+  });
+
   it('should clear the stored user on sign out', () => {
     service.login({ username: 'JanePorter123', password: 'password123' }, false).subscribe();
     http.expectOne('/api/auth/login').flush({

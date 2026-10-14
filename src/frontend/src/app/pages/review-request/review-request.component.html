@@ -4,79 +4,96 @@
       Return to Requests
     </a>
 
-    <h1>Review {{ applicantName }}</h1>
+    @if (loading) {
+      <p role="status">Loading provider request…</p>
+    } @else if (error && !request) {
+      <div class="error" role="alert">
+        <p>{{ error }}</p>
+      </div>
+    } @else if (request) {
+      <h1>Review {{ request.providerName }}</h1>
 
-    <p class="request-meta">
-      Request · Service Provider · {{ status }}
-    </p>
+      <p class="request-meta">
+        Request · Service Provider · {{ statusLabel }}
+      </p>
 
-    <div class="review-sections">
-      <section class="review-card beauty" aria-labelledby="beauty-heading">
-        <h2 id="beauty-heading">Beauty</h2>
-        <p>
-          License: {{ beautyLicense }}<br />
-          {{ beautyExperience }}
-        </p>
-      </section>
+      @if (error) {
+        <p class="submit-error" role="alert">{{ error }}</p>
+      }
 
-      <section class="review-card fitness" aria-labelledby="fitness-heading">
-        <h2 id="fitness-heading">Fitness</h2>
-        <p>
-          Certification: {{ fitnessCertification }}<br />
-          {{ fitnessExperience }}
-        </p>
-      </section>
+      <div class="review-sections">
+        @if (hasCategory('Beauty')) {
+          <section class="review-card beauty" aria-labelledby="beauty-heading">
+            <h2 id="beauty-heading">Beauty</h2>
+            <p>{{ request.beautyCredentials?.info || 'No beauty qualification submitted.' }}</p>
+          </section>
+        }
 
-      <section class="review-card medical" aria-labelledby="medical-heading">
-        <h2 id="medical-heading">Medical</h2>
-        <p>
-          {{ medicalCredentials }}
-        </p>
-      </section>
+        @if (hasCategory('Fitness')) {
+          <section class="review-card fitness" aria-labelledby="fitness-heading">
+            <h2 id="fitness-heading">Fitness</h2>
+            <p>{{ request.fitnessCredentials?.info || 'No fitness qualification submitted.' }}</p>
+          </section>
+        }
 
-      <section class="review-card comments-card">
-        <label class="comments-label" for="review-comments">Comments</label>
-        <textarea
-          id="review-comments"
-          name="reviewComments"
-          rows="4"
-          placeholder="Add reviewer notes, questions, or approval/disapproval context here…"
-          [ngModel]="comments"
-          (ngModelChange)="updateComments($event)"
-          [disabled]="submitting"
-        ></textarea>
-      </section>
-    </div>
+        @if (hasCategory('Medical')) {
+          <section class="review-card medical" aria-labelledby="medical-heading">
+            <h2 id="medical-heading">Medical</h2>
+            <p>{{ request.medicalCredentials?.info || 'No medical qualification submitted.' }}</p>
+          </section>
+        }
 
-    <!-- FIXED: Changed 'accept' to 'approve' to perfectly match your TS definition -->
-    <div class="review-actions" aria-label="Review actions">
-      <button
-        id="approve-action-btn"
-        type="button"
-        class="action-button approve"
-        [disabled]="submitting"
-        (click)="openDialog('approve')"
-      >
-        Approve
-      </button>
+        @if (isReviewed) {
+          <section class="review-card comments-card" aria-label="Reviewer note">
+            <span class="comments-label">Reviewer note</span>
+            <p>{{ request.notes || 'No note was recorded.' }}</p>
+          </section>
+        } @else {
+          <section class="review-card comments-card">
+            <label class="comments-label" for="review-comments">Comments</label>
+            <textarea
+              id="review-comments"
+              name="reviewComments"
+              rows="4"
+              placeholder="Add reviewer notes, questions, or approval/disapproval context here…"
+              [(ngModel)]="comments"
+              [disabled]="submitting"
+            ></textarea>
+          </section>
+        }
+      </div>
 
-      <button
-        id="reject-action-btn"
-        type="button"
-        class="action-button reject"
-        [disabled]="submitting"
-        (click)="openDialog('reject')"
-      >
-        Reject
-      </button>
-    </div>
+      @if (!isReviewed) {
+        <div class="review-actions" aria-label="Review actions">
+          <button
+            id="approve-action-btn"
+            type="button"
+            class="action-button approve"
+            [disabled]="submitting"
+            (click)="openDialog('approve')"
+          >
+            Approve
+          </button>
+
+          <button
+            id="reject-action-btn"
+            type="button"
+            class="action-button reject"
+            [disabled]="submitting"
+            (click)="openDialog('reject')"
+          >
+            Reject
+          </button>
+        </div>
+      }
+    }
   </main>
 </div>
 
 <app-confirmation-prompt
   #confirmationPrompt
   [action]="currentAction"
-  [personName]="applicantName"
+  [personName]="request?.providerName ?? 'this applicant'"
   [disabled]="submitting"
   (confirmed)="handleDialogConfirmed($event)"
 >

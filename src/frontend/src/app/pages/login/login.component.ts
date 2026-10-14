@@ -41,6 +41,14 @@ export class LoginComponent implements OnInit {
     }
   }
 
+  /**
+   * True when sign-in failed because the provider's request was rejected. In that case we offer a
+   * link to re-submit the application (the backend allows re-submission only after a rejection).
+   */
+  get showResubmit(): boolean {
+    return !!this.errorMessage && this.errorMessage.includes('rejected by an admin');
+  }
+
   onSubmit(): void {
     this.errorMessage = null;
 
@@ -61,8 +69,10 @@ export class LoginComponent implements OnInit {
       )
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: () => {
-          void this.router.navigateByUrl(this.route.snapshot.queryParamMap.get('returnUrl') ?? '/home');
+        next: (response) => {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          const home = response.user.isAdmin ? '/home-admin' : '/home';
+          void this.router.navigateByUrl(returnUrl ?? home);
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);

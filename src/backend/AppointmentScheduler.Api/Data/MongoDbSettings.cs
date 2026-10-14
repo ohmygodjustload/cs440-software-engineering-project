@@ -25,6 +25,8 @@ public sealed class MongoDbSettings
 
     public string ProvidersCollection { get; set; } = "Provider";
 
+    public string ProviderRequestsCollection { get; set; } = "ProviderRequest";
+
     public string UsersCollection { get; set; } = "User";
 
     public string AppointmentTypesCollection { get; set; } = "AppointmentType";

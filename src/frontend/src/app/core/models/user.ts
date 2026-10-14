@@ -32,8 +32,8 @@ export interface User {
   phone?: string | null;
   /** True when the account books appointments as a client. */
   isClient: boolean;
-  /** True when the account provides services. */
-  isProvider: boolean;
+  /** True when the account provides services (backend serializes `IsServiceProvider`). */
+  isServiceProvider: boolean;
   /** True when the account may manage any user's information. */
   isAdmin: boolean;
   /** False for accounts waiting on admin approval. */

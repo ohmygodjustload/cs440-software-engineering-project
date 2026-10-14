@@ -1,37 +1,56 @@
 <main class="signup-page">
   <section class="signup-card signup-card--wide" aria-labelledby="signup-provider-title">
     <p class="signup-card__brand">BAAAM Scheduling System</p>
-    <a class="signup-back" routerLink="/signup">&larr; Back to account type</a>
-    <h1 id="signup-provider-title" class="signup-card__title">Create a Service Provider Account</h1>
-    <p class="signup-card__lede">Service provider accounts are subject to admin approval.</p>
+    @if (isResubmit) {
+      <a class="signup-back" routerLink="/login">&larr; Back to sign in</a>
+    } @else {
+      <a class="signup-back" routerLink="/signup">&larr; Back to account type</a>
+    }
+    <h1 id="signup-provider-title" class="signup-card__title">{{ titleText }}</h1>
+    <p class="signup-card__lede">{{ ledeText }}</p>
 
     <form class="signup-form" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="signup-form__row">
         <div class="signup-field">
           <label class="signup-field__label" for="firstName">First name</label>
           <input class="signup-field__input" id="firstName" name="firstName" type="text" autocomplete="given-name" formControlName="firstName" required />
+          @if (fieldError('firstName', 'First name')) {
+            <p class="signup-field__error" role="alert">{{ fieldError('firstName', 'First name') }}</p>
+          }
         </div>
 
         <div class="signup-field">
           <label class="signup-field__label" for="lastName">Last name</label>
           <input class="signup-field__input" id="lastName" name="lastName" type="text" autocomplete="family-name" formControlName="lastName" required />
+          @if (fieldError('lastName', 'Last name')) {
+            <p class="signup-field__error" role="alert">{{ fieldError('lastName', 'Last name') }}</p>
+          }
         </div>
       </div>
 
       <div class="signup-field">
         <label class="signup-field__label" for="username">Username</label>
         <input class="signup-field__input" id="username" name="username" type="text" autocomplete="username" placeholder="Choose a unique username" formControlName="username" required />
+        @if (fieldError('username', 'Username')) {
+          <p class="signup-field__error" role="alert">{{ fieldError('username', 'Username') }}</p>
+        }
       </div>
 
       <div class="signup-form__row">
         <div class="signup-field">
           <label class="signup-field__label" for="email">Email</label>
           <input class="signup-field__input" id="email" name="email" type="email" autocomplete="email" formControlName="email" required />
+          @if (fieldError('email', 'Email')) {
+            <p class="signup-field__error" role="alert">{{ fieldError('email', 'Email') }}</p>
+          }
         </div>
 
         <div class="signup-field">
           <label class="signup-field__label" for="phone">Phone number</label>
           <input class="signup-field__input" id="phone" name="phone" type="tel" autocomplete="tel" formControlName="phone" required />
+          @if (fieldError('phone', 'Phone number')) {
+            <p class="signup-field__error" role="alert">{{ fieldError('phone', 'Phone number') }}</p>
+          }
         </div>
       </div>
 
@@ -45,6 +64,9 @@
             </svg>
           </button>
         </div>
+        @if (fieldError('password', 'Password')) {
+          <p class="signup-field__error" role="alert">{{ fieldError('password', 'Password') }}</p>
+        }
       </div>
 
       <div class="signup-field">
@@ -59,6 +81,9 @@
         </div>
         @if (hasPasswordMismatch) {
           <p class="signup-field__error">Passwords must match.</p>
+        }
+        @if (!hasPasswordMismatch && fieldError('confirmPassword', 'Confirm password')) {
+          <p class="signup-field__error" role="alert">{{ fieldError('confirmPassword', 'Confirm password') }}</p>
         }
       </div>
 
@@ -118,11 +143,19 @@
       }
 
       <button class="signup-submit" type="submit" [disabled]="loading">
-        {{ loading ? 'Submitting...' : 'Submit for approval' }}
+        {{ loading ? 'Submitting...' : submitLabel }}
       </button>
 
+      @if (successMessage) {
+        <p class="signup-form__message" role="status">{{ successMessage }}</p>
+      }
+
       <p class="signup-form__login">
-        Already have an account? <a class="signup-link" routerLink="/login">Sign in</a>
+        @if (successMessage) {
+          <a class="signup-link" (click)="goToLogin()">Continue to sign in</a>
+        } @else {
+          Already have an account? <a class="signup-link" routerLink="/login">Sign in</a>
+        }
       </p>
     </form>
   </section>
