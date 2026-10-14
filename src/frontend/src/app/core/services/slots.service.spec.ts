@@ -109,4 +109,21 @@ describe('SlotsService', () => {
 
     expect(failed).toBeTrue();
   });
+
+  it('reports unavailable publishing without creating a booked appointment', () => {
+    let failed = false;
+
+    service.publish({
+      title: 'Physical',
+      category: 'Medical',
+      providerId: 'p-1',
+      startDateTime: '2030-01-01T10:00:00Z',
+      endDateTime: '2030-01-01T11:00:00Z',
+      location: '',
+      notes: ''
+    }).subscribe({ error: () => (failed = true) });
+
+    expect(failed).toBeTrue();
+    httpTesting.expectNone(() => true);
+  });
 });
