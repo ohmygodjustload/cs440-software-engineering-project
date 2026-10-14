@@ -153,6 +153,14 @@ export const routes: Routes = [
         .then(m => m.CreateSlotsComponent)
   },
   {
+    path: 'home-provider',
+    title: 'Service provider home · BAAAM',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/home-provider/home-provider.component')
+        .then(m => m.ProviderHomeComponent)
+  },
+  {
     path: '**',
     redirectTo: 'home'
   },
