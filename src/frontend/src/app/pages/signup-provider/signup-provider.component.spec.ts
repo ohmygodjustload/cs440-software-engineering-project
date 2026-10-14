@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, tick, fakeAsync } from '@angular/core/testing';
-import { Router, provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
@@ -25,8 +25,15 @@ describe('SignupProviderComponent', () => {
   let router: Router;
 
   beforeEach(async () => {
-    authService = jasmine.createSpyObj<AuthService>('AuthService', ['getErrorMessage', 'registerProvider']);
+    authService = jasmine.createSpyObj<AuthService>('AuthService', [
+      'getErrorMessage',
+      'registerProvider',
+      'resubmitProvider'
+    ]);
     authService.registerProvider.and.returnValue(
+      of({ user: {} as never, requiresApproval: true })
+    );
+    authService.resubmitProvider.and.returnValue(
       of({ user: {} as never, requiresApproval: true })
     );
 
@@ -66,6 +73,27 @@ describe('SignupProviderComponent', () => {
     component.onSubmit();
 
     expect(component.form.hasError('serviceTypeRequired')).toBeTrue();
+  });
+
+  it('should flag a missing required email inline after a failed submit', () => {
+    const component = fixture.componentInstance;
+
+    // Fill everything except email (the reported case) and try to submit.
+    component.form.patchValue({
+      firstName: 'Sam',
+      lastName: 'Provider',
+      username: 'SamProvider',
+      phone: '555-123-4567',
+      password: 'password123',
+      confirmPassword: 'password123'
+    });
+    component.form.controls.services.controls.medical.setValue(true);
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const page = fixture.nativeElement as HTMLElement;
+    expect(page.textContent).toContain('Email is required.');
+    expect(authService.registerProvider).not.toHaveBeenCalled();
   });
 
   it('should expand medical credentials when medical is selected', () => {
@@ -165,6 +193,70 @@ describe('SignupProviderComponent', () => {
       'Your request has been submitted for approval. Please check back soon for the status of your request.'
     );
     expect(router.navigate).not.toHaveBeenCalled();
+  });
+});
+
+describe('SignupProviderComponent (resubmit mode)', () => {
+  let fixture: ComponentFixture<SignupProviderComponent>;
+  let authService: jasmine.SpyObj<AuthService>;
+
+  beforeEach(async () => {
+    authService = jasmine.createSpyObj<AuthService>('AuthService', [
+      'getErrorMessage',
+      'registerProvider',
+      'resubmitProvider'
+    ]);
+    authService.resubmitProvider.and.returnValue(
+      of({ user: {} as never, requiresApproval: true })
+    );
+
+    await TestBed.resetTestingModule()
+      .configureTestingModule({
+        imports: [SignupProviderComponent],
+        providers: [
+          provideRouter([]),
+          {
+            provide: ActivatedRoute,
+            useValue: {
+              snapshot: { queryParamMap: convertToParamMap({ mode: 'resubmit' }) }
+            }
+          },
+          { provide: AuthService, useValue: authService }
+        ]
+      })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(SignupProviderComponent);
+    fixture.detectChanges();
+  });
+
+  it('should show the re-submit copy', () => {
+    const component = fixture.componentInstance;
+    const page = fixture.nativeElement as HTMLElement;
+
+    expect(component.isResubmit).toBeTrue();
+    expect(page.textContent).toContain('Re-submit Your Service Provider Application');
+    expect(page.textContent).toContain('Re-submit for approval');
+  });
+
+  it('should call resubmitProvider (not registerProvider) on submit', () => {
+    const component = fixture.componentInstance;
+
+    component.form.patchValue({
+      firstName: 'Sam',
+      lastName: 'Provider',
+      username: 'SamProvider',
+      email: 'sam@example.com',
+      phone: '555-123-4567',
+      password: 'password123',
+      confirmPassword: 'password123'
+    });
+    component.form.controls.services.controls.beauty.setValue(true);
+    component.onSubmit();
+
+    expect(authService.resubmitProvider).toHaveBeenCalled();
+    expect(authService.registerProvider).not.toHaveBeenCalled();
+    expect(component.successMessage).toContain('re-submitted for approval');
   });
 });
 

@@ -74,6 +74,15 @@
           <p class="login-form__error" role="alert">{{ errorMessage }}</p>
         }
 
+        @if (showResubmit) {
+          <p class="login-form__resubmit">
+            Want to try again?
+            <a class="login-link" routerLink="/signup/provider" [queryParams]="{ mode: 'resubmit' }">
+              Re-submit your application
+            </a>
+          </p>
+        }
+
         <button class="login-submit" type="submit" [disabled]="loading">
           {{ loading ? 'Signing in...' : 'Sign in' }}
         </button>

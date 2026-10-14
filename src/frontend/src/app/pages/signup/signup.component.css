@@ -122,6 +122,16 @@ input {
   box-shadow: 0 0 0 3px rgb(52 73 69 / 12%);
 }
 
+/* Flag a field the user has touched but left invalid (e.g. a required field left blank). */
+.signup-field__input.ng-invalid.ng-touched {
+  border-color: #9a3412;
+}
+
+.signup-field__input.ng-invalid.ng-touched:focus-visible {
+  border-color: #9a3412;
+  box-shadow: 0 0 0 3px rgb(154 52 18 / 12%);
+}
+
 .signup-password {
   position: relative;
 }

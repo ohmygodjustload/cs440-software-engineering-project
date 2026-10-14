@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { of, throwError } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { LoginComponent } from './login.component';
@@ -100,5 +101,34 @@ describe('LoginComponent', () => {
       { username: 'JanePorter123', password: 'password123' },
       true
     );
+  });
+
+  it('should offer a re-submit link when the provider request was rejected', () => {
+    const component = fixture.componentInstance;
+    const rejection =
+      'Your service provider request was rejected by an admin. Reason: License missing.';
+    authService.getErrorMessage.and.returnValue(rejection);
+    authService.login.and.returnValue(throwError(() => new HttpErrorResponse({ status: 401 })));
+
+    component.form.patchValue({ username: 'RejectedPro', password: 'password123' });
+    component.onSubmit();
+
+    expect(component.errorMessage).toBe(rejection);
+    expect(component.showResubmit).toBeTrue();
+    fixture.detectChanges();
+
+    const page = fixture.nativeElement as HTMLElement;
+    expect(page.textContent).toContain('Re-submit your application');
+  });
+
+  it('should not offer a re-submit link for other sign-in errors', () => {
+    const component = fixture.componentInstance;
+    authService.getErrorMessage.and.returnValue('Invalid username or password.');
+    authService.login.and.returnValue(throwError(() => new HttpErrorResponse({ status: 401 })));
+
+    component.form.patchValue({ username: 'Someone', password: 'wrong' });
+    component.onSubmit();
+
+    expect(component.showResubmit).toBeFalse();
   });
 });

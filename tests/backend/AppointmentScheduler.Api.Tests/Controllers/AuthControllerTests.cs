@@ -178,6 +178,162 @@ public class AuthControllerTests
     }
 
     [Fact]
+    public void ResubmitProvider_FilesNewOpenRequestForRejectedProvider()
+    {
+        var controller = CreateController();
+        _ = controller.RegisterProvider(new RegisterProviderRequest
+        {
+            FirstName = "Sam",
+            LastName = "Provider",
+            Username = "RejectedPro",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        var rejected = Assert.Single(_providerRequests.GetAll());
+        rejected.IsReviewed = true;
+        rejected.IsApproved = false;
+        rejected.Notes = "License could not be verified.";
+        _providerRequests.Update(rejected);
+
+        var result = controller.ResubmitProvider(new RegisterProviderRequest
+        {
+            FirstName = "Samuel",
+            LastName = "Provider",
+            Username = "RejectedPro",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Beauty],
+            BeautyCredentials = new ServiceCredentialRequest { Info = "Cosmetology license #12345" }
+        });
+
+        var ok = Assert.IsType<OkObjectResult>(result.Result);
+        var response = Assert.IsType<RegisterResponse>(ok.Value);
+        Assert.True(response.RequiresApproval);
+        Assert.Null(response.Token);
+
+        // The account was updated in place (no duplicate inactive user) and a fresh open request filed.
+        var requests = _providerRequests.GetAll();
+        Assert.Equal(2, requests.Count);
+        var open = requests.Single(r => !r.IsReviewed);
+        Assert.Equal("Samuel Provider", open.ProviderName);
+        Assert.Contains(AppointmentCategory.Beauty, open.ServiceTypes);
+        Assert.Equal("Cosmetology license #12345", open.BeautyCredentials?.Info);
+
+        var user = _users.GetByUsername("RejectedPro")!;
+        Assert.False(user.IsActive);
+        Assert.Equal("Samuel", user.FirstName);
+        Assert.Contains(AppointmentCategory.Beauty, user.ServiceTypes);
+    }
+
+    [Fact]
+    public void ResubmitProvider_RejectsInvalidCredentials()
+    {
+        var controller = CreateController();
+        _ = controller.RegisterProvider(new RegisterProviderRequest
+        {
+            FirstName = "Sam",
+            LastName = "Provider",
+            Username = "RejectedPro",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        var rejected = Assert.Single(_providerRequests.GetAll());
+        rejected.IsReviewed = true;
+        rejected.IsApproved = false;
+        _providerRequests.Update(rejected);
+
+        var result = controller.ResubmitProvider(new RegisterProviderRequest
+        {
+            FirstName = "Sam",
+            LastName = "Provider",
+            Username = "RejectedPro",
+            Password = "wrong-password",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        Assert.IsType<UnauthorizedObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public void ResubmitProvider_RejectsNonProviderAccount()
+    {
+        var controller = CreateController();
+        _ = controller.RegisterUser(NewUserRequest("SomeClient"));
+
+        var result = controller.ResubmitProvider(new RegisterProviderRequest
+        {
+            FirstName = "New",
+            LastName = "Client",
+            Username = "SomeClient",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public void ResubmitProvider_RejectsActiveAccount()
+    {
+        var controller = CreateController();
+        _ = controller.RegisterProvider(new RegisterProviderRequest
+        {
+            FirstName = "Sam",
+            LastName = "Provider",
+            Username = "ActivePro",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        var rejected = Assert.Single(_providerRequests.GetAll());
+        rejected.IsReviewed = true;
+        rejected.IsApproved = false;
+        _providerRequests.Update(rejected);
+
+        var user = _users.GetByUsername("ActivePro")!;
+        user.IsActive = true;
+        _users.Update(user);
+
+        var result = controller.ResubmitProvider(new RegisterProviderRequest
+        {
+            FirstName = "Sam",
+            LastName = "Provider",
+            Username = "ActivePro",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        Assert.IsType<ConflictObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public void ResubmitProvider_RejectsWhenStillPendingReview()
+    {
+        var controller = CreateController();
+        _ = controller.RegisterProvider(new RegisterProviderRequest
+        {
+            FirstName = "Sam",
+            LastName = "Provider",
+            Username = "PendingPro",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        // The single request is still open (not reviewed), so re-submission is not allowed.
+        var result = controller.ResubmitProvider(new RegisterProviderRequest
+        {
+            FirstName = "Sam",
+            LastName = "Provider",
+            Username = "PendingPro",
+            Password = "password123",
+            ServiceTypes = [AppointmentCategory.Medical]
+        });
+
+        Assert.IsType<ConflictObjectResult>(result.Result);
+    }
+
+    [Fact]
     public void Login_SucceedsAfterAdminApprovesRequest()
     {
         var controller = CreateController();
