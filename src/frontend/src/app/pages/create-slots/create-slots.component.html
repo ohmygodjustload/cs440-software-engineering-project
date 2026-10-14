@@ -27,10 +27,15 @@
         </div>
         <div>
           <label for="service">Service / appointment title</label>
-          <select id="service" name="title" required [(ngModel)]="draft.title" [disabled]="categories.length === 0">
-            <option value="">Select a service</option>
-            @for (service of serviceOptions; track service) { <option [value]="service">{{ service }}</option> }
-          </select>
+          <input
+            id="service"
+            type="text"
+            name="title"
+            required
+            maxlength="200"
+            [(ngModel)]="draft.title"
+            placeholder="Enter your service name"
+          />
         </div>
 
         <section class="date-section">

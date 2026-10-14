@@ -1,5 +1,4 @@
 import { providerCategories } from '../../core/models/provider-categories';
-import { SERVICE_OPTIONS } from '../../core/models/service-options';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -67,9 +66,6 @@ export class CreateSlotsComponent implements OnInit {
       providerCategories(provider).includes(this.draft.category));
   }
 
-  get serviceOptions(): readonly string[] {
-    return SERVICE_OPTIONS[this.draft.category];
-  }
 
   categoryChanged(): void {
     // Clear the previous category's service so it cannot be submitted accidentally.
@@ -181,11 +177,6 @@ export class CreateSlotsComponent implements OnInit {
 
     if (start.getTime() <= Date.now()) {
       this.formError = 'Choose a future appointment time.';
-      return;
-    }
-
-    if (!this.serviceOptions.includes(this.draft.title)) {
-      this.formError = 'Choose a service from the selected category.';
       return;
     }
 
