@@ -22,4 +22,10 @@ public sealed class Provider
 
     [MaxLength(50)]
     public string? Phone { get; set; }
+
+    /// <summary>
+    /// True once an admin approved the provider. Slots from unapproved providers are hidden
+    /// from clients and unapproved providers cannot create new appointments.
+    /// </summary>
+    public bool IsApproved { get; set; } = true;
 }

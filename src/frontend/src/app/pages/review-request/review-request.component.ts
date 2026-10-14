@@ -1,96 +1,135 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-// Make sure your relative path accurately matches your file structure here
-import { 
-  ConfirmationPromptComponent, 
-  ConfirmationAction, 
-  ConfirmationDecision 
+import { ProviderRequest } from '../../core/models/provider-request';
+import { ProviderRequestsService } from '../../core/services/provider-requests.service';
+
+import {
+  ConfirmationPromptComponent,
+  ConfirmationAction,
+  ConfirmationDecision
 } from '../confirmation/confirmation.component';
 
-export type AdminPage = 'Home' | 'Requests' | 'Accounts' | 'Appointments';
-
-export interface ReviewDecision {
-  decision: 'approve' | 'reject';
-  comments: string;
-}
-
+/**
+ * review-request.component.ts — the admin review screen for one provider request.
+ *
+ * Reached from the Requests page via /review-request?id=... . Loads the request,
+ * shows the applicant's name, categories, and submitted qualifications, and lets
+ * the admin approve or reject with an optional note (BAAAM-138 / BAAAM-144).
+ */
 @Component({
   selector: 'app-credential-review',
   standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    RouterLink, 
-    ConfirmationPromptComponent // Allows the template to recognize your dialog markup tag
-  ],
+  imports: [FormsModule, RouterLink, ConfirmationPromptComponent],
   templateUrl: './review-request.component.html',
   styleUrls: ['./review-request.component.css'],
 })
-export class ReviewRequestComponent {
-  @Input() applicantName = 'Ava Brooks';
-  @Input() status = 'Pending review';
+export class ReviewRequestComponent implements OnInit {
+  private readonly service = inject(ProviderRequestsService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  @Input() beautyLicense = 'DEMO-COS-104';
-  @Input() beautyExperience = '4 years of salon experience.';
+  request: ProviderRequest | null = null;
+  loading = true;
+  error: string | null = null;
+  submitting = false;
+  comments = '';
 
-  @Input() fitnessCertification = 'DEMO-FIT-208';
-  @Input() fitnessExperience = '2 years of fitness coaching.';
+  /** Local layout state passed down into the confirmation dialog. */
+  currentAction: ConfirmationAction = 'accept';
 
-  @Input() medicalCredentials = 'No medical credential submitted.';
-  @Input() comments = '';
-  @Input() submitting = false;
+  @ViewChild('confirmationPrompt') private dialogComponent?: ConfirmationPromptComponent;
 
-  @Output() commentsChange = new EventEmitter<string>();
-  @Output() decision = new EventEmitter<ReviewDecision>();
-  @Output() pageRequested = new EventEmitter<AdminPage>();
-
-  // Queries the local layout template for the child dialog component methods
-  @ViewChild('confirmationPrompt') private dialogComponent!: ConfirmationPromptComponent;
-
-  // Holds local layout view state passed down into dialog property bindings
-  public currentAction: ConfirmationAction = 'accept';
-
-  // Fixed syntax typo: converted array values definition properly into typed array bracket signatures
-  readonly pages: AdminPage[] = [
-    'Home',
-    'Requests',
-    'Accounts',
-    'Appointments',
-  ];
-
-  updateComments(value: string): void {
-    this.comments = value;
-    this.commentsChange.emit(value);
+  ngOnInit(): void {
+    this.load(this.route.snapshot.queryParamMap.get('id'));
   }
 
-  // Prepares component configurations and triggers dialog presentation overlay
+  load(id: string | null): void {
+    if (!id) {
+      this.loading = false;
+      this.error = 'No provider request was selected. Return to Requests and pick one to review.';
+      return;
+    }
+
+    this.loading = true;
+    this.error = null;
+
+    this.service.getById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (request) => {
+          this.request = request;
+          this.comments = request.notes ?? '';
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'This provider request could not be loaded.';
+          this.loading = false;
+        }
+      });
+  }
+
+  get isReviewed(): boolean {
+    return this.request?.isReviewed ?? false;
+  }
+
+  get statusLabel(): string {
+    if (!this.request?.isReviewed) {
+      return 'Pending review';
+    }
+
+    return this.request.isApproved ? 'Approved' : 'Rejected';
+  }
+
+  /** True when the applicant selected the given category. */
+  hasCategory(category: 'Medical' | 'Beauty' | 'Fitness'): boolean {
+    return this.request?.serviceTypes?.includes(category) ?? false;
+  }
+
+  /** Prepares the dialog and opens it for approve or reject. */
   openDialog(type: 'approve' | 'reject'): void {
-    if (this.submitting) {
+    if (this.submitting || this.isReviewed) {
       return;
     }
+
     this.currentAction = type === 'approve' ? 'accept' : 'reject';
-    this.dialogComponent.open();
+    this.dialogComponent?.open();
   }
 
-  // Bridging method triggered once internal popup confirmation bubbles a value upward
+  /** Runs once the admin confirms inside the dialog. */
   handleDialogConfirmed(decisionData: ConfirmationDecision): void {
-    const finalDecision: ReviewDecision['decision'] = 
-      decisionData.action === 'accept' ? 'approve' : 'reject';
-    
-    this.decide(finalDecision);
+    this.submit(decisionData.action === 'accept' ? 'approve' : 'reject');
   }
 
-  decide(decision: ReviewDecision['decision']): void {
-    if (this.submitting) {
+  private submit(decision: 'approve' | 'reject'): void {
+    if (this.submitting || !this.request || this.isReviewed) {
       return;
     }
 
-    this.decision.emit({
-      decision,
-      comments: this.comments,
-    });
+    this.submitting = true;
+    this.error = null;
+
+    const call = decision === 'approve'
+      ? this.service.approve(this.request.id, this.comments)
+      : this.service.reject(this.request.id, this.comments);
+
+    call
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (reviewed) => {
+          this.request = reviewed;
+          this.submitting = false;
+          void this.router.navigate(['/requests'], {
+            queryParams: { reviewed: reviewed.id, outcome: decision }
+          });
+        },
+        error: () => {
+          this.error = `The request could not be ${decision}d. Please try again.`;
+          this.submitting = false;
+        }
+      });
   }
 }

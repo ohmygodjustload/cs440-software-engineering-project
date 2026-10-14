@@ -37,7 +37,7 @@ describe('SignupComponent', () => {
   it('should render the normal user create account copy', () => {
     const page = fixture.nativeElement as HTMLElement;
 
-    expect(page.textContent).toContain('Create a Client account');
+    expect(page.textContent).toContain('Create a Client Account');
     expect(page.textContent).toContain('First name');
     expect(page.textContent).toContain('Last name');
     expect(page.textContent).toContain('Username');
@@ -60,6 +60,33 @@ describe('SignupComponent', () => {
     expect(component.form.controls.email.touched).toBeTrue();
     expect(component.form.controls.phone.touched).toBeTrue();
     expect(component.form.controls.password.touched).toBeTrue();
+  });
+
+  it('should flag required fields inline after a failed submit', () => {
+    const component = fixture.componentInstance;
+
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const page = fixture.nativeElement as HTMLElement;
+    expect(page.textContent).toContain('First name is required.');
+    expect(page.textContent).toContain('Username is required.');
+    expect(page.textContent).toContain('Password is required.');
+    expect(component.fieldError('firstName', 'First name')).toBe('First name is required.');
+  });
+
+  it('should flag an invalid email format only once touched', () => {
+    const component = fixture.componentInstance;
+
+    // Untouched: no message yet.
+    expect(component.fieldError('email', 'Email')).toBeNull();
+
+    component.form.controls.email.setValue('not-an-email');
+    // Still untouched, so no message is surfaced.
+    expect(component.fieldError('email', 'Email')).toBeNull();
+
+    component.form.controls.email.markAsTouched();
+    expect(component.fieldError('email', 'Email')).toBe('Enter a valid email address.');
   });
 
   it('should require matching passwords', () => {

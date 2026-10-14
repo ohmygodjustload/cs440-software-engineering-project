@@ -14,7 +14,6 @@
         [class.confirmation-prompt__button--reject]="action === 'reject'"
         [disabled]="disabled"
         (click)="confirm()"
-        routerLink="/requests"
       >
         Yes, {{ action }}
       </button>
@@ -25,7 +24,6 @@
         class="confirmation-prompt__button confirmation-prompt__button--back"
         [disabled]="disabled"
         (click)="goBack()"
-        routerLink="/review-request"
       >
         No, go back
       </button>

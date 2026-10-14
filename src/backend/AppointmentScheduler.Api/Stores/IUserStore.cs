@@ -9,4 +9,7 @@ public interface IUserStore
     User? GetById(string id);
     User? GetByUsername(string username);
     User Add(User user);
+
+    /// <summary>Persists changes to an existing user. Returns false when the id is unknown.</summary>
+    bool Update(User user);
 }

@@ -1,8 +1,12 @@
 <div class="admin-container">
   <header class="greeting">
     <h1>Requests</h1>
-    <p>Review pending provider requests</p>
+    <p>Review provider requests awaiting approval</p>
   </header>
+
+  @if (successMessage) {
+    <p class="success" role="status">{{ successMessage }}</p>
+  }
 
   @if (loading) {
     <p role="status">Loading provider requests…</p>
@@ -12,22 +16,54 @@
       <button type="button" (click)="load()">Try again</button>
     </div>
   } @else {
-    <section class="request-list" aria-label="Pending requests">
-      <h2>Pending requests</h2>
+    <section class="request-list open-list" aria-label="Open requests">
+      <h2>Open requests</h2>
+      <p class="list-subtitle">To be reviewed</p>
 
       @for (request of requests; track request.id) {
         <div class="request-card">
-          <div>
-            <h3>{{ request.name }}</h3>
-            <p class="request-meta">
-              {{ request.status }} · Provider type: {{ request.providerType || 'Not specified' }}
-            </p>
+          <div class="request-body">
+            <h3>{{ request.providerName }}</h3>
+            <p class="request-meta">Categories: {{ categoriesOf(request) }}</p>
+            <p class="request-qualifications">{{ qualificationsOf(request) }}</p>
           </div>
-          <a class="primary" [routerLink]="['/review-request']">Review</a>
+          <a
+            class="primary"
+            [routerLink]="['/review-request']"
+            [queryParams]="{ id: request.id }"
+          >Review</a>
         </div>
       } @empty {
         <div class="request-card">
           <p class="empty">No pending provider requests.</p>
+        </div>
+      }
+    </section>
+
+    <section class="request-list closed-list" aria-label="Closed requests">
+      <h2>Closed requests</h2>
+      <p class="list-subtitle">Already approved or rejected</p>
+
+      @for (request of visibleClosedRequests; track request.id) {
+        <div class="request-card">
+          <div class="request-body">
+            <h3>
+              {{ request.providerName }}
+              <span
+                class="status-badge"
+                [class.status-badge--approved]="request.isApproved"
+                [class.status-badge--rejected]="!request.isApproved"
+              >{{ outcomeOf(request) }}</span>
+            </h3>
+            <p class="request-meta">Categories: {{ categoriesOf(request) }}</p>
+            @if (request.notes) {
+              <p class="request-note">Note: {{ request.notes }}</p>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="request-card">
+          <p class="empty">No closed provider requests yet.</p>
         </div>
       }
     </section>
