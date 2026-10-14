@@ -8,7 +8,7 @@
 
 import { Routes } from '@angular/router';
 
-import { adminGuard, authGuard, guestGuard } from './core/guards/auth.guard';
+import { adminGuard, authGuard, guestGuard, providerGuard } from './core/guards/auth.guard';
 
 /**
  * Application routes. Each page is loaded lazily so the initial bundle only contains the shell
@@ -155,7 +155,7 @@ export const routes: Routes = [
   {
     path: 'home-provider',
     title: 'Service provider home · BAAAM',
-    canActivate: [authGuard],
+    canActivate: [authGuard, providerGuard],
     loadComponent: () =>
       import('./pages/home-provider/home-provider.component')
         .then(m => m.ProviderHomeComponent)
