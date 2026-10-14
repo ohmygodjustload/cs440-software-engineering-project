@@ -1,0 +1,82 @@
+<main class="slot-page">
+  <header>
+    <h1>Create appointment slots</h1>
+    <p>Publish your availability so clients can book your services.</p>
+  </header>
+
+  <form #slotForm="ngForm" (ngSubmit)="save(slotForm)">
+    <fieldset [disabled]="saving">
+      @if (!draft.providerId) {
+        <p role="status">Your service provider profile is not connected yet.</p>
+      }
+      @if (providersLoading) { <p role="status">Loading your service categories…</p> }
+      @if (providerError) {
+        <div role="alert"><p>{{ providerError }}</p><button type="button" (click)="loadProviders()">Retry</button></div>
+      }
+
+      <div class="form-grid">
+        <div>
+          <label for="category">Category</label>
+          <select id="category" name="category" required [(ngModel)]="draft.category"
+            (ngModelChange)="categoryChanged()" [disabled]="categories.length === 0">
+            @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
+          </select>
+          @if (draft.providerId && categories.length === 0) {
+            <p class="hint">No categories are configured for this provider.</p>
+          }
+        </div>
+        <div>
+          <label for="service">Service / appointment title</label>
+          <select id="service" name="title" required [(ngModel)]="draft.title" [disabled]="categories.length === 0">
+            <option value="">Select a service</option>
+            @for (service of serviceOptions; track service) { <option [value]="service">{{ service }}</option> }
+          </select>
+        </div>
+
+        <section class="date-section">
+          <label for="date">Select date · {{ dateLabel }}</label>
+          <input id="date" type="date" name="date" required [min]="today"
+            [ngModel]="selectedDate" (ngModelChange)="chooseDate($event)">
+          <div class="date-options" aria-label="Dates in selected week">
+            @for (option of dateOptions; track option.key) {
+              <button type="button" class="date-option" [class.selected]="option.key === selectedDate"
+                [attr.aria-pressed]="option.key === selectedDate" [disabled]="option.key < today"
+                [attr.aria-label]="option.date | date:'fullDate'" (click)="chooseDate(option.key)">
+                <span>{{ option.date | date:'EEE' }}</span>{{ option.date | date:'d' }}
+              </button>
+            }
+          </div>
+        </section>
+        <section>
+          <h2>Start time · 60-minute duration</h2>
+          <div class="time-options" aria-label="Slot start times">
+            @for (time of startTimes; track time) {
+              <button type="button" [class.selected]="selectedTime === time"
+                [attr.aria-pressed]="selectedTime === time" [disabled]="isPastTime(time)"
+                (click)="chooseTime(time)">{{ timeLabel(time) }}</button>
+            }
+          </div>
+          @if (draft.start) { <p class="hint">Ends at {{ draft.end | date:'h:mm a' }}</p> }
+        </section>
+
+        <div>
+          <label for="location">Location</label>
+          <input id="location" name="location" required maxlength="300" [(ngModel)]="draft.location" placeholder="Studio or clinic location">
+        </div>
+        <div>
+          <label for="notes">Access instructions (optional)</label>
+          <textarea id="notes" name="notes" maxlength="2000" [(ngModel)]="draft.notes"
+            placeholder="For example: use the main entrance."></textarea>
+        </div>
+      </div>
+      <p class="rule">Slots last 60 minutes. The backend must prevent overlapping slots before publishing is enabled.</p>
+      @if (formError) { <p class="error" role="alert">{{ formError }}</p> }
+      <div class="actions">
+        <a class="secondary" routerLink="/home-provider">Cancel</a>
+        <button type="submit" class="primary" [disabled]="providersLoading || !draft.providerId || categories.length === 0">
+          {{ saving ? 'Publishing…' : 'Publish available slot' }}
+        </button>
+      </div>
+    </fieldset>
+  </form>
+</main>

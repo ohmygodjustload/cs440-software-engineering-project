@@ -145,6 +145,14 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'create-slots',
+    title: 'Create appointment slots · BAAAM',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/create-slots/create-slots.component')
+        .then(m => m.CreateSlotsComponent)
+  },
+  {
     path: '**',
     redirectTo: 'home'
   },
