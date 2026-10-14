@@ -162,3 +162,85 @@
 .app-main--full-page {
   padding: 0;
 }
+/* Provider navigation: Figma Provider page picker, node 267:28. */
+.app-header--provider {
+  height: auto;
+  min-height: 90px;
+  aspect-ratio: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 20px;
+  padding: 24px 40px;
+  background: #f7f5f1;
+}
+
+.app-header--provider .app-brand {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #344945;
+}
+
+.app-header--provider .app-nav {
+  position: static;
+  transform: none;
+}
+
+.app-header--provider .app-nav__list {
+  gap: 4px;
+  padding: 5px;
+  border-color: #e0dcd1;
+  background: #f7f5f1;
+}
+
+.app-header--provider .app-nav__link {
+  padding: 12px 17px;
+  font-size: 13px;
+  line-height: 18px;
+  color: #344945;
+  white-space: nowrap;
+}
+
+.app-header--provider .app-nav__link--active,
+.app-header--provider .app-nav__link--active:hover {
+  background: #d5e3e8;
+}
+
+.app-header--provider .app-account {
+  justify-self: end;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.app-header--provider .app-nav__link:focus-visible {
+  outline: 2px solid #344945;
+  outline-offset: 2px;
+}
+
+@media (max-width: 1150px) {
+  .app-header--provider {
+    grid-template-columns: 1fr auto;
+  }
+
+  .app-header--provider .app-nav {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .app-header--provider {
+    padding: 20px 16px;
+  }
+
+  .app-header--provider .app-nav__list {
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: 24px;
+  }
+
+  .app-header--provider .app-account__name {
+    display: none;
+  }
+}
