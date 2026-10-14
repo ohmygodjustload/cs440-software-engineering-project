@@ -147,7 +147,7 @@ export const routes: Routes = [
   {
     path: 'create-slots',
     title: 'Create appointment slots · BAAAM',
-    canActivate: [authGuard],
+    canActivate: [authGuard, providerGuard],
     loadComponent: () =>
       import('./pages/create-slots/create-slots.component')
         .then(m => m.CreateSlotsComponent)
