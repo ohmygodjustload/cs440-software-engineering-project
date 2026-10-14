@@ -139,7 +139,7 @@ export class SettingsComponent implements OnInit {
     if (this.currentUser?.isAdmin) {
       roles.push('Admin');
     }
-    if (this.currentUser?.isProvider) {
+    if (this.currentUser?.isServiceProvider) {
       roles.push('Service provider');
     }
     if (this.currentUser?.isClient) {

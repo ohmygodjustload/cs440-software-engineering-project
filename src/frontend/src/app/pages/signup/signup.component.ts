@@ -10,6 +10,7 @@ import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
+import { fieldErrorMessage } from '../../core/validation/field-error';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -51,6 +52,11 @@ export class SignupComponent {
 
   get hasPasswordMismatch(): boolean {
     return this.form.hasError('passwordsMismatch') && this.form.controls.confirmPassword.touched;
+  }
+
+  /** Inline validation message for a field, or null when it is untouched or valid. */
+  fieldError(controlName: string, label: string): string | null {
+    return fieldErrorMessage(this.form.get(controlName), label);
   }
 
   onSubmit(): void {

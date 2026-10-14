@@ -30,20 +30,6 @@
           <span>request{{ pendingApprovals === 1 ? '' : 's' }} waiting</span>
         </div>
       </div>
-      <div class="stat-card providers-card">
-        <h2>Active providers</h2>
-        <div class="stat-info">
-          <span class="stat-number">{{ activeProviders }}</span>
-          <span>provider{{ activeProviders === 1 ? '' : 's' }} approved</span>
-        </div>
-      </div>
-      <div class="stat-card booked-card">
-        <h2>Booked today</h2>
-        <div class="stat-info">
-          <span class="stat-number">{{ bookedToday }}</span>
-          <span>booking{{ bookedToday === 1 ? '' : 's' }} today</span>
-        </div>
-      </div>
     </section>
 
     <section class="needs-review">
@@ -65,18 +51,6 @@
           <p>No provider requests need review.</p>
           <a class="primary" routerLink="/requests">View requests</a>
         </div>
-      }
-    </section>
-
-    <section class="recent">
-      <h2>Recent activity</h2>
-      @for (item of activity; track item.id) {
-        <div class="activity-row">
-          <time>{{ item.at | date:'h:mm a' }}</time>
-          <span>{{ item.summary }}</span>
-        </div>
-      } @empty {
-        <p class="empty">No recent activity.</p>
       }
     </section>
   }

@@ -170,7 +170,6 @@ public sealed class MongoProviderStore : IProviderStore
         var name = fallback;
         string? email = null;
         string? phone = null;
-
         // Specialty: the qualification text matching the provider's active discipline
         // flags (Provider { IsMedical / IsBeauty / IsFitness } + { Med, Beauty, Fitness }
         // Qualification). Falls back to the first non-empty qualification so a
@@ -204,6 +203,9 @@ public sealed class MongoProviderStore : IProviderStore
             Specialty = specialty,
             Email = email,
             Phone = phone,
+            // BAAAM.ServiceProvider records carry IsApproved; older docs without the flag
+            // are treated as approved so legacy seed data keeps showing in dropdowns.
+            IsApproved = !FindElement(d, "IsApproved").HasValue || Flag(d, "IsApproved"),
         };
     }
 }

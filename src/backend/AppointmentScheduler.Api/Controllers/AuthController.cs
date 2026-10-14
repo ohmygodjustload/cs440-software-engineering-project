@@ -13,6 +13,7 @@ namespace AppointmentScheduler.Api.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly IUserStore _users;
+    private readonly IProviderRequestStore _providerRequests;
     private readonly PasswordHasher _passwordHasher;
     private readonly JwtTokenService _tokens;
 
@@ -20,11 +21,17 @@ public sealed class AuthController : ControllerBase
     /// Creates a controller that can read/write users, verify password hashes, and issue JWTs.
     /// </summary>
     /// <param name="users">User persistence boundary used for username lookup and registration.</param>
+    /// <param name="providerRequests">Provider request persistence boundary used to file approval requests.</param>
     /// <param name="passwordHasher">Password hashing service used to hash and verify credentials.</param>
     /// <param name="tokens">JWT token service used to create successful authentication responses.</param>
-    public AuthController(IUserStore users, PasswordHasher passwordHasher, JwtTokenService tokens)
+    public AuthController(
+        IUserStore users,
+        IProviderRequestStore providerRequests,
+        PasswordHasher passwordHasher,
+        JwtTokenService tokens)
     {
         _users = users;
+        _providerRequests = providerRequests;
         _passwordHasher = passwordHasher;
         _tokens = tokens;
     }
@@ -51,7 +58,7 @@ public sealed class AuthController : ControllerBase
 
         if (!user.IsActive)
         {
-            return Unauthorized("Account is pending approval.");
+            return Unauthorized(GetInactiveAccountMessage(user));
         }
 
         return Ok(_tokens.CreateToken(user));
@@ -131,6 +138,21 @@ public sealed class AuthController : ControllerBase
             return Conflict("Username is already taken.");
         }
 
+        // File an open provider request so admins can review and approve/reject it.
+        _providerRequests.Add(new ProviderRequest
+        {
+            UserId = created.Id,
+            ProviderName = $"{created.FirstName} {created.LastName}".Trim(),
+            ServiceTypes = serviceTypes,
+            MedicalCredentials = created.MedicalCredentials,
+            BeautyCredentials = created.BeautyCredentials,
+            FitnessCredentials = created.FitnessCredentials,
+            IsReviewed = false,
+            IsApproved = false,
+            Notes = string.Empty,
+            SubmittedAt = DateTimeOffset.UtcNow
+        });
+
         var response = new RegisterResponse
         {
             User = created,
@@ -138,6 +160,121 @@ public sealed class AuthController : ControllerBase
         };
 
         return CreatedAtAction(nameof(UsersController.GetById), "Users", new { id = created.Id }, response);
+    }
+
+    /// <summary>
+    /// Re-submit a rejected provider application. The provider authenticates with their existing
+    /// (still inactive) username and password, may update their profile and credentials, and a fresh
+    /// open <see cref="ProviderRequest"/> is filed against the same account. Re-using the account
+    /// means a rejected application does not leave a duplicate inactive user behind.
+    /// </summary>
+    /// <param name="request">
+    /// The provider's full application. <see cref="RegisterProviderRequest.Username"/> and
+    /// <see cref="RegisterProviderRequest.Password"/> authenticate the existing account; the remaining
+    /// fields update the profile that is snapshotted into the new request.
+    /// </param>
+    /// <returns>
+    /// 200 OK with the pending provider account and <c>RequiresApproval = true</c>;
+    /// 400 Bad Request when no service type is selected or the account is not a provider;
+    /// 401 Unauthorized when the credentials are invalid;
+    /// 409 Conflict when the account is already active or the latest request is not a rejection
+    /// (for example, still pending review).
+    /// </returns>
+    [HttpPost("resubmit/provider")]
+    [ProducesResponseType<RegisterResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public ActionResult<RegisterResponse> ResubmitProvider([FromBody] RegisterProviderRequest request)
+    {
+        var username = request.Username.Trim();
+        var user = _users.GetByUsername(username);
+        if (user is null
+            || string.IsNullOrWhiteSpace(user.PasswordHash)
+            || !_passwordHasher.Verify(request.Password, user.PasswordHash))
+        {
+            return Unauthorized("Invalid username or password.");
+        }
+
+        if (!user.IsServiceProvider)
+        {
+            return BadRequest("This account is not a service provider.");
+        }
+
+        if (user.IsActive)
+        {
+            return Conflict("This account is already active.");
+        }
+
+        // Only a rejected request may be re-submitted. A still-pending request is under review
+        // and an approved request would have activated the account (handled above).
+        var latest = _providerRequests.GetLatestByUserId(user.Id);
+        if (latest is null || !latest.IsReviewed || latest.IsApproved)
+        {
+            return Conflict("You can only re-submit after an admin rejects your request.");
+        }
+
+        var serviceTypes = request.ServiceTypes.Distinct().ToList();
+        if (serviceTypes.Count == 0)
+        {
+            ModelState.AddModelError(nameof(request.ServiceTypes), "At least one service type is required.");
+            return ValidationProblem(ModelState);
+        }
+
+        // Update the existing account in place (username and password are unchanged) so rejected
+        // applications do not accumulate duplicate inactive users in the database.
+        user.FirstName = request.FirstName.Trim();
+        user.LastName = request.LastName.Trim();
+        user.Email = NormalizeOptional(request.Email);
+        user.Phone = NormalizeOptional(request.Phone);
+        user.ServiceTypes = serviceTypes;
+        user.MedicalCredentials = ToCredential(request.MedicalCredentials);
+        user.BeautyCredentials = ToCredential(request.BeautyCredentials);
+        user.FitnessCredentials = ToCredential(request.FitnessCredentials);
+        _users.Update(user);
+
+        // File a brand-new open request so admins review the updated application.
+        _providerRequests.Add(new ProviderRequest
+        {
+            UserId = user.Id,
+            ProviderName = $"{user.FirstName} {user.LastName}".Trim(),
+            ServiceTypes = serviceTypes,
+            MedicalCredentials = user.MedicalCredentials,
+            BeautyCredentials = user.BeautyCredentials,
+            FitnessCredentials = user.FitnessCredentials,
+            IsReviewed = false,
+            IsApproved = false,
+            Notes = string.Empty,
+            SubmittedAt = DateTimeOffset.UtcNow
+        });
+
+        return Ok(new RegisterResponse
+        {
+            User = user,
+            RequiresApproval = true
+        });
+    }
+
+    /// <summary>
+    /// Explains why a provider cannot sign in yet. Rejected accounts surface the admin's
+    /// rejection note; everything else is treated as waiting on review.
+    /// </summary>
+    private string GetInactiveAccountMessage(User user)
+    {
+        if (user.IsServiceProvider)
+        {
+            var latest = _providerRequests.GetLatestByUserId(user.Id);
+            if (latest is { IsReviewed: true, IsApproved: false })
+            {
+                return string.IsNullOrWhiteSpace(latest.Notes)
+                    ? "Your service provider request was rejected by an admin. Please contact an administrator for details."
+                    : $"Your service provider request was rejected by an admin. Reason: {latest.Notes}";
+            }
+
+            return "Your request is yet to be reviewed by an admin. Please try again later.";
+        }
+
+        return "Account is pending approval.";
     }
 
     private User BuildUser(RegisterUserRequest request) => new()

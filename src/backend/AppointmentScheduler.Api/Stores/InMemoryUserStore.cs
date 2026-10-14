@@ -35,4 +35,19 @@ public sealed class InMemoryUserStore : IUserStore
             return user;
         }
     }
+
+    public bool Update(User user)
+    {
+        lock (_gate)
+        {
+            var index = _items.FindIndex(u => u.Id == user.Id);
+            if (index < 0)
+            {
+                return false;
+            }
+
+            _items[index] = user;
+            return true;
+        }
+    }
 }

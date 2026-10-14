@@ -36,6 +36,15 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${AUTH_ENDPOINT}/register/provider`, request);
   }
 
+  /**
+   * Re-submits a rejected provider application. The provider authenticates with their existing
+   * (still inactive) username and password and may update their profile; the backend files a fresh
+   * open request against the same account so no duplicate inactive user is created.
+   */
+  resubmitProvider(request: RegisterProviderRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${AUTH_ENDPOINT}/resubmit/provider`, request);
+  }
+
   getToken(): string | null {
     if (!this.isAuthenticated()) {
       return null;
