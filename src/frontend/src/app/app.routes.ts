@@ -8,7 +8,7 @@
 
 import { Routes } from '@angular/router';
 
-import { adminGuard, authGuard, guestGuard } from './core/guards/auth.guard';
+import { adminGuard, authGuard, guestGuard, providerGuard } from './core/guards/auth.guard';
 
 /**
  * Application routes. Each page is loaded lazily so the initial bundle only contains the shell
@@ -143,6 +143,22 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
+  },
+  {
+    path: 'create-slots',
+    title: 'Create appointment slots · BAAAM',
+    canActivate: [authGuard, providerGuard],
+    loadComponent: () =>
+      import('./pages/create-slots/create-slots.component')
+        .then(m => m.CreateSlotsComponent)
+  },
+  {
+    path: 'home-provider',
+    title: 'Service provider home · BAAAM',
+    canActivate: [authGuard, providerGuard],
+    loadComponent: () =>
+      import('./pages/home-provider/home-provider.component')
+        .then(m => m.ProviderHomeComponent)
   },
   {
     path: '**',

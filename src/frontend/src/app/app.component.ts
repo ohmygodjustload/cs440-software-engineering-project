@@ -35,12 +35,12 @@ const ADMIN_NAV: readonly NavLink[] = [
   { label: 'Appointments', path: '/appointments-admin' }
 ];
 const PROVIDER_NAV: readonly NavLink[] = [
-  { label: 'Home', path: '/' },
+  { label: 'Home', path: '/home-provider' },
   { label: 'Calendar', path: '/calendar' },
-  { label: 'Create Appointments', path: '/appointments' },
-  { label: 'Notifications', path: '/notifications' },
-  { label: 'Statistics', path: '/statistics' },
-  { label: 'Settings', path: '/settings' }
+  { label: 'Create appointments', path: '/create-slots' },
+  { label: 'Notification', path: '/notifications' },
+  { label: 'Settings', path: '/settings' },
+  { label: 'Stats', path: '/statistics' }
 ];
 
 @Component({
@@ -55,7 +55,15 @@ export class AppComponent {
     private readonly router: Router
   ) {}
 
-  readonly title = 'BAAAM Scheduling System';
+  get title(): string {
+    return this.signedInUser?.isServiceProvider && !this.signedInUser?.isAdmin
+      ? 'BAAAM / PROVIDER'
+      : 'BAAAM Scheduling System';
+  }
+
+  get isProviderWorkspace(): boolean {
+    return !!this.signedInUser?.isServiceProvider && !this.signedInUser?.isAdmin;
+  }
 
   /** Role-aware navigation: the admin, provider, and client menus differ per app.routes.ts. */
   get navLinks(): readonly NavLink[] {
