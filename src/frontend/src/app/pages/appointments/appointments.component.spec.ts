@@ -30,17 +30,17 @@ describe('Appointments overview', () => {
       }]
     });
     const component = TestBed.createComponent(AppointmentsComponent).componentInstance;
-    const booking = (year: number, month: number, status: Appointment['status'] = 'Scheduled'): Appointment => ({
+    const booking = (year: number, month: number, status: Appointment['status'] = 'Booked'): Appointment => ({
       id: `${year}-${month}-${status}`, title: 'Physical', category: 'Medical',
       startDateTime: new Date(year, month, 16, 14).toISOString(),
       endDateTime: new Date(year, month, 16, 15).toISOString(),
       providerId: 'p-1', userId: 'demo-user', status
     });
-    component.appointments = [booking(2027, 9), booking(2026, 9), booking(2026, 8), booking(2026, 8, 'Cancelled')];
+    component.appointments = [booking(2027, 9), booking(2026, 9), booking(2026, 8), booking(2026, 8, 'Canceled')];
 
     expect(component.months.length).toBe(3);
     expect(component.months[0].items.length).toBe(1);
-    expect(component.months[0].items[0].id).toBe('2026-8-Scheduled');
+    expect(component.months[0].items[0].id).toBe('2026-8-Booked');
     expect(component.months[2].label).toContain('2027');
   });
 });

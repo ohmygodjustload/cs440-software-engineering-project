@@ -43,4 +43,3 @@ BAAAM Scheduling System: clients book appointments by category (medical, beauty,
 - An appointment's provider and location come from its `AppointmentType`.
 - Provider approval uses one `ProviderRequest` per application. Approve: request `IsReviewed` and `IsApproved` true, and `Provider.IsApproved` true. Reject: request `IsReviewed` true, `IsApproved` false, reason in `Notes`. A rejected provider re-applies with a new request.
 - Deletes are soft (`IsDeleted`, `DeletedAt`), every query filters `IsDeleted` false, and all times are UTC.
-- Renames in progress in the database: status `Scheduled` becomes `Booked`, and `Provider.MedQualification` becomes `MedicalQualification`. Accept both names until the rename is finished.

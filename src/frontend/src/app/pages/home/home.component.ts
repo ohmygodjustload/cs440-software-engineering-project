@@ -61,7 +61,7 @@ export class HomeComponent implements OnInit {
 
   get nextAppointment(): Appointment | null {
     return this.appointments
-      .filter((item) => item.status === 'Scheduled' &&
+      .filter((item) => item.status === 'Booked' &&
         new Date(item.endDateTime).getTime() > this.now.getTime())
       .sort((a, b) => this.startTime(a) - this.startTime(b))[0] ?? null;
   }
@@ -107,7 +107,7 @@ export class HomeComponent implements OnInit {
     return this.appointments.filter((item) => {
       const time = this.startTime(item);
 
-      return item.status === 'Scheduled' &&
+      return item.status === 'Booked' &&
         time >= start.getTime() && time < end.getTime();
     }).length;
   }

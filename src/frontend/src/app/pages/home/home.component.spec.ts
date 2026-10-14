@@ -18,7 +18,7 @@ describe('HomeComponent', () => {
   let service: jasmine.SpyObj<HomeService>;
   let component: HomeComponent;
 
-  const appointment = (start: Date, status: Appointment['status'] = 'Scheduled'): Appointment => ({
+  const appointment = (start: Date, status: Appointment['status'] = 'Booked'): Appointment => ({
     id: start.toISOString(),
     title: 'Physical',
     category: 'Medical',
@@ -48,7 +48,7 @@ describe('HomeComponent', () => {
   it('counts scheduled starts using local day and Monday week boundaries', () => {
     component.appointments = [
       appointment(new Date(2026, 9, 14, 14)),
-      appointment(new Date(2026, 9, 14, 15), 'Cancelled'),
+      appointment(new Date(2026, 9, 14, 15), 'Canceled'),
       appointment(new Date(2026, 9, 12, 0)),
       appointment(new Date(2026, 9, 18, 23)),
       appointment(new Date(2026, 9, 19, 0))

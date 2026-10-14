@@ -61,7 +61,7 @@ body=$(curl -s $B/api/appointments)
 echo "$body" | grep -q '"providerName":"John Smith"'; assert $? "appointments: providerName resolved (John Smith)"
 echo "$body" | grep -q '123 Test St.';               assert $? "appointments: location resolved (123 Test St.)"
 echo "$body" | grep -q '"total":1';                  assert $? "appointments: write tests changed nothing (total=1)"
-echo "$body" | grep -q '"status":"Scheduled"';        assert $? "appointments: status still Scheduled (DELETE blocked)"
+echo "$body" | grep -q '"status":"Booked"';        assert $? "appointments: status still Booked (DELETE blocked)"
 
 prov=$(curl -s $B/api/providers)
 echo "$prov" | grep -q '"name":"John Smith"';         assert $? "providers: name resolved from User folder"

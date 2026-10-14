@@ -17,8 +17,8 @@
 /** Mirrors `AppointmentCategory` (Medical = 0, Beauty = 1, Fitness = 2). */
 export type AppointmentCategory = 'Medical' | 'Beauty' | 'Fitness';
 
-/** Mirrors `AppointmentStatus` (Scheduled = 0, Cancelled = 1, Completed = 2). */
-export type AppointmentStatus = 'Scheduled' | 'Cancelled' | 'Completed';
+/** Mirrors `AppointmentStatus` (Available = 0, Booked = 1, Completed = 2, Canceled = 3, Missed = 4). */
+export type AppointmentStatus = 'Available' | 'Booked' | 'Completed' | 'Canceled' | 'Missed';
 
 /**
  * Response body of `GET /api/appointments` items, `GET /api/appointments/{id}`,
@@ -26,27 +26,17 @@ export type AppointmentStatus = 'Scheduled' | 'Cancelled' | 'Completed';
  * (see src/backend/AppointmentScheduler.Api/Models/Appointment.cs).
  */
 export interface Appointment {
-  /** Unique id (GUID hex without dashes for in-memory store, ObjectId hex for BAAAM). */
   id: string;
-  /** Short title, e.g. `Dental checkup`. */
+  appointmentTypeId?: string | null;
   title: string;
-  /** Service category: Medical, Beauty, or Fitness. */
   category: AppointmentCategory;
-  /** Appointment start as an ISO-8601 string in UTC. */
   startDateTime: string;
-  /** Appointment end as an ISO-8601 string in UTC. Must be after `startDateTime`. */
   endDateTime: string;
-  /** Service provider id (doctor, stylist, trainer, …). */
   providerId: string;
-  /** Denormalized provider display name, when known. */
   providerName?: string | null;
-  /** Owner of the appointment. Defaults to `demo-user` when omitted. */
-  userId: string;
-  /** Free-form location, e.g. `Clinic A`. */
+  userId: string | null;
   location?: string | null;
-  /** Free-form notes. */
   notes?: string | null;
-  /** Lifecycle status. */
   status: AppointmentStatus;
 }
 

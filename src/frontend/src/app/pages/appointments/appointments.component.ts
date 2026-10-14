@@ -40,7 +40,7 @@ export class AppointmentsComponent implements OnInit {
   get months(): AppointmentMonth[] {
     const groups = new Map<string, AppointmentMonth>();
     const sorted = this.appointments
-      .filter((item) => item.status === 'Scheduled')
+      .filter((item) => item.status === 'Booked')
       .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
 
     for (const item of sorted) {

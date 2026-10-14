@@ -7,12 +7,12 @@
  *
  */
 
-import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, catchError, of, switchMap, tap } from 'rxjs';
-import { CalendarItem } from '../../core/models/calendar-item';
-import { CalendarService } from '../../core/services/calendar.service';
+import {CommonModule} from '@angular/common';
+import {Component, DestroyRef, OnInit, inject} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Subject, catchError, of, switchMap, tap} from 'rxjs';
+import {CalendarItem} from '../../core/models/calendar-item';
+import {CalendarService} from '../../core/services/calendar.service';
 
 interface CalendarDay {
   date: Date;
@@ -39,21 +39,27 @@ export class CalendarComponent {
   error = '';
 
   get monthLabel(): string {
-    return this.month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return this.month.toLocaleDateString('en-US', {month: 'long', year: 'numeric'});
   }
 
   ngOnInit(): void {
     this.monthChanges.pipe(
-      tap(() => { this.loading = true; this.error = ''; }),
+      tap(() => {
+        this.loading = true;
+        this.error = '';
+      }),
       switchMap(range => this.service.getItems(range.from, range.to).pipe(
-        catchError(() => { this.error = 'Appointments could not be loaded. Please try again.'; return of([]); })
+        catchError(() => {
+          this.error = 'Appointments could not be loaded. Please try again.';
+          return of([]);
+        })
       )),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe(items => {
       this.loading = false;
       for (const day of this.days) {
         const next = new Date(day.date.getFullYear(), day.date.getMonth(), day.date.getDate() + 1);
-        day.items = items.filter(item => item.status !== 'Cancelled'
+        day.items = items.filter(item => item.status !== 'Canceled' && item.status !== 'Available'
           && new Date(item.startDateTime) < next && new Date(item.endDateTime) > day.date)
           .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
       }
@@ -61,12 +67,12 @@ export class CalendarComponent {
     this.refresh();
   }
 
-  previousMonth(): void { 
-    this.changeMonth(-1); 
+  previousMonth(): void {
+    this.changeMonth(-1);
   }
 
-  nextMonth(): void { 
-    this.changeMonth(1); 
+  nextMonth(): void {
+    this.changeMonth(1);
   }
 
   goToToday(): void {
@@ -86,20 +92,20 @@ export class CalendarComponent {
     const from = new Date(year, month, 1 - this.month.getDay());
     const count = Math.ceil((this.month.getDay() + new Date(year, month + 1, 0).getDate()) / 7) * 7;
     const today = new Date().toDateString();
-    this.days = Array.from({ length: count }, (_, index) => {
+    this.days = Array.from({length: count}, (_, index) => {
       const date = new Date(from.getFullYear(), from.getMonth(), from.getDate() + index);
-      return { 
-        date, 
-        isCurrentMonth: date.getMonth() === month, 
-        isToday: date.toDateString() === today, 
-        items: [] 
+      return {
+        date,
+        isCurrentMonth: date.getMonth() === month,
+        isToday: date.toDateString() === today,
+        items: []
       };
     });
-    
-    this.monthChanges.next({ 
-      from, 
-      to: new Date(from.getFullYear(), from.getMonth(), 
-      from.getDate() + count) 
+
+    this.monthChanges.next({
+      from,
+      to: new Date(from.getFullYear(), from.getMonth(),
+        from.getDate() + count)
     });
   }
 

@@ -7,11 +7,13 @@ namespace AppointmentScheduler.Api.Stores;
 /// lets the frontend integrate today; swap it for a MongoDB implementation
 /// later without touching controllers.
 /// </summary>
-public interface IAppointmentStore
-{
+public interface IAppointmentStore {
     IReadOnlyList<Appointment> GetAll();
     Appointment? GetById(string id);
     Appointment Add(Appointment appointment);
     bool Update(Appointment appointment);
     bool Remove(string id);
+    Appointment AddSlot(Appointment slot);
+    bool UpdateSlot(Appointment slot);
+    bool SoftDeleteSlot(string id);
 }

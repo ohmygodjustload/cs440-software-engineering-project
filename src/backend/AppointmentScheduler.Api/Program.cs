@@ -2,6 +2,7 @@ using System.Reflection;
 using System.IO;
 using System.Text;
 using AppointmentScheduler.Api.Security;
+using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -52,6 +53,8 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString))
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderStore, AppointmentScheduler.Api.Stores.MongoProviderStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderRequestStore, AppointmentScheduler.Api.Stores.MongoProviderRequestStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.MongoUserStore>();
+    builder.Services.AddSingleton<IAppointmentTypeStore, MongoAppointmentTypeStore>();
+    builder.Services.AddSingleton<ILocationStore, MongoLocationStore>();
 }
 else
 {
@@ -61,6 +64,8 @@ else
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderStore, AppointmentScheduler.Api.Stores.InMemoryProviderStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderRequestStore, AppointmentScheduler.Api.Stores.InMemoryProviderRequestStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.InMemoryUserStore>();
+    builder.Services.AddSingleton<IAppointmentTypeStore, InMemoryAppointmentTypeStore>();
+    builder.Services.AddSingleton<ILocationStore, InMemoryLocationStore>();
 }
 
 // The Angular dev server (http://localhost:4200) is a different origin than the API, so browser
@@ -114,6 +119,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<AppointmentScheduler.Api.Auth.ICurrentUser, AppointmentScheduler.Api.Auth.DevCurrentUser>();
+
 var app = builder.Build();
 
 // Global safety net: a Mongo outage must surface as 503 with NO stack trace,
@@ -126,9 +134,7 @@ app.Use(async (context, next) =>
         await next();
     }
     catch (Exception ex) when (
-        ex is MongoDB.Driver.MongoException
-        || ex is TimeoutException
-        || ex is NotSupportedException)
+        ex is MongoDB.Driver.MongoException or TimeoutException or NotSupportedException)
     {
         var readOnly = ex is NotSupportedException;
         context.Response.StatusCode = readOnly

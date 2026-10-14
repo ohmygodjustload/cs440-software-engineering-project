@@ -33,7 +33,7 @@ public class AppointmentsControllerTests
         var created = Assert.IsType<CreatedAtActionResult>(result.Result);
         var payload = Assert.IsType<Appointment>(created.Value);
         Assert.Equal("Dental checkup", payload.Title);
-        Assert.Equal(AppointmentStatus.Scheduled, payload.Status);
+        Assert.Equal(AppointmentStatus.Booked, payload.Status);
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class AppointmentsControllerTests
         // DELETE is a soft cancel: record stays with Status = Cancelled.
         Assert.IsType<NoContentResult>(controller.Delete(id));
         var cancelled = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(controller.GetById(id).Result).Value);
-        Assert.Equal(AppointmentStatus.Cancelled, cancelled.Status);
+        Assert.Equal(AppointmentStatus.Canceled, cancelled.Status);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class AppointmentsControllerTests
         Assert.IsType<NoContentResult>(controller.Delete(id));
         Assert.IsType<NoContentResult>(controller.Delete(id));
 
-        var list = controller.List(null, null, null, AppointmentStatus.Cancelled, null);
+        var list = controller.List(null, null, null, AppointmentStatus.Canceled, null);
         var ok = Assert.IsType<OkObjectResult>(list.Result);
         var payload = Assert.IsType<PagedResult<Appointment>>(ok.Value);
         Assert.Contains(payload.Items, a => a.Id == id);
