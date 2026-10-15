@@ -101,7 +101,7 @@ public sealed class SlotPublishingController(
         try
         {
             var providerId = StableProviderId(user.Id);
-            var planned = drafts.Select(dto => Build(user, dto, providerId, Guid.NewGuid().ToString("N"))).ToList();
+            var planned = drafts.Select(dto => Build(user, dto, user.Id, Guid.NewGuid().ToString("N"))).ToList();
             var existing = appointments.GetAll();
             if (planned.Any(slot => existing.Any(a => !a.IsDeleted &&
                 (a.ProviderId == providerId || a.ProviderId == user.Id) &&
@@ -207,13 +207,13 @@ public sealed class SlotPublishingController(
             }, cancellationToken: ct);
                 var typeKey = ObjectId.GenerateNewId();
                 await typeRows.InsertOneAsync(transaction, new BsonDocument {
-                { "_id", typeKey }, { "ProviderId", providerKey }, { "LocationId", locationKey },
+                { "_id", typeKey }, { "ProviderId", Ref(user.Id) }, { "LocationId", locationKey },
                 { "CustomServiceName", dto.Title.Trim() }, { "DurationInMinutes", 60 }, { "Price", 0 },
                 { "IsMedical", dto.Category == AppointmentCategory.Medical },
                 { "IsBeauty", dto.Category == AppointmentCategory.Beauty },
                 { "IsFitness", dto.Category == AppointmentCategory.Fitness }, { "IsDeleted", false }
             }, cancellationToken: ct);
-                var slot = Build(user, dto, providerId, typeKey.ToString());
+                var slot = Build(user, dto, user.Id, typeKey.ToString());
                 var slotKey = ObjectId.GenerateNewId();
                 await slotRows.InsertOneAsync(transaction, new BsonDocument {
                 { "_id", slotKey }, { "StartTime", start.UtcDateTime }, { "EndTime", end.UtcDateTime },
