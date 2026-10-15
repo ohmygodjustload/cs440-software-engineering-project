@@ -48,11 +48,14 @@ describe('CreateSlotsComponent', () => {
     });
   });
 
-  it('exposes 12 start times, ending with 2:30, 3:00, and 3:30 PM', () => {
+  it('exposes 20 start times from 9:00 AM through 6:30 PM, including noon', () => {
     const component = create().componentInstance;
 
-    expect(component.startTimes.length).toBe(12);
-    expect(component.startTimes.slice(-3)).toEqual(['14:30', '15:00', '15:30']);
+    expect(component.startTimes.length).toBe(20);
+    expect(component.startTimes[0]).toBe('09:00');
+    expect(component.startTimes[component.startTimes.length - 1]).toBe('18:30');
+    expect(component.startTimes).toContain('12:00');
+    expect(component.startTimes).toContain('12:30');
   });
 
   it('selects 3:30 PM on a future date and sets the end 60 minutes later', () => {
@@ -67,13 +70,27 @@ describe('CreateSlotsComponent', () => {
     expect(minutes).toBe(60);
   });
 
-  it('renders 12 start-time buttons with 3:30 PM last', () => {
+  it('selects 6:30 PM on a future date and sets the end 60 minutes later', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+
+    component.chooseDate(date);
+    component.chooseTime('18:30');
+
+    expect(component.draft.start).toBe(`${date}T18:30`);
+    const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
+    expect(minutes).toBe(60);
+  });
+
+  it('renders 20 start-time buttons with 6:30 PM last and 12:00 PM present', () => {
     const fixture = create();
     const buttons: HTMLButtonElement[] = Array.from(
       fixture.nativeElement.querySelectorAll('.time-options button')
     );
+    const labels = buttons.map((button) => button.textContent?.trim());
 
-    expect(buttons.length).toBe(12);
-    expect(buttons[buttons.length - 1].textContent?.trim()).toBe('3:30 PM');
+    expect(buttons.length).toBe(20);
+    expect(labels[labels.length - 1]).toBe('6:30 PM');
+    expect(labels).toContain('12:00 PM');
   });
 });
