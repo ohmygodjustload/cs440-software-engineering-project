@@ -6,6 +6,7 @@ namespace AppointmentScheduler.Api.Stores;
 /// <summary>Thread-safe in-memory store. Replaced by MongoDB when it is wired up.</summary>
 public sealed class InMemoryAppointmentStore : IAppointmentStore {
     private readonly ConcurrentDictionary<string, Appointment> _items = new();
+    private readonly Lock _slotGate = new();
 
     public IReadOnlyList<Appointment> GetAll() =>
         [.. _items.Values.Where(a => !a.IsDeleted).OrderBy(a => a.StartDateTime)];
@@ -46,6 +47,17 @@ public sealed class InMemoryAppointmentStore : IAppointmentStore {
         cur.IsDeleted = true;
         cur.DeletedAt = DateTimeOffset.UtcNow;
         return true;
+    }
+
+    public bool BookSlot(string id, string clientId, string notes) {
+        lock (_slotGate) {
+            if (!_items.TryGetValue(id, out var cur) || cur.IsDeleted ||
+                cur.Status != AppointmentStatus.Available || cur.UserId is not null) return false;
+            cur.UserId = clientId;
+            cur.Status = AppointmentStatus.Booked;
+            cur.Notes = notes;
+            return true;
+        }
     }
 
     public bool Remove(string id) => _items.TryRemove(id, out _);

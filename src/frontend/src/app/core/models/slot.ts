@@ -13,3 +13,9 @@ export interface AvailableSlotFilters {
   from?: string;
   to?: string;
 }
+
+/** Body for `POST /api/slots/{id}/book`. The client comes from the JWT, never the body. */
+export interface BookSlotDto { notes?: string; }
+
+/** A slot a client has booked: the `POST /api/slots/{id}/book` response and `GET /api/appointments/mine` items. */
+export type BookedAppointment = Appointment & { status: 'Booked'; userId: string };

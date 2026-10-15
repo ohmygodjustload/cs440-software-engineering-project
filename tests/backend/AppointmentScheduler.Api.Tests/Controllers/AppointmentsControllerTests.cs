@@ -1,3 +1,4 @@
+using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Controllers;
 using AppointmentScheduler.Api.Models;
 using AppointmentScheduler.Api.Stores;
@@ -6,15 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduler.Api.Tests.Controllers;
 
-public class AppointmentsControllerTests
-{
-    private static AppointmentsController CreateController()
-    {
+public class AppointmentsControllerTests {
+    private sealed class FakeUser(string? id) : ICurrentUser {
+        public string? UserId => id;
+    }
+
+    private static AppointmentsController CreateController() {
         return new AppointmentsController(new InMemoryAppointmentStore());
     }
 
-    private static CreateAppointmentDto ValidDto() => new()
-    {
+    private static CreateAppointmentDto ValidDto() => new() {
         Title = "Dental checkup",
         Category = AppointmentCategory.Medical,
         StartDateTime = DateTimeOffset.UtcNow.AddDays(1),
@@ -23,9 +25,19 @@ public class AppointmentsControllerTests
         Location = "Clinic A"
     };
 
+    private static Appointment AddAt(InMemoryAppointmentStore store, double hours, string? userId, AppointmentStatus status) {
+        var start = DateTimeOffset.UtcNow.AddHours(hours);
+        return store.Add(new Appointment {
+            Title = "Seeded", ProviderId = SeedIds.ProviderUser, StartDateTime = start,
+            EndDateTime = start.AddMinutes(30), UserId = userId, Status = status,
+        });
+    }
+
+    private static AppointmentsController Mine(InMemoryAppointmentStore store, string? userId) =>
+        new(store, null, new FakeUser(userId), new InMemoryUserStore());
+
     [Fact]
-    public void Create_ReturnsCreatedAppointment()
-    {
+    public void Create_ReturnsCreatedAppointment() {
         var controller = CreateController();
 
         var result = controller.Create(ValidDto());
@@ -37,8 +49,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void Create_RejectsEndBeforeStart()
-    {
+    public void Create_RejectsEndBeforeStart() {
         var controller = CreateController();
         var dto = ValidDto();
         dto.EndDateTime = dto.StartDateTime!.Value.AddHours(-1);
@@ -49,8 +60,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void List_FiltersByCategory()
-    {
+    public void List_FiltersByCategory() {
         var controller = CreateController();
         controller.Create(ValidDto());
         var fitness = ValidDto();
@@ -68,8 +78,29 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void Update_And_Delete_RoundTrip()
-    {
+    public void GetMine_ReturnsOnlyCallersBookedAppointments_SoonestFirst() {
+        var store = new InMemoryAppointmentStore();
+        var later = AddAt(store, 48, SeedIds.ClientUser, AppointmentStatus.Booked);
+        var sooner = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
+        AddAt(store, 30, SeedIds.ClientUser, AppointmentStatus.Canceled);
+        AddAt(store, 31, "someone-else", AppointmentStatus.Booked);
+        AddAt(store, 32, null, AppointmentStatus.Available);
+
+        var items = Assert.IsType<List<Appointment>>(
+            Assert.IsType<OkObjectResult>(Mine(store, SeedIds.ClientUser).GetMine().Result).Value);
+        Assert.Equal([sooner.Id, later.Id], items.Select(a => a.Id));
+    }
+
+    [Fact]
+    public void GetMine_NoUser_401() =>
+        Assert.IsType<UnauthorizedResult>(Mine(new InMemoryAppointmentStore(), null).GetMine().Result);
+
+    [Fact]
+    public void GetMine_NotAClient_403() =>
+        Assert.IsType<ForbidResult>(Mine(new InMemoryAppointmentStore(), SeedIds.ProviderUser).GetMine().Result);
+
+    [Fact]
+    public void Update_And_Delete_RoundTrip() {
         var controller = CreateController();
         var created = Assert.IsType<CreatedAtActionResult>(controller.Create(ValidDto()).Result);
         var id = Assert.IsType<Appointment>(created.Value).Id;
@@ -84,8 +115,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void Delete_IsIdempotent_And_KeepsHistory()
-    {
+    public void Delete_IsIdempotent_And_KeepsHistory() {
         var controller = CreateController();
         var created = Assert.IsType<CreatedAtActionResult>(controller.Create(ValidDto()).Result);
         var id = Assert.IsType<Appointment>(created.Value).Id;
@@ -100,8 +130,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void List_RejectsToBeforeFrom()
-    {
+    public void List_RejectsToBeforeFrom() {
         var controller = CreateController();
 
         var result = controller.List(
@@ -113,8 +142,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void Update_ProviderId_ResolvesProviderName()
-    {
+    public void Update_ProviderId_ResolvesProviderName() {
         var appointmentStore = new InMemoryAppointmentStore();
         var providerStore = new InMemoryProviderStore();
         var provider = providerStore.GetAll()[0];
@@ -131,8 +159,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void Update_ProviderId_ExplicitNameWins()
-    {
+    public void Update_ProviderId_ExplicitNameWins() {
         var appointmentStore = new InMemoryAppointmentStore();
         var providerStore = new InMemoryProviderStore();
         var provider = providerStore.GetAll()[0];
@@ -141,8 +168,7 @@ public class AppointmentsControllerTests
         var created = Assert.IsType<CreatedAtActionResult>(controller.Create(ValidDto()).Result);
         var id = Assert.IsType<Appointment>(created.Value).Id;
 
-        var updated = controller.Update(id, new UpdateAppointmentDto
-        {
+        var updated = controller.Update(id, new UpdateAppointmentDto {
             ProviderId = provider.Id,
             ProviderName = "Custom name"
         });
@@ -152,8 +178,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void Create_RejectsUnapprovedProvider()
-    {
+    public void Create_RejectsUnapprovedProvider() {
         var appointmentStore = new InMemoryAppointmentStore();
         var providerStore = new InMemoryProviderStore();
         var unapproved = providerStore.GetAll()[0];
@@ -170,8 +195,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void List_HidesSlotsFromUnapprovedProviders()
-    {
+    public void List_HidesSlotsFromUnapprovedProviders() {
         var appointmentStore = new InMemoryAppointmentStore();
         var providerStore = new InMemoryProviderStore();
         var approved = providerStore.GetAll()[0];
@@ -198,8 +222,7 @@ public class AppointmentsControllerTests
     }
 
     [Fact]
-    public void List_ShowsAppointmentsOfApprovedProviders()
-    {
+    public void List_ShowsAppointmentsOfApprovedProviders() {
         var appointmentStore = new InMemoryAppointmentStore();
         var providerStore = new InMemoryProviderStore();
         var approved = providerStore.GetAll()[0];

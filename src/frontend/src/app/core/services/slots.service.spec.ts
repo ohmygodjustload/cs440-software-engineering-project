@@ -1,7 +1,9 @@
 /**
  * slots.service.spec.ts — unit tests for SlotsService.
  *
- * Proves create, getMine, getAvailable, update, and delete hit /api/slots with the right method and body.
+ * Proves create, getMine, getAvailable, update, and delete hit /api/slots with the right method and body,
+ * book posts to /api/slots/{id}/book, and getMyBookings reads /api/appointments/mine.
+ *
  * None of this needs a running backend.
  */
 
@@ -9,7 +11,7 @@ import {provideHttpClient} from '@angular/common/http';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
-import {Slot} from '../models/slot';
+import {BookedAppointment, Slot} from '../models/slot';
 import {SlotsService} from './slots.service';
 
 describe('SlotsService', () => {
@@ -27,6 +29,55 @@ describe('SlotsService', () => {
     notes: '',
     status: 'Available'
   };
+
+  const booking: BookedAppointment = {
+    ...slot, status: 'Booked', userId: '6abc20bda313dfdf8ecc0286', notes: 'First visit'
+  };
+
+  it('should POST /api/slots/{id}/book with the trimmed notes and emit the booking', () => {
+    let actual: BookedAppointment | undefined;
+
+    service.book('s1', '  First visit  ').subscribe((b) => (actual = b));
+
+    const request = httpTesting.expectOne('/api/slots/s1/book');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({notes: 'First visit'});
+    request.flush(booking);
+
+    expect(actual).toEqual(booking);
+  });
+
+  it('should POST an empty body when booking without notes', () => {
+    service.book('s1').subscribe();
+
+    const request = httpTesting.expectOne('/api/slots/s1/book');
+    expect(request.request.body).toEqual({});
+    request.flush(booking);
+  });
+
+  it('should surface a 409 when the slot was already taken', () => {
+    let status: number | undefined;
+
+    service.book('s1').subscribe({error: (e) => (status = e.status)});
+    httpTesting.expectOne('/api/slots/s1/book').flush('Slot is no longer available.', {
+      status: 409,
+      statusText: 'Conflict'
+    });
+
+    expect(status).toBe(409);
+  });
+
+  it('should GET /api/appointments/mine and emit the client bookings', () => {
+    let actual: BookedAppointment[] | undefined;
+
+    service.getMyBookings().subscribe((b) => (actual = b));
+
+    const request = httpTesting.expectOne('/api/appointments/mine');
+    expect(request.request.method).toBe('GET');
+    request.flush([booking]);
+
+    expect(actual).toEqual([booking]);
+  });
 
   let service: SlotsService;
   let httpTesting: HttpTestingController;

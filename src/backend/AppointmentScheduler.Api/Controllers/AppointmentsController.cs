@@ -1,3 +1,4 @@
+using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Models;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +10,11 @@ namespace AppointmentScheduler.Api.Controllers;
 /// <summary>
 /// Manage appointments: list, retrieve, create, update and cancel (soft-delete).
 /// </summary>
-public sealed class AppointmentsController(IAppointmentStore store, IProviderStore? providerStore = null)
-    : ControllerBase {
+public sealed class AppointmentsController(
+    IAppointmentStore store,
+    IProviderStore? providerStore = null,
+    ICurrentUser? currentUser = null,
+    IUserStore? users = null) : ControllerBase {
     /// <summary>
     /// List appointments with optional filtering and paging.
     /// </summary>
@@ -111,8 +115,7 @@ public sealed class AppointmentsController(IAppointmentStore store, IProviderSto
         // provider ids pass through so demo flows without a Provider row keep working.
         var providerId = dto.ProviderId.Trim();
         var provider = providerStore?.GetById(providerId);
-        if (provider is { IsApproved: false })
-        {
+        if (provider is { IsApproved: false }) {
             return StatusCode(StatusCodes.Status403Forbidden,
                 "This service provider has not been approved by an admin yet.");
         }
@@ -134,6 +137,20 @@ public sealed class AppointmentsController(IAppointmentStore store, IProviderSto
 
         var created = store.Add(appointment);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    /// <summary>The signed-in client's Booked appointments, soonest first.</summary>
+    [HttpGet("mine")]
+    [ProducesResponseType<IReadOnlyList<Appointment>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public ActionResult<IReadOnlyList<Appointment>> GetMine() {
+        if (currentUser?.UserId is not { } userId) return Unauthorized();
+        if (users?.GetById(userId) is not { IsClient: true, IsActive: true }) return Forbid();
+        return Ok(store.GetAll()
+            .Where(a => a.UserId == userId && a.Status == AppointmentStatus.Booked)
+            .OrderBy(a => a.StartDateTime).ThenBy(a => a.Id, StringComparer.Ordinal)
+            .ToList());
     }
 
     /// <summary>Update an appointment (edit / reschedule / cancel via status).</summary>

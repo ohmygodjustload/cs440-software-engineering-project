@@ -2,36 +2,26 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { Appointment } from '../models/appointment';
 import { HomeService } from './home.service';
 
 describe('HomeService', () => {
-  it('loads later pages and keeps only the booking demo owner', () => {
+  it('loads the signed-in client bookings from /api/appointments/mine', () => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()]
     });
     const http = TestBed.inject(HttpTestingController);
     const service = TestBed.inject(HomeService);
-    let resultIds: string[] = [];
+    const mine = [{ id: 'mine', status: 'Booked', userId: '6abc20bda313dfdf8ecc0286' }] as Appointment[];
+    let actual: Appointment[] | undefined;
 
-    service.loadAppointments().subscribe((items) => {
-      resultIds = items.map((item) => item.id);
-    });
+    service.loadAppointments().subscribe((items) => (actual = items));
 
-    const first = http.expectOne((request) =>
-      request.url === '/api/appointments' && request.params.get('page') === '1');
-    expect(first.request.params.get('pageSize')).toBe('100');
-    first.flush({
-      page: 1, pageSize: 1, total: 2,
-      items: [{ id: 'mine', userId: 'demo-user' }]
-    });
-
-    const second = http.expectOne((request) => request.params.get('page') === '2');
-    second.flush({
-      page: 2, pageSize: 1, total: 2,
-      items: [{ id: 'other', userId: 'other-user' }]
-    });
-
-    expect(resultIds).toEqual(['mine']);
+    const request = http.expectOne('/api/appointments/mine');
+    expect(request.request.method).toBe('GET');
+    request.flush(mine);
     http.verify();
+
+    expect(actual).toEqual(mine);
   });
 });

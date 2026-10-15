@@ -16,4 +16,7 @@ public interface IAppointmentStore {
     Appointment AddSlot(Appointment slot);
     bool UpdateSlot(Appointment slot);
     bool SoftDeleteSlot(string id);
+
+    /// <summary>One conditional write: succeeds only while the slot is Available, has no client, and is not deleted.</summary>
+    bool BookSlot(string id, string clientId, string notes);
 }

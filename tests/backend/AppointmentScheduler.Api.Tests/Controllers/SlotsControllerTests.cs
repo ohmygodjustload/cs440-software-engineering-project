@@ -50,6 +50,12 @@ public class SlotsControllerTests {
     private static string[] Ids(ActionResult<IReadOnlyList<Appointment>> result) =>
         [.. Available(result).Select(s => s.Id)];
 
+    private const string DualRoleUser = "6abc2000a313dfdf8ecc0012";
+    private const string InactiveClient = "6abc2000a313dfdf8ecc0013";
+
+    private static Appointment Booked(ActionResult<Appointment> result) =>
+        Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(result.Result).Value);
+
     [Fact]
     public void GetAvailable_ReturnsOnlyOpenFutureSlots_SoonestFirst() {
         var (c, appts) = Make();
@@ -199,4 +205,136 @@ public class SlotsControllerTests {
 
     [Fact]
     public void Delete_UnknownId_404() => Assert.IsType<NotFoundResult>(Make().c.Delete("missing"));
+
+    [Fact]
+    public void Book_SetsClientStatusAndNotes_AndReturnsConfirmationDetails() {
+        var (c, appts) = Make(SeedIds.ClientUser);
+        var seeded = Seed(appts, 24);
+
+        var booked = Booked(c.Book(seeded.Id, new BookSlotDto { Notes = "  First visit  " }));
+
+        Assert.Equal(seeded.Id, booked.Id);
+        Assert.Equal(SeedIds.ClientUser, booked.UserId);
+        Assert.Equal(AppointmentStatus.Booked, booked.Status);
+        Assert.Equal("First visit", booked.Notes);
+        Assert.Equal(SeedIds.ProviderUser, booked.ProviderId);
+        Assert.Equal("John Smith", booked.ProviderName);
+        Assert.Equal("General checkup", booked.Title); // from the appointment type, not the stored "Seeded"
+        Assert.Equal("1 Main St, Chicago, IL, 60601", booked.Location);
+        Assert.Equal(seeded.StartDateTime, booked.StartDateTime);
+        Assert.Equal(seeded.EndDateTime, booked.EndDateTime);
+
+        var stored = appts.GetById(seeded.Id)!;
+        Assert.Equal(SeedIds.ClientUser, stored.UserId);
+        Assert.Equal(AppointmentStatus.Booked, stored.Status);
+        Assert.Equal("First visit", stored.Notes);
+    }
+
+    [Fact]
+    public void Book_WithoutNotes_StoresEmptyNotes() {
+        var (c, appts) = Make(SeedIds.ClientUser);
+        Assert.Equal("", Booked(c.Book(Seed(appts, 24).Id)).Notes);
+    }
+
+    [Fact]
+    public void Book_NoUser_401() {
+        var (c, appts) = Make(null);
+        Assert.IsType<UnauthorizedResult>(c.Book(Seed(appts, 24).Id).Result);
+    }
+
+    [Theory]
+    [InlineData(SeedIds.ProviderUser)]
+    [InlineData(SeedIds.AdminUser)]
+    [InlineData(InactiveClient)]
+    [InlineData("unknown-user")]
+    public void Book_NotAnActiveClient_403(string userId) {
+        var users = UsersWith(new User {
+            Id = InactiveClient, FirstName = "Ina", LastName = "Client", Username = "InaClient",
+            IsClient = true, IsActive = false,
+        });
+        var (c, appts) = Make(userId, users);
+        var slot = Seed(appts, 24);
+
+        Assert.IsType<ForbidResult>(c.Book(slot.Id).Result);
+        Assert.Equal(AppointmentStatus.Available, appts.GetById(slot.Id)!.Status);
+    }
+
+    [Fact]
+    public void Book_OwnSlot_403() {
+        var users = UsersWith(new User {
+            Id = DualRoleUser, FirstName = "Dee", LastName = "Dual", Username = "DeeDual",
+            IsClient = true, IsServiceProvider = true, IsActive = true,
+        });
+        var (c, appts) = Make(DualRoleUser, users);
+        Assert.IsType<ForbidResult>(c.Book(Seed(appts, 24, providerId: DualRoleUser, typeId: null).Id).Result);
+    }
+
+    [Fact]
+    public void Book_MissingOrDeletedSlot_404() {
+        var (c, appts) = Make(SeedIds.ClientUser);
+        var deleted = Seed(appts, 24);
+        appts.SoftDeleteSlot(deleted.Id);
+
+        Assert.IsType<NotFoundResult>(c.Book("missing").Result);
+        Assert.IsType<NotFoundResult>(c.Book(deleted.Id).Result);
+    }
+
+    [Fact]
+    public void Book_SlotOfUnapprovedProvider_404() {
+        var users = UsersWith(new User {
+            Id = InactiveProvider, FirstName = "Ina", LastName = "Active", Username = "InaActive",
+            IsServiceProvider = true, IsActive = false,
+        });
+        var (c, appts) = Make(SeedIds.ClientUser, users);
+        Assert.IsType<NotFoundResult>(c.Book(Seed(appts, 24, providerId: InactiveProvider, typeId: null).Id).Result);
+    }
+
+    [Fact]
+    public void Book_PastSlot_400() {
+        var (c, appts) = Make(SeedIds.ClientUser);
+        Assert.IsType<BadRequestObjectResult>(c.Book(Seed(appts, -1).Id).Result);
+    }
+
+    [Fact]
+    public void Book_SlotNoLongerAvailable_409() {
+        var (c, appts) = Make(SeedIds.ClientUser);
+        var slot = Seed(appts, 24);
+        Booked(c.Book(slot.Id));
+        Assert.IsType<ConflictObjectResult>(c.Book(slot.Id).Result);
+
+        var taken = Seed(appts, 48, status: AppointmentStatus.Booked, userId: "someone-else");
+        Assert.IsType<ConflictObjectResult>(c.Book(taken.Id).Result);
+    }
+
+    [Fact]
+    public void Book_OverlapsClientsAppointment_409_ButCanceledAndBackToBackDoNot() {
+        var (c, appts) = Make(SeedIds.ClientUser);
+        Seed(appts, 24, providerId: OtherProvider, typeId: null,
+            status: AppointmentStatus.Booked, userId: SeedIds.ClientUser); // 24h -> 24h30
+        Seed(appts, 48, providerId: OtherProvider, typeId: null,
+            status: AppointmentStatus.Canceled, userId: SeedIds.ClientUser);
+        var overlapping = Seed(appts, 24.25);
+        var backToBack = Seed(appts, 24.5);
+        var overCanceled = Seed(appts, 48);
+
+        Assert.IsType<ConflictObjectResult>(c.Book(overlapping.Id).Result);
+        Assert.Equal(AppointmentStatus.Available, appts.GetById(overlapping.Id)!.Status);
+        Booked(c.Book(backToBack.Id));
+        Booked(c.Book(overCanceled.Id));
+    }
+
+    [Fact]
+    public void Book_ProviderSeesBookingInAppointmentsList() {
+        var (c, appts) = Make(SeedIds.ClientUser);
+        var slot = Seed(appts, 24);
+        Booked(c.Book(slot.Id));
+
+        var list = new AppointmentsController(appts).List(
+            from: null, to: null, category: null, status: null, providerId: SeedIds.ProviderUser);
+        var page = Assert.IsType<PagedResult<Appointment>>(Assert.IsType<OkObjectResult>(list.Result).Value);
+        var item = Assert.Single(page.Items);
+        Assert.Equal(slot.Id, item.Id);
+        Assert.Equal(AppointmentStatus.Booked, item.Status);
+        Assert.Equal(SeedIds.ClientUser, item.UserId);
+    }
 }
