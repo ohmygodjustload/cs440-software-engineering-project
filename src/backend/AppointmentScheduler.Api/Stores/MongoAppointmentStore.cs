@@ -105,6 +105,20 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         return _raw.UpdateOne(AvailableFilter(id), update).ModifiedCount == 1;
     }
 
+    public bool BookSlot(string id, string clientId, string notes)
+    {
+        var bookedId = FindStatusId("Booked") ?? FindStatusId("Scheduled")
+            ?? throw new InvalidOperationException("Status 'Booked' (or 'Scheduled') not found in Status collection.");
+        var filter = Builders<BsonDocument>.Filter.And(
+            AvailableFilter(id),
+            Builders<BsonDocument>.Filter.Eq("UserId", BsonNull.Value)); // matches null or missing
+        var update = Builders<BsonDocument>.Update
+            .Set("StatusId", bookedId)
+            .Set("UserId", ToObjectIdOrString(clientId))
+            .Set("Notes", notes);
+        return _raw.UpdateOne(filter, update).ModifiedCount == 1;
+    }
+
     private FilterDefinition<BsonDocument> AvailableFilter(string id) =>
         Builders<BsonDocument>.Filter.And(
             Builders<BsonDocument>.Filter.Eq("_id", ToObjectIdOrString(id)),

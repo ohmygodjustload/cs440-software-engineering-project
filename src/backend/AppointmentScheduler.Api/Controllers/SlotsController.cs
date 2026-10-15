@@ -89,6 +89,41 @@ public sealed class SlotsController(
         return Ok(open.OrderBy(s => s.StartDateTime).ThenBy(s => s.Id, StringComparer.Ordinal).ToList());
     }
 
+    /// <summary>
+    /// Books an open slot for the signed-in client. The client always comes from <see cref="ICurrentUser"/>,
+    /// never the body. Returns what the confirmation screen needs: provider, service, location, and time.
+    /// </summary>
+    [HttpPost("{id}/book")]
+    public ActionResult<Appointment> Book(string id, [FromBody] BookSlotDto? dto = null) {
+        if (currentUser.UserId is null) return Unauthorized();
+        if (users.GetById(currentUser.UserId) is not { IsClient: true, IsActive: true } client) return Forbid();
+
+        var slot = appointments.GetById(id);
+        if (slot is null) return NotFound();
+
+        var type = slot.AppointmentTypeId is null ? null : types.GetById(slot.AppointmentTypeId);
+        var ownerId = type?.ProviderId ?? slot.ProviderId;
+        if (string.Equals(ownerId, client.Id, StringComparison.OrdinalIgnoreCase)) return Forbid();
+        if (users.GetById(ownerId) is not { IsServiceProvider: true, IsActive: true } provider) return NotFound();
+
+        if (slot.StartDateTime <= DateTimeOffset.UtcNow) return BadRequest("This slot has already started.");
+        if (slot.Status != AppointmentStatus.Available || slot.UserId is not null)
+            return Conflict("Slot is no longer available.");
+
+        var overlaps = appointments.GetAll().Any(a =>
+            a.UserId == client.Id
+            && a.Id != slot.Id
+            && a.Status != AppointmentStatus.Canceled
+            && a.StartDateTime < slot.EndDateTime && slot.StartDateTime < a.EndDateTime); // half-open intervals
+        if (overlaps) return Conflict("You already have an appointment at this time.");
+
+        var notes = dto?.Notes?.Trim() ?? "";
+        if (!appointments.BookSlot(slot.Id, client.Id, notes)) return Conflict("Slot is no longer available.");
+
+        var booked = appointments.GetById(slot.Id);
+        return booked is null ? Conflict("Slot is no longer available.") : Ok(Describe(booked, type, provider));
+    }
+
     [HttpPut("{id}")]
     public ActionResult<Appointment> Update(string id, [FromBody] UpdateSlotDto dto) {
         var (provider, error) = GetApprovedProvider();
@@ -124,6 +159,23 @@ public sealed class SlotsController(
         if (!cache.TryGetValue(key, out var value)) cache[key] = value = load(key);
         return value;
     }
+
+    private Appointment Describe(Appointment a, AppointmentType? type, User provider) => new() {
+        Id = a.Id,
+        Title = type is not null && !string.IsNullOrWhiteSpace(type.CustomServiceName)
+            ? type.CustomServiceName
+            : a.Title,
+        Category = type is null ? a.Category : CategoryOf(type),
+        StartDateTime = a.StartDateTime,
+        EndDateTime = a.EndDateTime,
+        ProviderId = provider.Id,
+        ProviderName = $"{provider.FirstName} {provider.LastName}".Trim(),
+        Location = a.Location ?? (type is null ? null : locations.GetById(type.LocationId)?.ToString()),
+        AppointmentTypeId = a.AppointmentTypeId,
+        UserId = a.UserId,
+        Status = a.Status,
+        Notes = a.Notes,
+    };
 
     private static AppointmentCategory CategoryOf(AppointmentType t) =>
         t.IsBeauty ? AppointmentCategory.Beauty

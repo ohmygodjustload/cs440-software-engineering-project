@@ -11,3 +11,7 @@ public sealed class UpdateSlotDto {
     public string? AppointmentTypeId { get; set; }
     public DateTimeOffset? StartTime { get; set; }
 }
+
+public sealed class BookSlotDto {
+    [MaxLength(1000)] public string? Notes { get; set; }
+}
