@@ -54,10 +54,20 @@ export class CreateSlotsComponent implements OnInit {
   isPastTime(time: string): boolean {
     return new Date(`${this.selectedDate}T${time}`).getTime() <= Date.now();
   }
-  readonly startTimes = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '13:00', '13:30', '14:00', '14:30', '15:00', '15:30'
-  ];
+  // Half-hour start times from 9:00 AM through 5:30 PM, inclusive (18 options).
+  // Slots are 60 minutes, so the last slot ends at 6:30 PM. 18 options fill the
+  // 3-column picker in six even rows. Generated from a range so gaps (like the
+  // earlier missing noon hour) cannot sneak back in.
+  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17.5, 30);
+
+  private buildStartTimes(startHour: number, endHour: number, stepMinutes: number): string[] {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const out: string[] = [];
+    for (let m = startHour * 60; m <= endHour * 60; m += stepMinutes) {
+      out.push(`${pad(Math.floor(m / 60))}:${pad(m % 60)}`);
+    }
+    return out;
+  }
 
   draft = this.emptyDraft();
   saving = false;
