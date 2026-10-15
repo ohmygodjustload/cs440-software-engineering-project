@@ -207,3 +207,38 @@ footer {
     flex-wrap: wrap;
   }
 }
+
+
+/* Open availability list */
+.availability-panel {
+  margin-top: 30px;
+}
+
+.availability-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.open-slot {
+  padding: 22px 24px;
+  margin: 16px 0;
+  border-radius: 20px;
+  background: #e4e3bc;
+  overflow-wrap: anywhere;
+}
+
+.open-slot h3 {
+  margin: 10px 0;
+  font-size: 22px;
+}
+
+.open-slot p {
+  margin: 8px 0;
+}
+
+.slot-category {
+  font-size: 13px;
+}

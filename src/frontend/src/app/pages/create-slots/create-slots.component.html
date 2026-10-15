@@ -6,12 +6,8 @@
 
   <form #slotForm="ngForm" (ngSubmit)="save(slotForm)">
     <fieldset [disabled]="saving">
-      @if (!draft.providerId) {
-        <p role="status">Your service provider profile is not connected yet.</p>
-      }
-      @if (providersLoading) { <p role="status">Loading your service categories…</p> }
-      @if (providerError) {
-        <div role="alert"><p>{{ providerError }}</p><button type="button" (click)="loadProviders()">Retry</button></div>
+      @if (categories.length === 0) {
+        <p role="status">No service categories are listed on your account. Sign in again after your provider profile has been updated.</p>
       }
 
       <div class="form-grid">
@@ -21,8 +17,8 @@
             (ngModelChange)="categoryChanged()" [disabled]="categories.length === 0">
             @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
           </select>
-          @if (draft.providerId && categories.length === 0) {
-            <p class="hint">No categories are configured for this provider.</p>
+          @if (categories.length === 0) {
+            <p class="hint">Categories come from your signed-in provider account.</p>
           }
         </div>
         <div>
@@ -74,11 +70,14 @@
             placeholder="For example: use the main entrance."></textarea>
         </div>
       </div>
-      <p class="rule">Slots last 60 minutes. The backend must prevent overlapping slots before publishing is enabled.</p>
+      <p class="rule">Slots last 60 minutes. Overlapping slots cannot be published.</p>
+      @if (success) {
+        <p role="status">{{ success }}</p>
+      }
       @if (formError) { <p class="error" role="alert">{{ formError }}</p> }
       <div class="actions">
         <a class="secondary" routerLink="/home-provider">Cancel</a>
-        <button type="submit" class="primary" [disabled]="providersLoading || !draft.providerId || categories.length === 0">
+        <button type="submit" class="primary" [disabled]="categories.length === 0">
           {{ saving ? 'Publishing…' : 'Publish available slot' }}
         </button>
       </div>
