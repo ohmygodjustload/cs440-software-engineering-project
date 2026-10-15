@@ -1,16 +1,16 @@
 /**
  * slots.service.spec.ts — unit tests for SlotsService.
  *
- * Proves create, getMine, update, and delete hit /api/slots with the right method and body.
+ * Proves create, getMine, getAvailable, update, and delete hit /api/slots with the right method and body.
  * None of this needs a running backend.
  */
 
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+import {provideHttpClient} from '@angular/common/http';
+import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { Slot } from '../models/slot';
-import { SlotsService } from './slots.service';
+import {Slot} from '../models/slot';
+import {SlotsService} from './slots.service';
 
 describe('SlotsService', () => {
   const slot: Slot = {
@@ -47,7 +47,7 @@ describe('SlotsService', () => {
   });
 
   it('should POST /api/slots and emit the created slot', () => {
-    const dto = { appointmentTypeId: 't1', startTime: '2027-01-01T10:00:00Z' };
+    const dto = {appointmentTypeId: 't1', startTime: '2027-01-01T10:00:00Z'};
     let actual: Slot | undefined;
 
     service.create(dto).subscribe((created) => (actual = created));
@@ -72,8 +72,38 @@ describe('SlotsService', () => {
     expect(actual).toEqual([slot]);
   });
 
+  it('should GET /api/slots with no query string when no filters are given', () => {
+    let actual: Slot[] | undefined;
+
+    service.getAvailable().subscribe((slots) => (actual = slots));
+
+    const request = httpTesting.expectOne('/api/slots');
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.keys()).toEqual([]);
+    request.flush([slot]);
+
+    expect(actual).toEqual([slot]);
+  });
+
+  it('should send only the filters that are set to GET /api/slots', () => {
+    service.getAvailable({
+      category: 'Beauty',
+      providerId: '6abc1939a313dfdf8ecc0265',
+      from: '2027-01-01T00:00:00Z',
+      to: ''
+    }).subscribe();
+
+    const request = httpTesting.expectOne((r) => r.url === '/api/slots');
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('category')).toBe('Beauty');
+    expect(request.request.params.get('providerId')).toBe('6abc1939a313dfdf8ecc0265');
+    expect(request.request.params.get('from')).toBe('2027-01-01T00:00:00Z');
+    expect(request.request.params.has('to')).toBeFalse();
+    request.flush([]);
+  });
+
   it('should PUT /api/slots/{id} and emit the updated slot', () => {
-    const dto = { startTime: '2027-01-01T11:00:00Z' };
+    const dto = {startTime: '2027-01-01T11:00:00Z'};
     let actual: Slot | undefined;
 
     service.update('s1', dto).subscribe((updated) => (actual = updated));
@@ -81,7 +111,7 @@ describe('SlotsService', () => {
     const request = httpTesting.expectOne('/api/slots/s1');
     expect(request.request.method).toBe('PUT');
     expect(request.request.body).toEqual(dto);
-    request.flush({ ...slot, startDateTime: dto.startTime });
+    request.flush({...slot, startDateTime: dto.startTime});
 
     expect(actual?.startDateTime).toBe(dto.startTime);
   });
@@ -101,7 +131,7 @@ describe('SlotsService', () => {
   it('should surface an error when the backend rejects the request', () => {
     let failed = false;
 
-    service.getMine().subscribe({ error: () => (failed = true) });
+    service.getMine().subscribe({error: () => (failed = true)});
     httpTesting.expectOne('/api/slots/mine').flush('Slot is no longer available.', {
       status: 409,
       statusText: 'Conflict'
@@ -121,7 +151,7 @@ describe('SlotsService', () => {
       endDateTime: '2030-01-01T11:00:00Z',
       location: '',
       notes: ''
-    }).subscribe({ error: () => (failed = true) });
+    }).subscribe({error: () => (failed = true)});
 
     expect(failed).toBeTrue();
     httpTesting.expectNone(() => true);
