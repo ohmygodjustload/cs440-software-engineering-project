@@ -48,7 +48,8 @@ public sealed class CalendarController : ControllerBase
         var items = _store.GetAll()
             .Where(a => a.EndDateTime > startDateTime && a.StartDateTime < endDateTime)
             .Where(a => !category.HasValue || a.Category == category.Value)
-            .Where(a => a.Status != AppointmentStatus.Cancelled)
+            .Where(a => a.Status != AppointmentStatus.Canceled
+                        && a.Status != AppointmentStatus.Available)
             .OrderBy(a => a.StartDateTime)
             .Select(a => new CalendarItem(a.Id, a.Title, a.Category, a.StartDateTime, a.EndDateTime, a.Status))
             .ToList();

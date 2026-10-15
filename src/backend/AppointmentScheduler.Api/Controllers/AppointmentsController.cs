@@ -9,17 +9,8 @@ namespace AppointmentScheduler.Api.Controllers;
 /// <summary>
 /// Manage appointments: list, retrieve, create, update and cancel (soft-delete).
 /// </summary>
-public sealed class AppointmentsController : ControllerBase
-{
-    private readonly IAppointmentStore _store;
-    private readonly IProviderStore? _providers;
-
-    public AppointmentsController(IAppointmentStore store, IProviderStore? providerStore = null)
-    {
-        _store = store;
-        _providers = providerStore;
-    }
-
+public sealed class AppointmentsController(IAppointmentStore store, IProviderStore? providerStore = null)
+    : ControllerBase {
     /// <summary>
     /// List appointments with optional filtering and paging.
     /// </summary>
@@ -41,44 +32,37 @@ public sealed class AppointmentsController : ControllerBase
         [FromQuery] AppointmentStatus? status,
         [FromQuery] string? providerId,
         [FromQuery] int page = 1,
-        [FromQuery] int pageSize = 20)
-    {
-        if (from.HasValue && to.HasValue && to.Value < from.Value)
-        {
+        [FromQuery] int pageSize = 20) {
+        if (from.HasValue && to.HasValue && to.Value < from.Value) {
             return BadRequest("to must not be before from.");
         }
 
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
-        var query = _store.GetAll().AsQueryable();
+        var query = store.GetAll().AsQueryable();
 
-        if (from.HasValue)
-        {
+        if (from.HasValue) {
             // Half-open [from, to): an appointment ending exactly at `from`
             // belongs to the previous range.
             query = query.Where(a => a.EndDateTime > from.Value);
         }
 
-        if (to.HasValue)
-        {
+        if (to.HasValue) {
             // Half-open [from, to): an appointment starting exactly at `to`
             // belongs to the next range.
             query = query.Where(a => a.StartDateTime < to.Value);
         }
 
-        if (category.HasValue)
-        {
+        if (category.HasValue) {
             query = query.Where(a => a.Category == category.Value);
         }
 
-        if (status.HasValue)
-        {
+        if (status.HasValue) {
             query = query.Where(a => a.Status == status.Value);
         }
 
-        if (!string.IsNullOrWhiteSpace(providerId))
-        {
+        if (!string.IsNullOrWhiteSpace(providerId)) {
             query = query.Where(a => a.ProviderId == providerId);
         }
 
@@ -101,9 +85,8 @@ public sealed class AppointmentsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<Appointment> GetById(string id)
-    {
-        var item = _store.GetById(id);
+    public ActionResult<Appointment> GetById(string id) {
+        var item = store.GetById(id);
         return item is null ? NotFound() : Ok(item);
     }
 
@@ -115,30 +98,26 @@ public sealed class AppointmentsController : ControllerBase
     [HttpPost]
     [ProducesResponseType<Appointment>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<Appointment> Create([FromBody] CreateAppointmentDto dto)
-    {
-        if (!dto.StartDateTime.HasValue || !dto.EndDateTime.HasValue)
-        {
+    public ActionResult<Appointment> Create([FromBody] CreateAppointmentDto dto) {
+        if (!dto.StartDateTime.HasValue || !dto.EndDateTime.HasValue) {
             return BadRequest("StartDateTime and EndDateTime are required.");
         }
 
-        if (dto.EndDateTime.Value <= dto.StartDateTime.Value)
-        {
+        if (dto.EndDateTime.Value <= dto.StartDateTime.Value) {
             return BadRequest("EndDateTime must be after StartDateTime.");
         }
 
         // Only approved providers may create appointments/slots (BAAAM-138). Unknown
         // provider ids pass through so demo flows without a Provider row keep working.
         var providerId = dto.ProviderId.Trim();
-        var provider = _providers?.GetById(providerId);
+        var provider = providerStore?.GetById(providerId);
         if (provider is { IsApproved: false })
         {
             return StatusCode(StatusCodes.Status403Forbidden,
                 "This service provider has not been approved by an admin yet.");
         }
 
-        var appointment = new Appointment
-        {
+        var appointment = new Appointment {
             Title = dto.Title.Trim(),
             Category = dto.Category!.Value,
             StartDateTime = dto.StartDateTime.Value,
@@ -150,10 +129,10 @@ public sealed class AppointmentsController : ControllerBase
             UserId = string.IsNullOrWhiteSpace(dto.UserId) ? "demo-user" : dto.UserId.Trim(),
             Location = string.IsNullOrWhiteSpace(dto.Location) ? null : dto.Location.Trim(),
             Notes = string.IsNullOrWhiteSpace(dto.Notes) ? null : dto.Notes,
-            Status = AppointmentStatus.Scheduled
+            Status = AppointmentStatus.Booked
         };
 
-        var created = _store.Add(appointment);
+        var created = store.Add(appointment);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
@@ -165,43 +144,35 @@ public sealed class AppointmentsController : ControllerBase
     [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<Appointment> Update(string id, [FromBody] UpdateAppointmentDto dto)
-    {
-        var existing = _store.GetById(id);
-        if (existing is null)
-        {
+    public ActionResult<Appointment> Update(string id, [FromBody] UpdateAppointmentDto dto) {
+        var existing = store.GetById(id);
+        if (existing is null) {
             return NotFound();
         }
 
         var startDateTime = dto.StartDateTime ?? existing.StartDateTime;
         var endDateTime = dto.EndDateTime ?? existing.EndDateTime;
-        if (endDateTime <= startDateTime)
-        {
+        if (endDateTime <= startDateTime) {
             return BadRequest("EndDateTime must be after StartDateTime.");
         }
 
-        if (dto.Title is not null)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Title))
-            {
+        if (dto.Title is not null) {
+            if (string.IsNullOrWhiteSpace(dto.Title)) {
                 return BadRequest("Title cannot be empty.");
             }
 
             existing.Title = dto.Title.Trim();
         }
 
-        if (dto.Category.HasValue)
-        {
+        if (dto.Category.HasValue) {
             existing.Category = dto.Category.Value;
         }
 
         existing.StartDateTime = startDateTime;
         existing.EndDateTime = endDateTime;
 
-        if (dto.ProviderId is not null)
-        {
-            if (string.IsNullOrWhiteSpace(dto.ProviderId))
-            {
+        if (dto.ProviderId is not null) {
+            if (string.IsNullOrWhiteSpace(dto.ProviderId)) {
                 return BadRequest("ProviderId cannot be empty.");
             }
 
@@ -210,61 +181,52 @@ public sealed class AppointmentsController : ControllerBase
 
             // Keep the denormalized ProviderName in sync when the provider changes,
             // unless the caller explicitly overrides it in the same request.
-            if (dto.ProviderName is null)
-            {
+            if (dto.ProviderName is null) {
                 existing.ProviderName = ResolveProviderName(trimmedProviderId);
             }
         }
 
-        if (dto.ProviderName is not null)
-        {
+        if (dto.ProviderName is not null) {
             existing.ProviderName = string.IsNullOrWhiteSpace(dto.ProviderName) ? null : dto.ProviderName.Trim();
         }
 
-        if (dto.Location is not null)
-        {
+        if (dto.Location is not null) {
             existing.Location = string.IsNullOrWhiteSpace(dto.Location) ? null : dto.Location.Trim();
         }
 
-        if (dto.Notes is not null)
-        {
+        if (dto.Notes is not null) {
             existing.Notes = string.IsNullOrWhiteSpace(dto.Notes) ? null : dto.Notes;
         }
 
-        if (dto.Status.HasValue)
-        {
+        if (dto.Status.HasValue) {
             existing.Status = dto.Status.Value;
         }
 
-        _store.Update(existing);
+        store.Update(existing);
         return Ok(existing);
     }
 
     /// <summary> Cancel an appointment by id (soft delete).</summary>
     /// <param name="id">Appointment identifier.</param>
     /// <remarks>
-    /// Performs a soft delete by setting <c>Status = Cancelled</c>. The record
+    /// Performs a soft delete by setting <c>Status = Canceled</c>. The record
     /// is retained for history and is still returned by GET /api/appointments/{id}
-    /// and GET /api/appointments?status=Cancelled. Cancelling an already-cancelled
+    /// and GET /api/appointments?status=Canceled. Cancelling an already-canceled
     /// appointment is a no-op and returns 204 No Content.
     /// </remarks>
     /// <returns>204 No Content on success, or 404 Not Found when the appointment does not exist.</returns>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Delete(string id)
-    {
-        var existing = _store.GetById(id);
-        if (existing is null)
-        {
+    public IActionResult Delete(string id) {
+        var existing = store.GetById(id);
+        if (existing is null) {
             return NotFound();
         }
 
-        if (existing.Status != AppointmentStatus.Cancelled)
-        {
-            existing.Status = AppointmentStatus.Cancelled;
-            _store.Update(existing);
-        }
+        if (existing.Status == AppointmentStatus.Canceled) return NoContent();
+        existing.Status = AppointmentStatus.Canceled;
+        store.Update(existing);
 
         return NoContent();
     }
@@ -275,12 +237,12 @@ public sealed class AppointmentsController : ControllerBase
     /// rather than failing the write.
     /// </summary>
     private string? ResolveProviderName(string providerId) =>
-        _providers?.GetById(providerId)?.Name;
+        providerStore?.GetById(providerId)?.Name;
 
     /// <summary>
     /// False only when the provider id maps to a known provider that is not approved.
     /// Unknown ids stay visible so legacy/demo data is not hidden by accident.
     /// </summary>
     private bool IsProviderVisible(string providerId) =>
-        _providers?.GetById(providerId) is not { IsApproved: false };
+        providerStore?.GetById(providerId) is not { IsApproved: false };
 }

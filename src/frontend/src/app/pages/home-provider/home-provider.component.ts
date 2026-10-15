@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { Appointment } from '../../core/models/appointment';
@@ -17,16 +17,23 @@ import { ProviderHomeService } from '../../core/services/home-provider.service';
 })
 export class ProviderHomeComponent implements OnInit {
   private readonly service = inject(ProviderHomeService);
-  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private request?: Subscription;
 
-  readonly providerId: string = this.route.snapshot.data['providerId'] ?? '';
   appointments: Appointment[] = [];
   selectedAppointment: Appointment | null = null;
+  showAvailability = false;
   loading = false;
   error = '';
   now = new Date();
+
+  get openSlots(): Appointment[] {
+    const now = Date.now();
+    return this.appointments
+      .filter(item => item.status === 'Available' && !item.userId &&
+        Date.parse(item.startDateTime) > now)
+      .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
+  }
 
   private isBooked(item: Appointment): boolean {
     // Accept the legacy and renamed backend statuses during migration.
@@ -57,7 +64,7 @@ export class ProviderHomeComponent implements OnInit {
   }
 
   get recentAppointments(): Appointment[] {
-    return this.appointments.filter(item => ['Scheduled', 'Booked', 'Completed', 'Cancelled'].includes(item.status) &&
+    return this.appointments.filter(item => ['Scheduled', 'Booked', 'Completed', 'Canceled', 'Cancelled', 'Missed'].includes(item.status) &&
       Date.parse(item.startDateTime) < this.now.getTime())
       .sort((a, b) => Date.parse(b.startDateTime) - Date.parse(a.startDateTime)).slice(0, 3);
   }
@@ -73,13 +80,11 @@ export class ProviderHomeComponent implements OnInit {
     this.error = '';
     this.now = new Date();
     this.loading = false;
-    if (!this.providerId) return;
     this.loading = true;
-    this.request = this.service.bookings(this.providerId)
+    this.request = this.service.bookings()
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: items => {
-          // Also filter responses defensively if an API ignores its query parameter.
-          this.appointments = items.filter(item => item.providerId === this.providerId);
+          this.appointments = items;
           this.loading = false;
         },
         error: () => {

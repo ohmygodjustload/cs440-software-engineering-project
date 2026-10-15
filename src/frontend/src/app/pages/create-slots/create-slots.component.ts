@@ -1,4 +1,3 @@
-import { providerCategories } from '../../core/models/provider-categories';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -6,8 +5,10 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { AuthService } from '../../core/services/auth.service';
+
 import { AppointmentCategory } from '../../core/models/appointment';
-import { BookingProvider, CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
+import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
 
 interface AppointmentForm {
   title: string;
@@ -28,12 +29,17 @@ interface AppointmentForm {
 })
 export class CreateSlotsComponent implements OnInit {
   private readonly service = inject(SlotsService);
+  private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
   get categories(): readonly AppointmentCategory[] {
-    const provider = this.providers.find(item => item.id === this.draft.providerId);
-    return provider ? providerCategories(provider) : [];
+    const user = this.auth.getCurrentUser();
+    if (!user?.isServiceProvider || user.isActive === false) return [];
+
+    const allowed: AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
+    return allowed.filter(category => user.serviceTypes?.some(value =>
+      value.trim().toLowerCase() === category.toLowerCase()));
   }
 
   get today(): string {
@@ -53,23 +59,13 @@ export class CreateSlotsComponent implements OnInit {
     '11:30', '13:00', '13:30', '14:00'
   ];
 
-  providers: BookingProvider[] = [];
   draft = this.emptyDraft();
-  providersLoading = false;
   saving = false;
-  providerError = '';
   formError = '';
   success = '';
 
-  get filteredProviders() {
-    return this.providers.filter((provider) =>
-      providerCategories(provider).includes(this.draft.category));
-  }
-
-
   categoryChanged(): void {
-    // Clear the previous category's service so it cannot be submitted accidentally.
-    this.draft.title = '';
+    // Providers write their own titles; keep their text when changing category.
     this.success = '';
     this.formError = '';
   }
@@ -123,33 +119,10 @@ export class CreateSlotsComponent implements OnInit {
     this.draft.end = this.localInput(new Date(Date.parse(this.draft.start) + duration * 60000).toISOString());
   }
 
-  get selectedProviderMissing(): boolean {
-    return !!this.draft.providerId &&
-      !this.filteredProviders.some((provider) => provider.id === this.draft.providerId);
-  }
-
   ngOnInit(): void {
+    // User ID and scheduler provider ID are different; do not substitute one for the other.
     this.draft.providerId = this.route.snapshot.data['providerId'] ?? '';
-    this.loadProviders();
-  }
-
-  loadProviders(): void {
-    if (this.providersLoading) return;
-    this.providersLoading = true;
-    this.providerError = '';
-
-    this.service.providers()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.providersLoading = false)
-      )
-      .subscribe({
-        next: (providers) => {
-          this.providers = providers;
-          this.providerChanged();
-        },
-        error: () => this.providerError = 'Providers could not be loaded. Check the API and retry.'
-      });
+    this.providerChanged();
   }
 
   save(form: NgForm): void {
@@ -164,9 +137,9 @@ export class CreateSlotsComponent implements OnInit {
     const start = new Date(this.draft.start);
     const end = new Date(this.draft.end);
 
-    if (form.invalid || !this.draft.title.trim() || !this.draft.providerId.trim() || !this.draft.location.trim()) {
+    if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim()) {
       form.control.markAllAsTouched();
-      this.formError = 'Select a provider, category, service, date, start time, and location.';
+      this.formError = 'Enter a category, service title, future date, start time, and location.';
       return;
     }
 
@@ -177,11 +150,6 @@ export class CreateSlotsComponent implements OnInit {
 
     if (start.getTime() <= Date.now()) {
       this.formError = 'Choose a future appointment time.';
-      return;
-    }
-
-    if (!this.filteredProviders.some((provider) => provider.id === this.draft.providerId)) {
-      this.formError = 'Choose a provider for the selected category.';
       return;
     }
 
@@ -207,8 +175,15 @@ export class CreateSlotsComponent implements OnInit {
         finalize(() => this.saving = false)
       )
       .subscribe({
-        error: () => {
-          this.formError = 'Publishing is unavailable: the backend has no slot endpoint yet. Your entries have been kept; nothing was saved.';
+        next: () => {
+          this.success = 'Your available slot has been published.';
+          const category = this.draft.category;
+          this.draft = this.emptyDraft();
+          this.draft.category = category;
+          form.resetForm(this.draft);
+        },
+        error: (error: unknown) => {
+          this.formError = this.auth.getErrorMessage(error);
         }
       });
   }

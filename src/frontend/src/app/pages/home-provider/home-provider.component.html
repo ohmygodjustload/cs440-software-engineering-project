@@ -12,12 +12,51 @@
     <p role="status">Loading your appointments…</p>
   } @else if (error) {
     <div role="alert"><p>{{ error }}</p><button (click)="load()">Try again</button></div>
-  } @else if (providerId) {
+  } @else {
     <section class="stats" aria-label="Appointment summary">
       <article class="stat"><h2>Today</h2><strong>{{ todayCount }}</strong><p>booked appointments</p></article>
       <article class="stat blue"><h2>This week</h2><strong>{{ weekCount }}</strong><p>booked appointments · Monday–Sunday</p></article>
-      <article class="stat yellow"><h2>Availability</h2><p>Manage the slots clients can book.</p><a routerLink="/create-slots">Create slots</a></article>
+      <article class="stat yellow">
+        <h2>Availability</h2>
+        <strong>{{ openSlots.length }}</strong>
+        <p>{{ openSlots.length === 1 ? 'open slot' : 'open slots' }}</p>
+        <button
+          type="button"
+          [attr.aria-expanded]="showAvailability"
+          aria-controls="open-slots"
+          (click)="showAvailability = !showAvailability"
+        >
+          {{ showAvailability ? 'Hide open slots' : 'View open slots' }}
+        </button>
+      </article>
     </section>
+
+    @if (showAvailability) {
+      <section id="open-slots" class="availability-panel" aria-labelledby="availability-title">
+        <div class="availability-heading">
+          <h2 id="availability-title">Your open slots</h2>
+          <a class="primary" routerLink="/create-slots">+ Create slots</a>
+        </div>
+        <p>Future slots that have not been booked. Times use your device’s timezone.</p>
+        @for (slot of openSlots; track slot.id) {
+          <article class="open-slot">
+            <div>
+              <p class="slot-category">{{ slot.category }} · Available</p>
+              <h3>{{ slot.title || 'Appointment name not provided' }}</h3>
+              <p>{{ slot.startDateTime | date:'fullDate' }}</p>
+              <p>{{ slot.startDateTime | date:'shortTime' }}–{{ slot.endDateTime | date:'shortTime' }}</p>
+              <p>{{ slot.location || 'Location not provided' }}</p>
+              @if (slot.notes) {
+                <p>{{ slot.notes }}</p>
+              }
+            </div>
+          </article>
+        } @empty {
+          <p>No future open slots. Create a slot to add availability.</p>
+        }
+        <button type="button" (click)="load()">Refresh availability</button>
+      </section>
+    }
 
     <section>
       <h2>Next appointment</h2>
@@ -61,5 +100,5 @@
       } @empty { <p>No recent appointments.</p> }
     </section>
     <footer><a routerLink="/provider">Manage appointments</a><button (click)="load()">Refresh</button></footer>
-  } @else { <p>Your service provider profile is not connected yet.</p> }
+  }
 </main>

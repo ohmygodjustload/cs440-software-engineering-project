@@ -186,3 +186,24 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     flex-wrap: wrap;
   }
 }
+
+
+.publish-confirmation {
+  padding: 20px 24px;
+  margin: 24px 0;
+  border: 1px solid #a9b9a6;
+  border-radius: 20px;
+  background: #e4e3bc;
+  color: #344945;
+}
+
+.publish-confirmation h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.publish-confirmation p {
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}

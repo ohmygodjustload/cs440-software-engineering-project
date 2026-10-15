@@ -19,7 +19,7 @@ public class CalendarControllerTests
             StartDateTime = start,
             EndDateTime = start.AddHours(1),
             ProviderId = "p1",
-            Status = AppointmentStatus.Scheduled
+            Status = AppointmentStatus.Booked
         });
         var controller = new CalendarController(store);
 
@@ -46,7 +46,7 @@ public class CalendarControllerTests
             StartDateTime = start,
             EndDateTime = start.AddHours(1),
             ProviderId = "p1",
-            Status = AppointmentStatus.Cancelled
+            Status = AppointmentStatus.Canceled
         });
         var controller = new CalendarController(store);
 
@@ -72,7 +72,7 @@ public class CalendarControllerTests
             StartDateTime = boundary,
             EndDateTime = boundary.AddHours(1),
             ProviderId = "p1",
-            Status = AppointmentStatus.Scheduled
+            Status = AppointmentStatus.Booked
         });
         var controller = new CalendarController(store);
 

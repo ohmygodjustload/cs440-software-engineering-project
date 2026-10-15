@@ -79,7 +79,7 @@ describe('CalendarComponent', () => {
           id: 'overnight',
           title: 'Overnight appointment',
           category: 'Medical',
-          status: 'Scheduled',
+          status: 'Booked',
           startDateTime: new Date(2026, 8, 16, 23).toISOString(),
           endDateTime: new Date(2026, 8, 17, 1).toISOString()
         }

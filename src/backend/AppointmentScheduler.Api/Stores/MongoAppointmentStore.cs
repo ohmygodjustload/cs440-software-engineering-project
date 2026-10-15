@@ -41,12 +41,13 @@ public sealed class MongoAppointmentStore : IAppointmentStore
     public IReadOnlyList<Appointment> GetAll()
     {
         var lookups = LoadLookups();
-        return _raw.Find(FilterDefinition<BsonDocument>.Empty)
-            .ToList()
-            .Where(d => !IsDeleted(d))
-            .Select(d => Map(d, lookups))
-            .OrderBy(a => a.StartDateTime)
-            .ToList();
+        return [
+            .. _raw.Find(FilterDefinition<BsonDocument>.Empty)
+                .ToList()
+                .Where(d => !IsDeleted(d))
+                .Select(d => Map(d, lookups))
+                .OrderBy(a => a.StartDateTime)
+        ];
     }
 
     public Appointment? GetById(string id)
@@ -66,6 +67,57 @@ public sealed class MongoAppointmentStore : IAppointmentStore
     public bool Remove(string id) =>
         throw new NotSupportedException("BAAAM.Appointment is read-only from this API.");
 
+    public Appointment AddSlot(Appointment slot)
+    {
+        var statusId = FindStatusId("Available")
+                       ?? throw new InvalidOperationException("Status 'Available' not found in Status collection.");
+
+        var doc = new BsonDocument {
+            { "_id", ObjectId.GenerateNewId() },
+            { "StartTime", slot.StartDateTime.UtcDateTime },
+            { "EndTime", slot.EndDateTime.UtcDateTime },
+            { "StatusId", statusId },
+            { "Notes", "" },
+            { "AppointmentTypeId", ToObjectIdOrString(slot.AppointmentTypeId!) },
+            { "UserId", BsonNull.Value },
+            { "IsDeleted", false },
+            { "DeletedAt", BsonNull.Value },
+        };
+        _raw.InsertOne(doc);
+        slot.Id = doc["_id"].AsObjectId.ToString();
+        return slot;
+    }
+
+    public bool UpdateSlot(Appointment slot)
+    {
+        var update = Builders<BsonDocument>.Update
+            .Set("StartTime", slot.StartDateTime.UtcDateTime)
+            .Set("EndTime", slot.EndDateTime.UtcDateTime)
+            .Set("AppointmentTypeId", ToObjectIdOrString(slot.AppointmentTypeId!));
+        return _raw.UpdateOne(AvailableFilter(slot.Id), update).ModifiedCount == 1;
+    }
+
+    public bool SoftDeleteSlot(string id)
+    {
+        var update = Builders<BsonDocument>.Update
+            .Set("IsDeleted", true)
+            .Set("DeletedAt", DateTime.Now);
+        return _raw.UpdateOne(AvailableFilter(id), update).ModifiedCount == 1;
+    }
+
+    private FilterDefinition<BsonDocument> AvailableFilter(string id) =>
+        Builders<BsonDocument>.Filter.And(
+            Builders<BsonDocument>.Filter.Eq("_id", ToObjectIdOrString(id)),
+            Builders<BsonDocument>.Filter.Ne("IsDeleted", true),
+            Builders<BsonDocument>.Filter.Eq("StatusId", FindStatusId("Available")));
+
+    private BsonValue? FindStatusId(string name) =>
+        _db.GetCollection<BsonDocument>(_settings.StatusesCollection)
+            .Find(Builders<BsonDocument>.Filter.Eq("Name", name)).FirstOrDefault()?["_id"];
+
+    private static BsonValue ToObjectIdOrString(string s) =>
+        ObjectId.TryParse(s, out var oid) ? oid : s;
+
     private sealed record Lookups(
         Dictionary<string, string> Statuses,
         Dictionary<string, BsonDocument> Users,
@@ -75,22 +127,12 @@ public sealed class MongoAppointmentStore : IAppointmentStore
 
     private Lookups LoadLookups()
     {
-        static Dictionary<string, string> Names(IMongoCollection<BsonDocument> c)
-        {
-            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var item in c.Find(FilterDefinition<BsonDocument>.Empty).ToList())
-            {
-                var id = ReadId(item, "_id");
-                if (id is null)
-                {
-                    continue;
-                }
-
-                dict[id] = ReadString(item, "Name") ?? string.Empty;
-            }
-
-            return dict;
-        }
+        return new Lookups(
+            Names(_db.GetCollection<BsonDocument>(_settings.StatusesCollection)),
+            ById(_db.GetCollection<BsonDocument>(_settings.UsersCollection)),
+            ById(_db.GetCollection<BsonDocument>(_settings.ProvidersCollection)),
+            ById(_db.GetCollection<BsonDocument>(_settings.LocationsCollection)),
+            ById(_db.GetCollection<BsonDocument>(_settings.AppointmentTypesCollection)));
 
         static Dictionary<string, BsonDocument> ById(IMongoCollection<BsonDocument> c)
         {
@@ -109,12 +151,22 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             return dict;
         }
 
-        return new Lookups(
-            Names(_db.GetCollection<BsonDocument>(_settings.StatusesCollection)),
-            ById(_db.GetCollection<BsonDocument>(_settings.UsersCollection)),
-            ById(_db.GetCollection<BsonDocument>(_settings.ProvidersCollection)),
-            ById(_db.GetCollection<BsonDocument>(_settings.LocationsCollection)),
-            ById(_db.GetCollection<BsonDocument>(_settings.AppointmentTypesCollection)));
+        static Dictionary<string, string> Names(IMongoCollection<BsonDocument> c)
+        {
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var item in c.Find(FilterDefinition<BsonDocument>.Empty).ToList())
+            {
+                var id = ReadId(item, "_id");
+                if (id is null)
+                {
+                    continue;
+                }
+
+                dict[id] = ReadString(item, "Name") ?? string.Empty;
+            }
+
+            return dict;
+        }
     }
 
     private static Appointment Map(BsonDocument d, Lookups l)
@@ -134,25 +186,30 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         }
         else if (l.AppointmentTypes.Count == 1)
         {
-            foreach (var kv in l.AppointmentTypes) { typeDoc = kv.Value; break; }
+            foreach (var kv in l.AppointmentTypes)
+            {
+                typeDoc = kv.Value;
+                break;
+            }
         }
 
-        string? customServiceName = typeDoc is null ? null : ReadString(typeDoc, "CustomServiceName");
-        string? categoryName = CategoryFromType(typeDoc);
-        string title = !string.IsNullOrWhiteSpace(customServiceName)
-            ? customServiceName!
+        var customServiceName = typeDoc is null ? null : ReadString(typeDoc, "CustomServiceName");
+        var categoryName = CategoryFromType(typeDoc);
+        var title = !string.IsNullOrWhiteSpace(customServiceName)
+            ? customServiceName
             : !string.IsNullOrWhiteSpace(categoryName)
                 ? $"{categoryName} appointment"
                 : ReadString(d, "Title") ?? "Appointment";
 
-        string statusName = statusId is not null && l.Statuses.TryGetValue(statusId, out var s) ? s : "Scheduled";
+        var statusName = statusId is not null && l.Statuses.TryGetValue(statusId, out var s) ? s : "Booked";
 
         // Provider: direct FKs first, then via AppointmentType, then single fallback.
-        string? providerId = ReadId(d, "ServiceProviderId", "ProviderId");
+        var providerId = ReadId(d, "ServiceProviderId", "ProviderId");
         if (providerId is null && typeDoc is not null)
         {
             providerId = ReadId(typeDoc, "ProviderId", "ServiceProviderId");
         }
+
         BsonDocument? providerDoc = null;
         if (providerId is not null && l.Providers.TryGetValue(providerId, out var pdirect))
         {
@@ -160,12 +217,26 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         }
         else if (providerId is null && l.Providers.Count == 1)
         {
-            foreach (var kv in l.Providers) { providerId = kv.Key; providerDoc = kv.Value; break; }
+            foreach (var kv in l.Providers)
+            {
+                providerId = kv.Key;
+                providerDoc = kv.Value;
+                break;
+            }
         }
 
-        string? providerName = providerDoc is not null
-            ? ProviderDisplayName(providerDoc, l.Users, providerId ?? string.Empty)
-            : null;
+        string? providerName = null;
+        if (providerDoc is not null)
+        {
+            providerName = ProviderDisplayName(providerDoc, l.Users, providerId ?? string.Empty);
+        }
+        else if (providerId is not null && l.Users.TryGetValue(providerId, out var userDoc))
+        {
+            var full = $"{ReadString(userDoc, "FirstName")} {ReadString(userDoc, "LastName")}".Trim();
+            providerName = string.IsNullOrWhiteSpace(full)
+                ? ReadString(userDoc, "Username", "Email")
+                : full;
+        }
 
         // Location: direct LocationId first, then via AppointmentType.
         string? location = null;
@@ -174,13 +245,18 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         {
             locationId = ReadId(typeDoc, "LocationId");
         }
+
         if (locationId is not null && l.Locations.TryGetValue(locationId, out var locationDoc))
         {
             location = FormatLocation(locationDoc);
         }
         else if (locationId is null && l.Locations.Count == 1)
         {
-            foreach (var kv in l.Locations) { location = FormatLocation(kv.Value); break; }
+            foreach (var kv in l.Locations)
+            {
+                location = FormatLocation(kv.Value);
+                break;
+            }
         }
 
         return new Appointment
@@ -192,10 +268,11 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             EndDateTime = ReadDate(d, "EndTime", "EndDateTime", "End"),
             ProviderId = providerId ?? string.Empty,
             ProviderName = string.IsNullOrWhiteSpace(providerName) ? null : providerName,
-            UserId = clientId,
+            UserId = string.IsNullOrEmpty(clientId) ? null : clientId,
             Location = string.IsNullOrWhiteSpace(location) ? null : location,
             Notes = ReadString(d, "Notes"),
             Status = NormalizeStatus(statusName),
+            AppointmentTypeId = appointmentTypeId,
         };
     }
 
@@ -211,12 +288,6 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             return null;
         }
 
-        bool Flag(string key)
-        {
-            var element = FindElement(typeDoc, key);
-            return element.HasValue && ToBool(element.Value.Value);
-        }
-
         if (Flag("IsBeauty"))
         {
             return "Beauty";
@@ -227,12 +298,13 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             return "Fitness";
         }
 
-        if (Flag("IsMedical"))
-        {
-            return "Medical";
-        }
+        return Flag("IsMedical") ? "Medical" : ReadString(typeDoc, "Category", "ServiceCategory", "ServiceTypeName", "Name");
 
-        return ReadString(typeDoc, "Category", "ServiceCategory", "ServiceTypeName", "Name");
+        bool Flag(string key)
+        {
+            var element = FindElement(typeDoc, key);
+            return element.HasValue && ToBool(element.Value.Value);
+        }
     }
 
     /// <summary>
@@ -294,14 +366,12 @@ public sealed class MongoAppointmentStore : IAppointmentStore
     /// </summary>
     private static string? FormatLocation(BsonDocument locationDoc)
     {
-        string? Line(params string?[] parts) =>
-            string.Join(", ", parts.Where(p => !string.IsNullOrWhiteSpace(p)));
-
+        var displayName = ReadString(locationDoc, "DisplayName");
+        if (!string.IsNullOrWhiteSpace(displayName)) return displayName;
         var street = Line(
             ReadString(locationDoc, "Street", "StreetAddress", "AddressLine1", "Address"),
             ReadString(locationDoc, "StreetLine2", "AddressLine2"));
-        var region = string.Join(" ", new[]
-        {
+        var region = string.Join(" ", new[] {
             ReadString(locationDoc, "State", "StateProvince", "Province", "Region"),
             ReadString(locationDoc, "ZIP", "Zip", "ZipCode", "PostalCode"),
         }.Where(p => !string.IsNullOrWhiteSpace(p)));
@@ -310,12 +380,10 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             string.IsNullOrWhiteSpace(street) ? null : street,
             ReadString(locationDoc, "City"),
             string.IsNullOrWhiteSpace(region) ? null : region);
-        if (!string.IsNullOrWhiteSpace(composed))
-        {
-            return composed;
-        }
+        return !string.IsNullOrWhiteSpace(composed) ? composed : ReadString(locationDoc, "Name", "Label", "Building");
 
-        return ReadString(locationDoc, "Name", "Label", "Building");
+        string Line(params string?[] parts) =>
+            string.Join(", ", parts.Where(p => !string.IsNullOrWhiteSpace(p)));
     }
 
     private static AppointmentCategory NormalizeCategory(string? serviceTypeName) =>
@@ -326,15 +394,14 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             _ => AppointmentCategory.Medical,
         };
 
-    private static AppointmentStatus NormalizeStatus(string? statusName) =>
-        statusName?.Trim() switch
+    private static AppointmentStatus NormalizeStatus(string? name) =>
+        name?.Trim().ToLowerInvariant() switch
         {
-            { } s when s.Equals("Completed", StringComparison.OrdinalIgnoreCase) => AppointmentStatus.Completed,
-            { } s when s.Equals("Canceled", StringComparison.OrdinalIgnoreCase)
-                || s.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)
-                || s.Equals("NoShow", StringComparison.OrdinalIgnoreCase)
-                || s.Equals("No-Show", StringComparison.OrdinalIgnoreCase) => AppointmentStatus.Cancelled,
-            _ => AppointmentStatus.Scheduled,
+            "available" => AppointmentStatus.Available,
+            "completed" => AppointmentStatus.Completed,
+            "canceled" or "cancelled" => AppointmentStatus.Canceled,
+            "missed" or "noshow" or "no-show" => AppointmentStatus.Missed,
+            _ => AppointmentStatus.Booked
         };
 
     private static bool IsDeleted(BsonDocument doc)
@@ -345,16 +412,10 @@ public sealed class MongoAppointmentStore : IAppointmentStore
 
     private static BsonDocument? FindById(IMongoCollection<BsonDocument> collection, string id)
     {
-        if (ObjectId.TryParse(id, out var oid))
-        {
-            var byOid = collection.Find(Builders<BsonDocument>.Filter.Eq("_id", oid)).FirstOrDefault();
-            if (byOid is not null)
-            {
-                return byOid;
-            }
-        }
-
-        return collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).FirstOrDefault();
+        if (!ObjectId.TryParse(id, out var oid))
+            return collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).FirstOrDefault();
+        var byOid = collection.Find(Builders<BsonDocument>.Filter.Eq("_id", oid)).FirstOrDefault();
+        return byOid ?? collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).FirstOrDefault();
     }
 
     private static BsonElement? FindElement(BsonDocument doc, string key)
@@ -460,7 +521,7 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         BsonInt32 i => i.Value != 0,
         BsonInt64 l => l.Value != 0,
         BsonString s => s.Value.Trim().Equals("true", StringComparison.OrdinalIgnoreCase)
-            || s.Value.Trim() == "1",
+                        || s.Value.Trim() == "1",
         _ => false,
     };
 }
