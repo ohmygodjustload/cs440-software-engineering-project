@@ -1,11 +1,11 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {Injectable, inject} from '@angular/core';
+import {Observable, throwError} from 'rxjs';
 
-import { AuthService } from './auth.service';
+import {AuthService} from './auth.service';
 
-import { AppointmentCategory } from '../models/appointment';
-import { CreateSlotDto, Slot, UpdateSlotDto } from '../models/slot';
+import {AppointmentCategory} from '../models/appointment';
+import {AvailableSlotFilters, CreateSlotDto, Slot, UpdateSlotDto} from '../models/slot';
 
 const SLOTS_ENDPOINT = '/api/slots';
 
@@ -26,14 +26,14 @@ export interface CreateSlotDraft {
   notes: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class SlotsService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
 
   private get headers(): Record<string, string> {
     const token = this.auth.getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    return token ? {Authorization: `Bearer ${token}`} : {};
   }
 
   providers(): Observable<BookingProvider[]> {
@@ -41,19 +41,28 @@ export class SlotsService {
   }
 
   create(dto: CreateSlotDto): Observable<Slot> {
-    return this.http.post<Slot>(SLOTS_ENDPOINT, dto, { headers: this.headers });
+    return this.http.post<Slot>(SLOTS_ENDPOINT, dto, {headers: this.headers});
   }
 
   getMine(): Observable<Slot[]> {
-    return this.http.get<Slot[]>(`${SLOTS_ENDPOINT}/mine`, { headers: this.headers });
+    return this.http.get<Slot[]>(`${SLOTS_ENDPOINT}/mine`, {headers: this.headers});
+  }
+
+  /** Open slots any visitor can book. No auth header, because the endpoint is anonymous. */
+  getAvailable(filters: AvailableSlotFilters = {}): Observable<Slot[]> {
+    let params = new HttpParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if (value) params = params.set(key, value);
+    }
+    return this.http.get<Slot[]>(SLOTS_ENDPOINT, {params});
   }
 
   update(id: string, dto: UpdateSlotDto): Observable<Slot> {
-    return this.http.put<Slot>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, dto, { headers: this.headers });
+    return this.http.put<Slot>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, dto, {headers: this.headers});
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, { headers: this.headers });
+    return this.http.delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, {headers: this.headers});
   }
 
   // The server derives provider ownership and a 60-minute end time from the authenticated account.
@@ -67,8 +76,9 @@ export class SlotsService {
       startDateTime: draft.startDateTime,
       location: draft.location,
       notes: draft.notes
-    }, { headers: this.headers });
+    }, {headers: this.headers});
   }
+
   publishBatch(drafts: CreateSlotDraft[]): Observable<Slot[]> {
     if (!this.auth.getToken()) {
       return throwError(() => new Error('Please sign in before publishing slots.'));
@@ -81,7 +91,7 @@ export class SlotsService {
         location: draft.location,
         notes: draft.notes
       }))
-    }, { headers: this.headers });
+    }, {headers: this.headers});
   }
 
 }
