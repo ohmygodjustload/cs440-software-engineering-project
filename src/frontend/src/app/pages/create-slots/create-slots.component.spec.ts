@@ -1,207 +1,96 @@
-import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule, NgForm } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { CreateSlotsComponent } from './create-slots.component';
 
-import { AppointmentCategory } from '../../core/models/appointment';
-import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
+describe('CreateSlotsComponent', () => {
+  let auth: jasmine.SpyObj<AuthService>;
 
-interface AppointmentForm {
-  title: string;
-  category: AppointmentCategory;
-  start: string;
-  end: string;
-  providerId: string;
-  location: string;
-  notes: string;
-}
-
-@Component({
-  selector: 'app-create-slots',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './create-slots.component.html',
-  styleUrl: './create-slots.component.css'
-})
-export class CreateSlotsComponent implements OnInit {
-  private readonly service = inject(SlotsService);
-  private readonly auth = inject(AuthService);
-  private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-
-  get categories(): readonly AppointmentCategory[] {
-    const user = this.auth.getCurrentUser();
-    if (!user?.isServiceProvider || user.isActive === false) return [];
-
-    const allowed: AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
-    return allowed.filter(category => user.serviceTypes?.some(value =>
-      value.trim().toLowerCase() === category.toLowerCase()));
-  }
-
-  get today(): string {
-    return this.localInput(new Date().toISOString()).split('T')[0];
-  }
-
-  providerChanged(): void {
-    this.draft.category = this.categories[0] ?? 'Medical';
-    this.categoryChanged();
-  }
-
-  isPastTime(time: string): boolean {
-    return new Date(`${this.selectedDate}T${time}`).getTime() <= Date.now();
-  }
-  readonly startTimes = [
-    '09:00', '09:30', '10:00', '10:30', '11:00',
-    '11:30', '13:00', '13:30', '14:00'
-  ];
-
-  draft = this.emptyDraft();
-  saving = false;
-  formError = '';
-  success = '';
-
-  categoryChanged(): void {
-    // Providers write their own titles; keep their text when changing category.
-    this.success = '';
-    this.formError = '';
-  }
-
-  get selectedDate(): string {
-    return this.draft.start.split('T')[0] || this.localInput(new Date().toISOString()).split('T')[0];
-  }
-
-  get selectedTime(): string {
-    return this.draft.start.split('T')[1]?.slice(0, 5) || '';
-  }
-
-  get dateOptions(): { key: string; date: Date }[] {
-    const selected = new Date(`${this.selectedDate}T12:00`);
-    const monday = new Date(selected);
-    monday.setDate(selected.getDate() - ((selected.getDay() + 6) % 7));
-    const count = 7;
-    return Array.from({ length: count }, (_, index) => {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + index);
-      return { key: this.localInput(date.toISOString()).split('T')[0], date };
+  function create() {
+    TestBed.configureTestingModule({
+      imports: [CreateSlotsComponent],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: auth },
+        { provide: ActivatedRoute, useValue: { snapshot: { data: { providerId: 'p1' } } } }
+      ]
     });
+    const fixture = TestBed.createComponent(CreateSlotsComponent);
+    fixture.detectChanges();
+    return fixture;
   }
 
-  get dateLabel(): string {
-    return new Date(`${this.selectedDate}T12:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  function futureDate(): string {
+    // One week out so 'isPastTime' never trips, no matter when the test runs.
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
-  get durationMinutes(): number {
-    return 60;
-  }
+  beforeEach(() => {
+    auth = jasmine.createSpyObj<AuthService>('AuthService', ['getCurrentUser', 'getErrorMessage']);
+    auth.getCurrentUser.and.returnValue({
+      id: 'u1',
+      firstName: 'John',
+      lastName: 'Smith',
+      username: 'JohnSmith123',
+      isClient: false,
+      isServiceProvider: true,
+      isAdmin: false,
+      isActive: true,
+      serviceTypes: ['Medical']
+    });
+  });
 
-  chooseDate(date: string): void {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < this.today) return;
-    this.setStart(date, this.selectedTime || '10:30');
-  }
+  it('exposes 18 start times from 9:00 AM through 5:30 PM, including noon', () => {
+    const component = create().componentInstance;
 
-  chooseTime(time: string): void {
-    if (!this.startTimes.includes(time) || this.isPastTime(time)) return;
-    this.setStart(this.selectedDate, time);
-  }
+    expect(component.startTimes.length).toBe(18);
+    expect(component.startTimes[0]).toBe('09:00');
+    expect(component.startTimes[component.startTimes.length - 1]).toBe('17:30');
+    expect(component.startTimes).toContain('12:00');
+    expect(component.startTimes).toContain('12:30');
+  });
 
-  timeLabel(time: string): string {
-    const [hour, minute] = time.split(':').map(Number);
-    return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`;
-  }
+  it('selects 3:30 PM on a future date and sets the end 60 minutes later', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
 
-  private setStart(date: string, time: string): void {
-    const duration = this.durationMinutes;
-    this.draft.start = `${date}T${time}`;
-    this.draft.end = this.localInput(new Date(Date.parse(this.draft.start) + duration * 60000).toISOString());
-  }
+    component.chooseDate(date);
+    component.chooseTime('15:30');
 
-  ngOnInit(): void {
-    // User ID and scheduler provider ID are different; do not substitute one for the other.
-    this.draft.providerId = this.route.snapshot.data['providerId'] ?? '';
-    this.providerChanged();
-  }
+    expect(component.draft.start).toBe(`${date}T15:30`);
+    const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
+    expect(minutes).toBe(60);
+  });
 
-  save(form: NgForm): void {
-    if (this.saving) return;
-    this.formError = '';
-    this.success = '';
-    if (this.draft.start && Number.isFinite(Date.parse(this.draft.start))) {
-      this.draft.end = this.localInput(
-        new Date(Date.parse(this.draft.start) + 60 * 60000).toISOString()
-      );
-    }
-    const start = new Date(this.draft.start);
-    const end = new Date(this.draft.end);
+  it('selects 5:30 PM on a future date and sets the end 60 minutes later', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
 
-    if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim()) {
-      form.control.markAllAsTouched();
-      this.formError = 'Enter a category, service title, future date, start time, and location.';
-      return;
-    }
+    component.chooseDate(date);
+    component.chooseTime('17:30');
 
-    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start) {
-      this.formError = 'The end date and time must be after the start.';
-      return;
-    }
+    expect(component.draft.start).toBe(`${date}T17:30`);
+    const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
+    expect(minutes).toBe(60);
+  });
 
-    if (start.getTime() <= Date.now()) {
-      this.formError = 'Choose a future appointment time.';
-      return;
-    }
+  it('renders 18 start-time buttons with 5:30 PM last and 12:00 PM present', () => {
+    const fixture = create();
+    const buttons: HTMLButtonElement[] = Array.from(
+      fixture.nativeElement.querySelectorAll('.time-options button')
+    );
+    const labels = buttons.map((button) => button.textContent?.trim());
 
-    if (!this.categories.includes(this.draft.category)) {
-      this.formError = 'Choose a category supported by this provider.';
-      return;
-    }
-
-    if (!this.draft.providerId) {
-      this.formError = 'Your form is ready, but publishing needs your account to be linked to a provider record. Nothing was saved.';
-      return;
-    }
-
-    const body: CreateSlotDraft = {
-      title: this.draft.title.trim(),
-      category: this.draft.category,
-      startDateTime: start.toISOString(),
-      endDateTime: end.toISOString(),
-      providerId: this.draft.providerId.trim(),
-      location: this.draft.location.trim(),
-      notes: this.draft.notes.trim()
-    };
-
-    this.saving = true;
-    this.service.publish(body)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.saving = false)
-      )
-      .subscribe({
-        error: () => {
-          this.formError = 'Publishing is unavailable: the backend has no slot endpoint yet. Your entries have been kept; nothing was saved.';
-        }
-      });
-  }
-
-  private emptyDraft(): AppointmentForm {
-    return {
-      title: '',
-      category: 'Medical',
-      start: '',
-      end: '',
-      providerId: '',
-      location: '',
-      notes: ''
-    };
-  }
-
-  private localInput(value: string): string {
-    const date = new Date(value);
-    const pad = (part: number) => String(part).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-  }
-
-}
+    expect(buttons.length).toBe(18);
+    expect(labels[labels.length - 1]).toBe('5:30 PM');
+    expect(labels).toContain('12:00 PM');
+  });
+});
