@@ -164,7 +164,7 @@ export class NotificationsComponent implements OnInit {
     this.notificationsService
       .updatePreferences(this.currentUser.id, { [key]: next } as Partial<NotificationPreferences>)
       .subscribe({
-        next: (confirmed) => {
+        next: (confirmed: NotificationPreferences) => {
           this.preferences = { ...confirmed };
           this.savingKey = null;
         },
@@ -238,7 +238,7 @@ export class NotificationsComponent implements OnInit {
     this.saveError = null;
 
     this.notificationsService.getPreferences(userId).subscribe({
-      next: (prefs) => {
+      next: (prefs: NotificationPreferences) => {
         this.preferences = { ...prefs };
         this.prefsState = 'loaded';
       },
@@ -259,7 +259,7 @@ export class NotificationsComponent implements OnInit {
     this.markAllReadDone = false;
 
     this.notificationsService.getNotifications(userId).subscribe({
-      next: (items) => {
+      next: (items: AppNotification[]) => {
         this.history = [...items].sort(
           (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );

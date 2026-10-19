@@ -55,6 +55,7 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString))
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.MongoUserStore>();
     builder.Services.AddSingleton<IAppointmentTypeStore, MongoAppointmentTypeStore>();
     builder.Services.AddSingleton<ILocationStore, MongoLocationStore>();
+    builder.Services.AddSingleton<INotificationPreferencesStore, NotificationPreferencesStore>();
 }
 else
 {
@@ -66,6 +67,7 @@ else
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.InMemoryUserStore>();
     builder.Services.AddSingleton<IAppointmentTypeStore, InMemoryAppointmentTypeStore>();
     builder.Services.AddSingleton<ILocationStore, InMemoryLocationStore>();
+    builder.Services.AddSingleton<INotificationPreferencesStore, InMemoryNotificationPreferencesStore>();
 }
 
 // The Angular dev server (http://localhost:4200) is a different origin than the API, so browser

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { User } from '../../core/models/user';
-import { UserSettingsService } from '../../core/services/user-settings.service';
+import { UserSettingsPatch, UserSettingsService } from '../../core/services/user-settings.service';
 import { SettingsComponent } from './settings.component';
 
 const demoUser: User = {
@@ -73,7 +73,7 @@ describe('SettingsComponent', () => {
     expect(fixture.nativeElement.querySelector('#settings-phone-error')).not.toBeNull();
   });
 
-  it('should accept international names and phone formats', () => {
+  it('should accept international names, numbered names, and phone formats', () => {
     const fixture = configure({ getCurrentUser: () => of(demoUser) });
     const component = fixture.componentInstance;
 
@@ -81,12 +81,42 @@ describe('SettingsComponent', () => {
     component.form.controls.phone.setValue('+44 20 7946 0958');
     expect(component.form.controls.fullName.valid).toBe(true);
     expect(component.form.controls.phone.valid).toBe(true);
+
+    component.form.controls.fullName.setValue('User 123');
+    expect(component.form.controls.fullName.valid).toBe(true);
   });
 
-  it('should preserve edits and report the missing endpoint on save', () => {
+  it('should save to the loaded account id with a clean first/last split', () => {
+    let savedId = '';
+    let savedPatch: UserSettingsPatch | null = null;
     const fixture = configure({
       getCurrentUser: () => of(demoUser),
-      saveSettings: () => throwError(() => new Error('Saving is unavailable: no endpoint.'))
+      saveSettings: (id: string, patch: UserSettingsPatch) => {
+        savedId = id;
+        savedPatch = patch;
+        return of({ ...demoUser, firstName: 'Jane', lastName: 'Updated' });
+      }
+    });
+    const component = fixture.componentInstance;
+
+    component.form.controls.fullName.setValue('Jane Updated');
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('.settings-save') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(savedId).toBe('user-1');
+    expect(savedPatch).toEqual(
+      jasmine.objectContaining({ firstName: 'Jane', lastName: 'Updated' })
+    );
+    expect(component.saving).toBe(false);
+    expect(component.saveSuccess).toBe(true);
+    expect(component.saveError).toBeNull();
+  });
+
+  it('should preserve edits and report save failures', () => {
+    const fixture = configure({
+      getCurrentUser: () => of(demoUser),
+      saveSettings: (id: string, patch: UserSettingsPatch) => throwError(() => new Error('Saving is unavailable: no endpoint.'))
     });
     const component = fixture.componentInstance;
 
@@ -120,7 +150,7 @@ describe('SettingsComponent', () => {
     fixture.detectChanges();
     expect(root.querySelector('#settings-panel-login')).not.toBeNull();
     expect(root.textContent).toContain('JanePorter123');
-    expect(root.textContent).toContain('Password changes unavailable');
+    expect(root.textContent).toContain('No password or verification changes are available');
     expect(root.querySelector('input[type="password"]')).toBeNull();
 
     // Preferences panel holds the calendar + notification controls.

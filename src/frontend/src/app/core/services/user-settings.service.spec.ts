@@ -1,9 +1,10 @@
 /**
  * user-settings.service.spec.ts — unit tests for UserSettingsService.
  *
- * Purpose: locks in the honest read-only boundary — current-user loads from
- * GET /api/users, and saveSettings() fails descriptively until the backend
- * adds PUT /api/users/{id}. None of this needs a running backend.
+ * Purpose: locks in the current-user boundary — signed-in users load their
+ * own record via GET /api/users/{id} (so "hii" edits only "hii"), logged-out
+ * demo mode falls back to users[0], and saveSettings() persists via
+ * PUT /api/users/{id}. None of this needs a running backend.
  */
 
 import { provideHttpClient } from '@angular/common/http';
@@ -11,6 +12,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 
 import { User } from '../models/user';
+import { AuthService } from './auth.service';
 import { UserSettingsService } from './user-settings.service';
 
 describe('UserSettingsService', () => {
@@ -28,12 +30,32 @@ describe('UserSettingsService', () => {
     }
   ];
 
+  const hiiUser: User = {
+    id: 'hii-id',
+    firstName: 'hi',
+    lastName: 'bye',
+    username: 'hii',
+    email: 'email@gmail',
+    phone: '123456789',
+    isClient: false,
+    isServiceProvider: true,
+    isAdmin: false
+  };
+
   let service: UserSettingsService;
   let httpTesting: HttpTestingController;
+  let authService: { getCurrentUser: jasmine.Spy };
 
   beforeEach(() => {
+    authService = jasmine.createSpyObj('AuthService', ['getCurrentUser']);
+    authService.getCurrentUser.and.returnValue(null);
+
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()]
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: authService }
+      ]
     });
 
     service = TestBed.inject(UserSettingsService);
@@ -46,7 +68,19 @@ describe('UserSettingsService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should load the current user from GET /api/users', () => {
+  it('should load the signed-in user by id so edits target their own account', () => {
+    authService.getCurrentUser.and.returnValue(hiiUser);
+    let actual: User | undefined;
+    service.getCurrentUser().subscribe((user) => (actual = user));
+
+    const request = httpTesting.expectOne('/api/users/hii-id');
+    expect(request.request.method).toBe('GET');
+    request.flush(hiiUser);
+
+    expect(actual).toEqual(hiiUser);
+  });
+
+  it('should fall back to the first directory entry when logged out', () => {
     let actual: User | undefined;
     service.getCurrentUser().subscribe((user) => (actual = user));
 
@@ -66,11 +100,21 @@ describe('UserSettingsService', () => {
     expect(failed).toBeTrue();
   });
 
-  it('should fail saveSettings honestly until PUT /api/users/{id} exists', () => {
-    let message = '';
-    service.saveSettings().subscribe({ error: (err: Error) => (message = err.message) });
+  it('should persist settings via PUT /api/users/{id}', () => {
+    let actual: User | undefined;
+    service
+      .saveSettings('hii-id', { firstName: 'hi', lastName: 'bye', email: 'new@example.com' })
+      .subscribe((user) => (actual = user));
 
-    httpTesting.expectNone('/api/users/user-1');
-    expect(message).toContain('PUT /api/users/{id}');
+    const request = httpTesting.expectOne('/api/users/hii-id');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({
+      firstName: 'hi',
+      lastName: 'bye',
+      email: 'new@example.com'
+    });
+    request.flush({ ...hiiUser, email: 'new@example.com' });
+
+    expect(actual?.email).toBe('new@example.com');
   });
 });
