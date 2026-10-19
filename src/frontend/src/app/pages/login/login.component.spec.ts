@@ -4,21 +4,43 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationsService } from '../../core/services/notifications.service';
+import { ToastService } from '../../core/services/toast.service';
+import { UserSettingsService } from '../../core/services/user-settings.service';
 import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
   let authService: jasmine.SpyObj<AuthService>;
+  let toastService: jasmine.SpyObj<ToastService>;
+  let settingsService: { getCurrentUser: jasmine.Spy };
+  let notificationsService: { getPreferences: jasmine.Spy; getNotifications: jasmine.Spy };
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['getErrorMessage', 'login']);
     authService.login.and.returnValue(of({ token: 'token', expiresAt: '2099-01-01T00:00:00Z', user: {} as never }));
+    toastService = jasmine.createSpyObj<ToastService>('ToastService', [
+      'show',
+      'showLoggedIn',
+      'showMissed'
+    ]);
+    settingsService = { getCurrentUser: jasmine.createSpy('getCurrentUser') };
+    settingsService.getCurrentUser.and.returnValue(throwError(() => new Error('no user')));
+    notificationsService = {
+      getPreferences: jasmine.createSpy('getPreferences'),
+      getNotifications: jasmine.createSpy('getNotifications')
+    };
+    notificationsService.getPreferences.and.returnValue(of({ inBrowserEnabled: false }));
+    notificationsService.getNotifications.and.returnValue(of([]));
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent],
       providers: [
         provideRouter([]),
-        { provide: AuthService, useValue: authService }
+        { provide: AuthService, useValue: authService },
+        { provide: ToastService, useValue: toastService },
+        { provide: UserSettingsService, useValue: settingsService },
+        { provide: NotificationsService, useValue: notificationsService }
       ]
     }).compileComponents();
 
@@ -62,7 +84,10 @@ describe('LoginComponent', () => {
                 snapshot: { queryParamMap: convertToParamMap({ reason: 'registered' }) }
               }
             },
-            { provide: AuthService, useValue: authService }
+            { provide: AuthService, useValue: authService },
+            { provide: ToastService, useValue: toastService },
+            { provide: UserSettingsService, useValue: settingsService },
+            { provide: NotificationsService, useValue: notificationsService }
           ]
         })
         .compileComponents();
@@ -101,6 +126,15 @@ describe('LoginComponent', () => {
       { username: 'JanePorter123', password: 'password123' },
       true
     );
+  });
+
+  it('should greet with a login popup on successful sign-in', () => {
+    const component = fixture.componentInstance;
+    component.form.patchValue({ username: 'JanePorter123', password: 'password123' });
+
+    component.onSubmit();
+
+    expect(toastService.showLoggedIn).toHaveBeenCalled();
   });
 
   it('should offer a re-submit link when the provider request was rejected', () => {

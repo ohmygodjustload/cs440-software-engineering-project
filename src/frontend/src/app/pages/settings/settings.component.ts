@@ -18,6 +18,7 @@ import {
   TIME_ZONES
 } from '../../core/models/user-settings';
 import { UserSettingsPatch } from '../../core/services/user-settings.service';
+import { ToastService } from '../../core/services/toast.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
 
 /** Full-name alphabet: Unicode letters/marks, digits, plus everyday punctuation. */
@@ -52,6 +53,7 @@ export function phoneValidator(): ValidatorFn {
 export class SettingsComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly settingsService = inject(UserSettingsService);
+  private readonly toastService = inject(ToastService);
 
   readonly tabs = SETTINGS_TABS;
   readonly timeZones = TIME_ZONES;
@@ -198,6 +200,7 @@ export class SettingsComponent implements OnInit {
         this.savedBaseline = { ...this.form.getRawValue() };
         this.saveSuccess = true;
         this.form.markAsPristine();
+        this.toastService.showNotificationSettingChanged('Your settings were saved.');
       },
       error: (error: unknown) => {
         this.saving = false;

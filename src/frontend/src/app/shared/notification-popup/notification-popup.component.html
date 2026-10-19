@@ -1,0 +1,28 @@
+<!-- Global top-right notification popups. Empty by default; stacks newest at the bottom. -->
+<div class="toast-stack" role="region" aria-label="Notifications" aria-live="polite">
+  @for (toast of (toastService.toasts$ | async) ?? []; track toast.id) {
+    <div
+      class="toast"
+      [class.toast--success]="toast.variant === 'success'"
+      [class.toast--info]="toast.variant === 'info'"
+      [class.toast--reminder]="toast.variant === 'reminder'"
+      [class.toast--leaving]="toast.leaving"
+      role="status"
+    >
+      <div class="toast__body">
+        <p class="toast__title">{{ toast.title }}</p>
+        @if (toast.message) {
+          <p class="toast__message">{{ toast.message }}</p>
+        }
+      </div>
+      <button
+        type="button"
+        class="toast__close"
+        [attr.aria-label]="'Dismiss: ' + toast.title"
+        (click)="dismiss(toast.id)"
+      >&#10005;</button>
+      <!-- Timer line: drains linearly over the toast lifetime, then the service dismisses. -->
+      <span class="toast__timer" aria-hidden="true" [style.animation-duration.ms]="toast.durationMs"></span>
+    </div>
+  }
+</div>

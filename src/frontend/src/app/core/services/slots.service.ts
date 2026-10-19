@@ -1,8 +1,9 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable, inject} from '@angular/core';
-import {Observable, throwError} from 'rxjs';
+import {Observable, tap, throwError} from 'rxjs';
 
 import {AuthService} from './auth.service';
+import {ToastService} from './toast.service';
 
 import {AppointmentCategory} from '../models/appointment';
 import {AvailableSlotFilters, BookedAppointment, BookSlotDto, CreateSlotDto, Slot, UpdateSlotDto} from '../models/slot';
@@ -31,6 +32,7 @@ export interface CreateSlotDraft {
 export class SlotsService {
   private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
+  private readonly toast = inject(ToastService);
 
   providers(): Observable<BookingProvider[]> {
     return this.http.get<BookingProvider[]>('/api/providers');
@@ -54,17 +56,23 @@ export class SlotsService {
   }
 
   update(id: string, dto: UpdateSlotDto): Observable<Slot> {
-    return this.http.put<Slot>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, dto);
+    return this.http.put<Slot>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, dto).pipe(
+      tap((slot) => this.toast.showAppointmentModified(slot.title, slot.startDateTime))
+    );
   }
 
   delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`);
+    return this.http.delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`).pipe(
+      tap(() => this.toast.showAppointmentDeleted())
+    );
   }
 
   /** Books an open slot for the signed-in client. The API takes the client from the JWT, never the body. */
   book(id: string, notes?: string): Observable<BookedAppointment> {
     const body: BookSlotDto = notes?.trim() ? {notes: notes.trim()} : {};
-    return this.http.post<BookedAppointment>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}/book`, body);
+    return this.http.post<BookedAppointment>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}/book`, body).pipe(
+      tap((booked) => this.toast.showAppointmentBooked(booked.title, booked.startDateTime))
+    );
   }
 
   /** The signed-in client's Booked appointments, soonest first. */
@@ -83,7 +91,9 @@ export class SlotsService {
       startDateTime: draft.startDateTime,
       location: draft.location,
       notes: draft.notes
-    });
+    }).pipe(
+      tap((slot) => this.toast.showAppointmentBooked(slot.title, slot.startDateTime))
+    );
   }
 
   publishBatch(drafts: CreateSlotDraft[]): Observable<Slot[]> {
@@ -98,7 +108,17 @@ export class SlotsService {
         location: draft.location,
         notes: draft.notes
       }))
-    });
+    }).pipe(
+      tap((slots) => {
+        if (slots.length > 0) {
+          this.toast.show({
+            title: 'Slots published',
+            message: `${slots.length} available slot${slots.length === 1 ? '' : 's'} published.`,
+            variant: 'success'
+          });
+        }
+      })
+    );
   }
 
 }

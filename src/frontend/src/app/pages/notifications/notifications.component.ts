@@ -14,6 +14,7 @@ import {
 } from '../../core/models/notification';
 import { User } from '../../core/models/user';
 import { NotificationsService } from '../../core/services/notifications.service';
+import { ToastService } from '../../core/services/toast.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
 
 type SectionState = 'loading' | 'loaded' | 'error';
@@ -51,6 +52,7 @@ const REMINDER_ROWS: readonly ReminderRow[] = [
 export class NotificationsComponent implements OnInit {
   private readonly settingsService = inject(UserSettingsService);
   private readonly notificationsService = inject(NotificationsService);
+  private readonly toastService = inject(ToastService);
 
   readonly reminderRows = REMINDER_ROWS;
 
@@ -151,6 +153,18 @@ export class NotificationsComponent implements OnInit {
     return this.savingKey === key;
   }
 
+  /** Human-readable preference name for the settings-changed popup. */
+  private toggleLabel(key: PreferenceKey): string {
+    switch (key) {
+      case 'inBrowserEnabled':
+        return 'In-browser notifications';
+      case 'reminderDayBeforeEnabled':
+        return '1 day before reminder';
+      case 'reminderHourBeforeEnabled':
+        return '1 hour before reminder';
+    }
+  }
+
   onToggle(key: PreferenceKey, next: boolean): void {
     if (!this.currentUser || !this.preferences || this.savingKey) {
       return;
@@ -167,6 +181,9 @@ export class NotificationsComponent implements OnInit {
         next: (confirmed: NotificationPreferences) => {
           this.preferences = { ...confirmed };
           this.savingKey = null;
+          this.toastService.showNotificationSettingChanged(
+            `${this.toggleLabel(key)} ${next ? 'enabled' : 'disabled'}.`
+          );
         },
         error: (error: unknown) => {
           this.savingKey = null;

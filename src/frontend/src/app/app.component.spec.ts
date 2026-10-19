@@ -11,20 +11,24 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { AuthService } from './core/services/auth.service';
+import { ToastService } from './core/services/toast.service';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   let authService: jasmine.SpyObj<AuthService>;
+  let toastService: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['clearToken', 'getCurrentUser']);
     authService.getCurrentUser.and.returnValue(null);
+    toastService = jasmine.createSpyObj<ToastService>('ToastService', ['clear', 'showLoggedOut']);
 
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
         provideRouter([]),
-        { provide: AuthService, useValue: authService }
+        { provide: AuthService, useValue: authService },
+        { provide: ToastService, useValue: toastService }
       ]
     }).compileComponents();
   });
@@ -101,5 +105,23 @@ describe('AppComponent', () => {
     fixture.componentInstance.signOut();
 
     expect(authService.clearToken).toHaveBeenCalled();
+  });
+
+  it('should clear stale popups then show the logout popup when signing out', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const order: string[] = [];
+    toastService.clear.and.callFake(() => {
+      order.push('clear');
+    });
+    toastService.showLoggedOut.and.callFake(() => {
+      order.push('showLoggedOut');
+      return 'toast-1';
+    });
+
+    fixture.componentInstance.signOut();
+
+    expect(toastService.clear).toHaveBeenCalled();
+    expect(toastService.showLoggedOut).toHaveBeenCalled();
+    expect(order).toEqual(['clear', 'showLoggedOut']);
   });
 });

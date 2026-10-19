@@ -36,6 +36,8 @@ export class AppointmentsComponent implements OnInit {
   loading = false;
   error = '';
   selectedId = '';
+  cancellingId: string | null = null;
+  actionError = '';
 
   get months(): AppointmentMonth[] {
     const groups = new Map<string, AppointmentMonth>();
@@ -87,5 +89,31 @@ export class AppointmentsComponent implements OnInit {
 
   toggleDetails(id: string): void {
     this.selectedId = this.selectedId === id ? '' : id;
+  }
+
+  /** Cancels one appointment; the service pops the "Appointment cancelled" popup. */
+  cancel(id: string): void {
+    if (this.cancellingId) {
+      return;
+    }
+    const target = this.appointments.find((item) => item.id === id);
+    this.cancellingId = id;
+    this.actionError = '';
+
+    this.service.cancelAppointment(id, target?.title ?? 'Appointment')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.cancellingId = null;
+          if (this.selectedId === id) {
+            this.selectedId = '';
+          }
+          this.load();
+        },
+        error: () => {
+          this.cancellingId = null;
+          this.actionError = 'That appointment could not be cancelled. Please try again.';
+        }
+      });
   }
 }

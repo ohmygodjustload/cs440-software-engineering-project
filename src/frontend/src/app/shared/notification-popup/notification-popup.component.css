@@ -1,0 +1,164 @@
+/* notification-popup.component.css — global top-right notification popups.
+ *
+ * Purpose: stacks floating cards fixed to the top-right corner. Each card has
+ * a dismiss X in its own top-right corner and a timer line along the bottom
+ * that drains until auto-dismiss. Entry is a smooth slide-and-fade from the
+ * right; dismissal plays a matching slide-and-fade (see `.toast--leaving`,
+ * whose 350ms length must match LEAVE_MS in toast.service.ts).
+ */
+
+.toast-stack {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(360px, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.toast {
+  --toast-accent: #4c8a5c;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  overflow: hidden;
+  padding: 14px 44px 16px 16px;
+  border: 1px solid #e3ded2;
+  border-left: 4px solid var(--toast-accent);
+  border-radius: 12px;
+  background: #fff;
+  color: #344b48;
+  box-shadow: 0 12px 32px rgba(52, 75, 72, 0.18);
+  pointer-events: auto;
+  animation: toast-in 350ms cubic-bezier(0.22, 0.9, 0.3, 1.2) both;
+}
+
+.toast--success {
+  --toast-accent: #4c8a5c;
+}
+
+.toast--info {
+  --toast-accent: #1f6feb;
+}
+
+.toast--reminder {
+  --toast-accent: #b7791f;
+}
+
+.toast--leaving {
+  animation: toast-out 350ms ease-in forwards;
+}
+
+.toast__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.toast__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.toast__message {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #526460;
+  overflow-wrap: anywhere;
+}
+
+.toast__close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #526460;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.toast__close:hover {
+  background: #f0efea;
+  color: #344b48;
+}
+
+.toast__close:focus-visible {
+  outline: 2px solid #344b48;
+  outline-offset: 2px;
+}
+
+/* Timer line: drains left-to-right over the toast lifetime (duration bound inline). */
+.toast__timer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--toast-accent);
+  transform-origin: left center;
+  animation-name: toast-timer;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}
+
+@keyframes toast-timer {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-stack {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: calc(100vw - 1.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+
+  .toast--leaving {
+    animation: none;
+    opacity: 0;
+  }
+}
