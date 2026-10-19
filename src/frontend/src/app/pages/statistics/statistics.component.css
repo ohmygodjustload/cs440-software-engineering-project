@@ -1,7 +1,222 @@
-/*
-  statistics.component.css — styles for the Statistics page only.
+:host {
+  display: block;
+  background: #f7f5f1;
+  color: #344945;
+}
 
-  Purpose: reserved for rules used by this page alone. It is intentionally empty while the page is a
-  placeholder.
+.statistics-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 12px 24px 80px;
+}
 
-*/
+header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+}
+
+header p {
+  margin: 18px 0 24px;
+  font-size: 14px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+}
+
+button, select {
+  font: inherit;
+  color: inherit;
+  padding: 10px 14px;
+  background: transparent;
+  border: 1px solid #e0dcd1;
+  border-radius: 24px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+
+.metric {
+  box-sizing: border-box;
+  min-height: 100px;
+  padding: 20px 22px;
+  border-radius: 24px;
+}
+
+.completed {
+  background: #e0dcd1;
+}
+
+.cancelled {
+  background: #e4e3bc;
+}
+
+.rescheduled {
+  background: #d5e3e8;
+}
+
+h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.metric p {
+  margin: 8px 0 0;
+  font-size: 40px;
+  font-weight: 500;
+}
+
+.metric .unavailable {
+  font-size: 22px;
+}
+
+.metric span, .chart-note, .time-grid span {
+  font-size: 12px;
+}
+
+.chart-note {
+  margin: 24px 0 0;
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.chart {
+  padding: 22px 24px;
+  min-width: 0;
+  border-radius: 24px;
+}
+
+.category-row {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 34px;
+  font-size: 14px;
+}
+
+.bar-track, .category-bar {
+  height: 18px;
+  border-radius: 9px;
+}
+
+.medical, .ink {
+  background: #344945;
+}
+
+.beauty, .yellow {
+  background: #e4e3bc;
+}
+
+.fitness, .blue {
+  background: #d5e3e8;
+}
+
+.day-columns {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.day-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.day-track {
+  display: flex;
+  align-items: flex-end;
+  height: 150px;
+  width: 100%;
+  max-width: 34px;
+}
+
+.day-bar {
+  width: 100%;
+  border-radius: 24px;
+  background: #e0dcd1;
+}
+
+.day-bar.ink { background: #344945; }
+.day-bar.yellow { background: #e4e3bc; }
+.day-bar.blue { background: #d5e3e8; }
+
+.time-trends {
+  margin-top: 38px;
+  padding: 22px 24px;
+  border-radius: 24px;
+  background: #e4e3bc;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+h3, .time-grid p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.error {
+  background: #fbeceb;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+@media (max-width: 760px) {
+  header {
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+
+  .metrics, .charts, .time-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .charts {
+    gap: 16px;
+  }
+
+  .chart {
+    padding: 22px 0;
+  }
+}

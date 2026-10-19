@@ -6,4 +6,92 @@
 
 -->
 
-<h1>Statistics Here!</h1>
+<section class="statistics-page" aria-labelledby="statistics-title">
+  <header>
+    <div>
+      <h1 id="statistics-title">Scheduling statistics</h1>
+      <p>Understand appointment patterns by category, day, and time.</p>
+    </div>
+    <div class="controls">
+      <label for="range">Date range</label>
+      <select id="range" [(ngModel)]="rangeDays" [disabled]="loading">
+        <option [ngValue]="30">Last 30 days</option>
+        <option [ngValue]="90">Last 90 days</option>
+        <option [ngValue]="365">Last 365 days</option>
+      </select>
+      <button type="button" (click)="load()" [disabled]="loading">Refresh</button>
+    </div>
+  </header>
+
+  @if (loading) {
+    <p role="status">Loading statistics…</p>
+  } @else if (error) {
+    <div class="error" role="alert">
+      <p>{{ error }}</p>
+      <button type="button" (click)="load()">Try again</button>
+    </div>
+  } @else {
+    <section class="metrics" aria-label="Appointment totals">
+      <div class="metric completed"><h2>Completed</h2><p>{{ completed.length }}</p></div>
+      <div class="metric cancelled"><h2>Cancelled</h2><p>{{ cancelledCount }}</p></div>
+      <div class="metric rescheduled">
+        <h2>Rescheduled</h2>
+        <p class="unavailable">Unavailable</p>
+        <span>No rescheduling history is stored.</span>
+      </div>
+    </section>
+
+    <p class="chart-note">Charts show completed appointments, grouped by their start time in your local timezone.</p>
+    @if (completed.length === 0) {
+      <p role="status">No completed appointments in this date range.</p>
+    }
+
+    <div class="charts">
+      <section class="chart category-chart" aria-labelledby="category-title">
+        <h2 id="category-title">Appointments by category</h2>
+        @for (row of categories; track row.label) {
+          <div class="category-row">
+            <span>{{ row.label }}</span>
+            <div class="bar-track" aria-hidden="true">
+              <div class="category-bar" [class.medical]="row.label === 'Medical'"
+                [class.beauty]="row.label === 'Beauty'" [class.fitness]="row.label === 'Fitness'"
+                [style.width.%]="percentage(row.count, categories)"></div>
+            </div>
+            <span>{{ row.count }}</span>
+          </div>
+        }
+      </section>
+
+      <section class="chart day-chart" aria-labelledby="day-title">
+        <h2 id="day-title">Appointments by day</h2>
+        <div class="day-columns">
+          @for (row of weekdays; track row.label; let index = $index) {
+            <div class="day-column">
+              <span class="day-count">{{ row.count }}</span>
+              <div class="day-track" aria-hidden="true">
+                <div class="day-bar" [class.ink]="index === 3"
+                  [class.yellow]="index === 1 || index === 4"
+                  [class.blue]="index === 2 || index === 5"
+                  [style.height.%]="percentage(row.count, weekdays)"></div>
+              </div>
+              <span>{{ row.label }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+
+    <section class="time-trends" aria-labelledby="time-title">
+      <h2 id="time-title">Most frequently scheduled times</h2>
+      <div class="time-grid">
+        @for (row of times; track row.label; let index = $index) {
+          <div>
+            <h3>{{ row.label }}</h3>
+            <p>{{ row.count }} appointment{{ row.count === 1 ? '' : 's' }}</p>
+            <span>{{ index === 0 ? '12 AM–12 PM' : index === 1 ? '12 PM–6 PM' : '6 PM–12 AM' }}</span>
+          </div>
+        }
+      </div>
+    </section>
+  }
+</section>
