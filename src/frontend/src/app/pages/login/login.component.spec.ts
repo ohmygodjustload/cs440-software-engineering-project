@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
@@ -164,5 +164,88 @@ describe('LoginComponent', () => {
     component.onSubmit();
 
     expect(component.showResubmit).toBeFalse();
+  });
+
+  describe('post-login redirect', () => {
+    let router: Router;
+
+    async function setupWithReturnUrl(returnUrl: string | null) {
+      await TestBed.resetTestingModule()
+        .configureTestingModule({
+          imports: [LoginComponent],
+          providers: [
+            provideRouter([]),
+            {
+              provide: ActivatedRoute,
+              useValue: {
+                snapshot: {
+                  queryParamMap: convertToParamMap(
+                    returnUrl === null ? {} : { returnUrl }
+                  )
+                }
+              }
+            },
+            { provide: AuthService, useValue: authService },
+            { provide: ToastService, useValue: toastService },
+            { provide: UserSettingsService, useValue: settingsService },
+            { provide: NotificationsService, useValue: notificationsService }
+          ]
+        })
+        .compileComponents();
+
+      fixture = TestBed.createComponent(LoginComponent);
+      fixture.detectChanges();
+      router = TestBed.inject(Router);
+      spyOn(router, 'navigateByUrl').and.resolveTo(true);
+    }
+
+    function providerUser() {
+      return {
+        id: 'provider-1',
+        firstName: 'Sam',
+        lastName: 'Provider',
+        username: 'SamProvider',
+        isClient: false,
+        isServiceProvider: true,
+        isAdmin: false,
+        isActive: true
+      };
+    }
+
+    it('should route a first-time provider to /home-provider when returnUrl is /home', async () => {
+      await setupWithReturnUrl('/home');
+      authService.login.and.returnValue(
+        of({ token: 'token', expiresAt: '2099-01-01T00:00:00Z', user: providerUser() as never })
+      );
+
+      fixture.componentInstance.form.patchValue({ username: 'SamProvider', password: 'password123' });
+      fixture.componentInstance.onSubmit();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/home-provider');
+    });
+
+    it('should route a provider to /home-provider when there is no returnUrl', async () => {
+      await setupWithReturnUrl(null);
+      authService.login.and.returnValue(
+        of({ token: 'token', expiresAt: '2099-01-01T00:00:00Z', user: providerUser() as never })
+      );
+
+      fixture.componentInstance.form.patchValue({ username: 'SamProvider', password: 'password123' });
+      fixture.componentInstance.onSubmit();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/home-provider');
+    });
+
+    it('should still honor a role-appropriate returnUrl for a provider', async () => {
+      await setupWithReturnUrl('/create-slots');
+      authService.login.and.returnValue(
+        of({ token: 'token', expiresAt: '2099-01-01T00:00:00Z', user: providerUser() as never })
+      );
+
+      fixture.componentInstance.form.patchValue({ username: 'SamProvider', password: 'password123' });
+      fixture.componentInstance.onSubmit();
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/create-slots');
+    });
   });
 });

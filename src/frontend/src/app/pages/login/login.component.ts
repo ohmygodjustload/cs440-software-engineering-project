@@ -7,6 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { NotificationsService } from '../../core/services/notifications.service';
 import { ToastService } from '../../core/services/toast.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
+import { User } from '../../core/models/user';
 
 /** Max missed notifications replayed as popups after the login greeting. */
 const MAX_MISSED_POPUPS = 3;
@@ -86,7 +87,7 @@ export class LoginComponent implements OnInit {
               ? '/home-provider'
               : '/home';
           this.greetAndReplayMissed();
-          void this.router.navigateByUrl(returnUrl ?? home);
+          void this.router.navigateByUrl(this.resolvePostLoginTarget(returnUrl, response.user, home));
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);
@@ -136,5 +137,30 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
+  }
+
+  /**
+   * Picks the post-login destination, preferring a stored returnUrl only when
+   * it is safe and role-appropriate. Ignored cases fall back to the
+   * role-based home so a stale `?returnUrl=/home` can never misroute a
+   * first-time provider (or admin) to the client home.
+   */
+  private resolvePostLoginTarget(returnUrl: string | null, user: User, home: string): string {
+    if (!returnUrl || !returnUrl.startsWith('/') || returnUrl.startsWith('//')) {
+      return home;
+    }
+
+    const path = returnUrl.split(/[?#]/)[0].toLowerCase();
+    // Default/empty route ('' -> '/home') is captured before the role is known.
+    if (path === '/' || path === '/home') {
+      return home;
+    }
+    if (path === '/home-admin') {
+      return user.isAdmin ? returnUrl : home;
+    }
+    if (path === '/home-provider') {
+      return user.isServiceProvider && !user.isAdmin ? returnUrl : home;
+    }
+    return returnUrl;
   }
 }

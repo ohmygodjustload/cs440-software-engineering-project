@@ -34,7 +34,7 @@ export const adminGuard: CanActivateFn = () => {
 
   return authService.getCurrentUser()?.isAdmin
     ? true
-    : router.createUrlTree(['/home']);
+    : router.createUrlTree([authService.getCurrentUser()?.isServiceProvider ? '/home-provider' : '/home']);
 };
 
 export const guestGuard: CanActivateFn = () => {
