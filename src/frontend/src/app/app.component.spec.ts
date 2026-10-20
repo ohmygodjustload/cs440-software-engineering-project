@@ -142,6 +142,12 @@ describe('AppComponent route fade (fallback without view transitions)', () => {
   @Component({ standalone: true, template: '<p>second page</p>' })
   class SecondPageComponent {}
 
+  @Component({ standalone: true, template: '<p>login page</p>' })
+  class LoginPageComponent {}
+
+  @Component({ standalone: true, template: '<p>home page</p>' })
+  class HomePageComponent {}
+
   let authService: jasmine.SpyObj<AuthService>;
   let restoreViewTransitions: () => void;
 
@@ -155,7 +161,9 @@ describe('AppComponent route fade (fallback without view transitions)', () => {
       providers: [
         provideRouter([
           { path: 'first', component: FirstPageComponent },
-          { path: 'second', component: SecondPageComponent }
+          { path: 'second', component: SecondPageComponent },
+          { path: 'login', component: LoginPageComponent },
+          { path: 'home', component: HomePageComponent }
         ]),
         { provide: AuthService, useValue: authService }
       ]
@@ -195,6 +203,58 @@ describe('AppComponent route fade (fallback without view transitions)', () => {
     fixture.detectChanges();
     expect(container.classList.contains('route-hidden')).toBeFalse();
   }));
+
+  it('should fade when signing in from the login page', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    const router = TestBed.inject(Router);
+    const container = fixture.nativeElement.querySelector('.app-route') as HTMLElement;
+
+    void router.navigateByUrl('/login');
+    tick(250);
+    fixture.detectChanges();
+    expect(container.classList.contains('route-hidden')).toBeFalse();
+
+    // What LoginComponent does after a successful sign-in: navigate to the role's home page.
+    void router.navigateByUrl('/home');
+    tick();
+    fixture.detectChanges();
+
+    expect(container.textContent).toContain('home page');
+    expect(container.classList.contains('route-hidden')).toBeTrue();
+
+    tick(250);
+    fixture.detectChanges();
+    expect(container.classList.contains('route-hidden')).toBeFalse();
+  }));
+
+  it('should fade when signing out to the login page', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    const router = TestBed.inject(Router);
+    const container = fixture.nativeElement.querySelector('.app-route') as HTMLElement;
+
+    void router.navigateByUrl('/home');
+    tick(250);
+    fixture.detectChanges();
+    expect(container.classList.contains('route-hidden')).toBeFalse();
+
+    // Sign out clears the token and navigates to the login page.
+    fixture.componentInstance.signOut();
+    tick();
+    fixture.detectChanges();
+
+    expect(authService.clearToken).toHaveBeenCalled();
+    expect(router.url).toBe('/login');
+    expect(container.classList.contains('route-hidden')).toBeTrue();
+
+    tick(250);
+    fixture.detectChanges();
+    expect(container.classList.contains('route-hidden')).toBeFalse();
+    expect(container.textContent).toContain('login page');
+  }));
 });
 
 describe('AppComponent with native view transitions', () => {
@@ -203,6 +263,12 @@ describe('AppComponent with native view transitions', () => {
 
   @Component({ standalone: true, template: '<p>second page</p>' })
   class SecondPageComponent {}
+
+  @Component({ standalone: true, template: '<p>login page</p>' })
+  class LoginPageComponent {}
+
+  @Component({ standalone: true, template: '<p>home page</p>' })
+  class HomePageComponent {}
 
   let authService: jasmine.SpyObj<AuthService>;
   let restoreViewTransitions: () => void;
@@ -217,7 +283,9 @@ describe('AppComponent with native view transitions', () => {
       providers: [
         provideRouter([
           { path: 'first', component: FirstPageComponent },
-          { path: 'second', component: SecondPageComponent }
+          { path: 'second', component: SecondPageComponent },
+          { path: 'login', component: LoginPageComponent },
+          { path: 'home', component: HomePageComponent }
         ]),
         { provide: AuthService, useValue: authService }
       ]
@@ -251,6 +319,36 @@ describe('AppComponent with native view transitions', () => {
 
     tick(250);
     fixture.detectChanges();
+    expect(container.classList.contains('route-hidden')).toBeFalse();
+  }));
+
+  it('should cross-fade on both sign in and sign out without hiding the page', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    const router = TestBed.inject(Router);
+    const container = fixture.nativeElement.querySelector('.app-route') as HTMLElement;
+
+    void router.navigateByUrl('/login');
+    tick(250);
+    fixture.detectChanges();
+    expect(container.classList.contains('route-hidden')).toBeFalse();
+
+    // Sign in: LoginComponent navigates to the role's home page; the browser cross-fades and
+    // the manual fade never hides the page.
+    void router.navigateByUrl('/home');
+    tick(250);
+    fixture.detectChanges();
+    expect(container.textContent).toContain('home page');
+    expect(container.classList.contains('route-hidden')).toBeFalse();
+
+    // Sign out: the shell navigates back to the login page the same way.
+    fixture.componentInstance.signOut();
+    tick(250);
+    fixture.detectChanges();
+    expect(authService.clearToken).toHaveBeenCalled();
+    expect(router.url).toBe('/login');
+    expect(container.textContent).toContain('login page');
     expect(container.classList.contains('route-hidden')).toBeFalse();
   }));
 });
