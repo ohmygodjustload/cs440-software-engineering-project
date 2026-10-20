@@ -41,11 +41,10 @@ export interface CalendarViewOption {
 }
 
 /**
- * Candidate default calendar views. NOTE: the Calendar page is still a
- * placeholder and consumes none of these yet, so this preference is
- * collected in the form but not applied anywhere. It is kept as a small,
- * conventional Month/Week/Day/Agenda set so a future calendar can adopt it
- * without a data migration.
+ * Candidate default calendar views. These are persisted per user in the
+ * browser (see CalendarViewService) and applied by the Calendar tab; they are
+ * intentionally a small Month/Week/Day/Agenda set so a future backend-backed
+ * preference can adopt the same values without a migration.
  */
 export const CALENDAR_VIEWS: readonly CalendarViewOption[] = [
   { value: 'month', label: 'Month' },

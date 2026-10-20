@@ -17,6 +17,7 @@ import {
   SettingsTabId,
   TIME_ZONES
 } from '../../core/models/user-settings';
+import { CalendarViewService } from '../../core/services/calendar-view.service';
 import { UserSettingsPatch } from '../../core/services/user-settings.service';
 import { ToastService } from '../../core/services/toast.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
@@ -54,6 +55,7 @@ export class SettingsComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly settingsService = inject(UserSettingsService);
   private readonly toastService = inject(ToastService);
+  private readonly calendarViewService = inject(CalendarViewService);
 
   readonly tabs = SETTINGS_TABS;
   readonly timeZones = TIME_ZONES;
@@ -196,6 +198,7 @@ export class SettingsComponent implements OnInit {
 
     this.settingsService.saveSettings(user.id, patch).subscribe({
       next: () => {
+        this.calendarViewService.setView(user.id, this.form.controls.defaultCalendarView.value);
         this.saving = false;
         this.savedBaseline = { ...this.form.getRawValue() };
         this.saveSuccess = true;
@@ -239,7 +242,7 @@ export class SettingsComponent implements OnInit {
       email: user.email ?? '',
       phone: user.phone ?? '',
       timeZone: this.resolveDefaultTimeZone(),
-      defaultCalendarView: 'month',
+      defaultCalendarView: this.calendarViewService.getView(user.id),
       notifyMedical: true,
       notifyBeauty: true,
       notifyFitness: true

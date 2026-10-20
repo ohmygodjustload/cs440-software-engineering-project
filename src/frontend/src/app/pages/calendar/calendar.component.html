@@ -14,10 +14,21 @@
   </header>
 
   <div class="calendar-toolbar" aria-label="Calendar controls">
-    <button type="button" aria-label="Previous month" (click)="previousMonth()">‹</button>
-    <h2 aria-live="polite">{{ monthLabel }}</h2>
+    <button type="button" [attr.aria-label]="previousLabel" (click)="previousMonth()">‹</button>
+    <h2 aria-live="polite">{{ periodLabel }}</h2>
     <button type="button" class="today-button" (click)="goToToday()">Today</button>
-    <button type="button" aria-label="Next month" (click)="nextMonth()">›</button>
+    <button type="button" [attr.aria-label]="nextLabel" (click)="nextMonth()">›</button>
+  </div>
+
+  <div class="calendar-view-switch" role="group" aria-label="Calendar view">
+    @for (option of views; track option.value) {
+      <button
+        type="button"
+        [attr.aria-pressed]="view === option.value"
+        [class.calendar-view-switch__active]="view === option.value"
+        (click)="setView(option.value)"
+      >{{ option.label }}</button>
+    }
   </div>
 
   <div class="calendar-status" aria-live="polite">
@@ -29,7 +40,22 @@
     }
   </div>
 
-  <div class="calendar-grid" role="table" [attr.aria-label]="monthLabel" [attr.aria-busy]="loading">
+  @if (view === 'agenda' || view === 'day') {
+    <ul class="calendar-agenda" [class.calendar-agenda--day]="view === 'day'"
+      [attr.aria-label]="view === 'day' ? 'Appointments for this day' : 'Appointments'"
+      [attr.aria-busy]="loading">
+      @for (item of listItems; track item.id) {
+        <li class="calendar-agenda__item" [class.medical]="item.category === 'Medical'"
+          [class.beauty]="item.category === 'Beauty'" [class.fitness]="item.category === 'Fitness'">
+          <time [attr.datetime]="item.startDateTime">{{ item.startDateTime | date:(view === 'day' ? 'h:mm a' : 'MMM d, y, h:mm a') }} – {{ item.endDateTime | date:'h:mm a' }}</time>
+          <span>{{ item.title }}</span>
+        </li>
+      } @empty {
+        <li class="calendar-agenda__empty">{{ listEmptyMessage }}</li>
+      }
+    </ul>
+  } @else {
+  <div class="calendar-grid" role="table" [attr.aria-label]="periodLabel" [attr.aria-busy]="loading">
 
     <div class="calendar-row weekdays" role="row">
       @for (weekday of weekdays; track weekday) {
@@ -58,6 +84,7 @@
       }
     }
   </div>
+  }
 
   <ul class="calendar-legend" aria-label="Appointment categories">
     <li><span class="swatch medical"></span>Medical · Physical</li>

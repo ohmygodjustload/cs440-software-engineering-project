@@ -29,6 +29,14 @@ function configure(serviceStub: Partial<UserSettingsService>): ComponentFixture<
 }
 
 describe('SettingsComponent', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
+
   it('should create and load the current user into the form', () => {
     const fixture = configure({ getCurrentUser: () => of(demoUser) });
 
@@ -189,6 +197,30 @@ describe('SettingsComponent', () => {
     expect(component.username).toBe('JanePorter123');
     expect(component.roleSummary).toContain('Admin');
     expect(component.roleSummary).toContain('Client');
+  });
+
+  it('should load the saved calendar view for the signed-in user', () => {
+    localStorage.setItem('baaam.calendar.view.user-1', 'week');
+
+    const fixture = configure({ getCurrentUser: () => of(demoUser) });
+
+    expect(fixture.componentInstance.form.controls.defaultCalendarView.value).toBe('week');
+  });
+
+  it('should save the calendar view to this device when settings are saved', () => {
+    const fixture = configure({
+      getCurrentUser: () => of(demoUser),
+      saveSettings: () => of(demoUser)
+    });
+    const component = fixture.componentInstance;
+
+    component.form.controls.defaultCalendarView.setValue('agenda');
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('.settings-save') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(component.saveError).toBeNull();
+    expect(localStorage.getItem('baaam.calendar.view.user-1')).toBe('agenda');
   });
 });
 

@@ -116,7 +116,7 @@
       <div role="tabpanel" id="settings-panel-preferences" aria-labelledby="settings-tab-preferences" tabindex="0">
       <section class="settings-section" aria-labelledby="prefs-heading">
         <h2 id="prefs-heading">Preferences</h2>
-        <p class="section-lede">Calendar and notification choices. These are collected on this page but not consumed anywhere yet.</p>
+        <p class="section-lede">Calendar and notification choices. The default calendar view is saved to this device and applied by the Calendar page; notification checkboxes are collected but not consumed anywhere yet.</p>
         <div class="field field--narrow">
           <label for="settings-calendar-view">Default calendar view</label>
           <select id="settings-calendar-view" formControlName="defaultCalendarView">
@@ -124,7 +124,7 @@
               <option [value]="view.value">{{ view.label }}</option>
             }
           </select>
-          <p class="field-hint">The Calendar page does not use this preference yet.</p>
+          <p class="field-hint">Applied the next time the Calendar tab opens. Saved in this browser for your account only.</p>
         </div>
         <fieldset class="notify-group">
           <legend>Notification settings</legend>
