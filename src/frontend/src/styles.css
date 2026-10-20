@@ -4,7 +4,7 @@
    Purpose: holds only the rules that genuinely apply everywhere: the CSS custom
    properties ("design tokens", e.g. --color-brand) that components reuse, a
    minimal reset, and the default page colours and font.
-   
+
    ========================================================================== */
 
 :root {
@@ -36,4 +36,25 @@ body {
   line-height: 1.5;
   height: 100%;
   padding: 0;
+}
+
+/*
+   Page transitions (View Transitions API)
+
+   The router's withViewTransitions() feature (app.config.ts) cross-fades the old and new page on
+   every navigation. These rules keep that cross-fade short so transitions never feel slow, and
+   turn it off entirely for users who asked the OS for reduced motion.
+  */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }

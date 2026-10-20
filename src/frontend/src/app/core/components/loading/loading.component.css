@@ -1,0 +1,42 @@
+/*
+  loading.component.css — styles for the loading indicator only.
+
+  Purpose: a short-lived spinner that reads well on every page background. Pages may add their
+  own class on <app-loading> (e.g. settings-status) for spacing and colour; those page rules win
+  over the :host defaults below because they are more specific.
+*/
+
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 13px;
+  color: #526460;
+}
+
+.loading__spinner {
+  flex: 0 0 auto;
+
+  width: 15px;
+  height: 15px;
+
+  border: 2px solid #c7d3d1;
+  border-top-color: #344f4b;
+  border-radius: 50%;
+
+  animation: loading-spin 700ms linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* No spinning for users who asked the OS for reduced motion; the ring still marks loading. */
+@media (prefers-reduced-motion: reduce) {
+  .loading__spinner {
+    animation: none;
+  }
+}

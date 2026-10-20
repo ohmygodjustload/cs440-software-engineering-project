@@ -9,7 +9,7 @@
   </header>
 
   @if (loading) {
-    <p role="status">Loading your appointments…</p>
+    <app-loading label="Loading your appointments…"></app-loading>
   } @else if (error) {
     <div role="alert"><p>{{ error }}</p><button (click)="load()">Try again</button></div>
   } @else {

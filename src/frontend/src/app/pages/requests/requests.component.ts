@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { ProviderRequest } from '../../core/models/provider-request';
 import { ProviderRequestsService } from '../../core/services/provider-requests.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 /** How many of the most recent closed requests the UI shows. */
 const CLOSED_REQUESTS_LIMIT = 5;
@@ -19,7 +20,7 @@ const CLOSED_REQUESTS_LIMIT = 5;
 @Component({
   selector: 'app-arequests',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, LoadingComponent],
   templateUrl: './requests.component.html',
   styleUrl: './requests.component.css',
 })

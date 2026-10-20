@@ -22,7 +22,7 @@
 
   <div class="calendar-status" aria-live="polite">
     @if (loading) {
-      <span>Loading appointments…</span>
+      <app-loading label="Loading appointments…"></app-loading>
     }
     @if (error) {
       <span role="alert">{{ error }} <button type="button" (click)="refresh()">Retry</button></span>

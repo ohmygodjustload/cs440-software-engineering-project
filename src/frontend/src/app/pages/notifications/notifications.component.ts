@@ -15,6 +15,7 @@ import {
 import { User } from '../../core/models/user';
 import { NotificationsService } from '../../core/services/notifications.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 type SectionState = 'loading' | 'loaded' | 'error';
 type PreferenceKey = keyof NotificationPreferences;
@@ -44,7 +45,7 @@ const REMINDER_ROWS: readonly ReminderRow[] = [
 
 @Component({
   selector: 'app-notifications',
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingComponent],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.css'
 })

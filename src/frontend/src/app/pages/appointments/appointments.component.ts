@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 
 import { Appointment } from '../../core/models/appointment';
 import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 interface AppointmentMonth {
   key: string;
@@ -24,7 +25,7 @@ interface AppointmentMonth {
 @Component({
   selector: 'app-appointments',
   standalone: true,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, LoadingComponent],
   templateUrl: './appointments.component.html',
   styleUrl: './appointments.component.css'
 })
