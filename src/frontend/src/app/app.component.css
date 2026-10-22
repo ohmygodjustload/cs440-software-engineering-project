@@ -19,6 +19,8 @@
   position: relative;
   background: #faf9f6;
   aspect-ratio: 16/9;
+  /* Fades with the page in the fallback transition (never triggers on native cross-fades). */
+  transition: opacity 180ms ease;
 }
 
 
@@ -74,6 +76,9 @@
   text-decoration: none;
 
   font-size: 13px;
+
+  /* Smooth pill highlight when hovering or moving between tabs. */
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
 
@@ -139,6 +144,8 @@
 
   cursor: pointer;
   font: inherit;
+
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
 }
 
 .app-account__signout:hover {
@@ -161,6 +168,25 @@
 
 .app-main--full-page {
   padding: 0;
+}
+
+/* ==========================================================================
+   Page fade (fallback for browsers without the View Transitions API)
+
+   .app-route wraps <router-outlet>, and the header shares the .route-hidden class, so the whole
+   shell fades as one unit: hidden while a navigation is running, then the new page fades in.
+   routeVisible starts hidden, so opening the site fades in too. Browsers with the View
+   Transitions API cross-fade natively instead (app.config.ts / styles.css) and never toggle
+   these classes after the initial fade-in.
+   ========================================================================== */
+
+.app-route {
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.route-hidden {
+  opacity: 0;
 }
 /* Provider navigation: Figma Provider page picker, node 267:28. */
 .app-header--provider {
@@ -242,5 +268,18 @@
 
   .app-header--provider .app-account__name {
     display: none;
+  }
+}
+
+/* Honour the OS "reduce motion" setting: pages swap instantly and pills only change colour. */
+@media (prefers-reduced-motion: reduce) {
+  .app-header,
+  .app-route {
+    transition: none;
+  }
+
+  .app-nav__link,
+  .app-account__signout {
+    transition: none;
   }
 }

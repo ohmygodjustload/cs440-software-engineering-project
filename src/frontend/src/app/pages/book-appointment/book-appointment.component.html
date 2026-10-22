@@ -45,7 +45,7 @@
     </div>
 
     @if (loading) {
-      <p class="field-help" role="status">Loading open slots…</p>
+      <app-loading class="field-help" label="Loading open slots…"></app-loading>
     }
     @if (loadError) {
       <p class="error-message" role="alert">

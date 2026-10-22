@@ -9,7 +9,7 @@
   }
 
   @if (loading) {
-    <p role="status">Loading provider requests…</p>
+    <app-loading label="Loading provider requests…"></app-loading>
   } @else if (error) {
     <div class="error" role="alert">
       <p>{{ error }}</p>

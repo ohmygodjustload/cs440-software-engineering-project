@@ -13,11 +13,12 @@ import { RouterLink } from '@angular/router';
 
 import { Appointment } from '../../core/models/appointment';
 import { HomeService } from '../../core/services/home.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, LoadingComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

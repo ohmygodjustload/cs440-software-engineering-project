@@ -41,7 +41,7 @@
     </div>
     <div class="notifications-panel__control">
       @if (prefsState === 'loading') {
-        <p class="notifications-status" role="status">Loading preferences…</p>
+        <app-loading class="notifications-status" label="Loading preferences…"></app-loading>
       } @else if (prefsState === 'error') {
         <div class="notifications-inline-error" role="alert">
           <p>{{ prefsError }}</p>
@@ -76,7 +76,7 @@
   <section class="notifications-section" aria-labelledby="schedule-heading">
     <h2 id="schedule-heading">Reminder schedule</h2>
     @if (prefsState === 'loading') {
-      <p class="notifications-status" role="status">Loading reminder schedule…</p>
+      <app-loading class="notifications-status" label="Loading reminder schedule…"></app-loading>
     } @else if (prefsState === 'error') {
       <div class="notifications-alert notifications-alert--error" role="alert">
         <p>{{ prefsError }}</p>
@@ -118,7 +118,7 @@
   <section class="notifications-section" aria-labelledby="recent-heading">
     <h2 id="recent-heading">Recent notifications</h2>
     @if (historyState === 'loading') {
-      <p class="notifications-status" role="status">Loading notifications…</p>
+      <app-loading class="notifications-status" label="Loading notifications…"></app-loading>
     } @else if (historyState === 'error') {
       <div class="notifications-alert notifications-alert--error" role="alert">
         <p>{{ historyError }}</p>

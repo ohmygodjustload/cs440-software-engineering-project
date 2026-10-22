@@ -18,6 +18,7 @@ import {
   TIME_ZONES
 } from '../../core/models/user-settings';
 import { UserSettingsService } from '../../core/services/user-settings.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 /** Full-name alphabet: Unicode letters/marks plus everyday punctuation. */
 const FULL_NAME_PATTERN = /^[\p{L}\p{M} .'\-]+$/u;
@@ -44,7 +45,7 @@ export function phoneValidator(): ValidatorFn {
 }
 @Component({
   selector: 'app-settings',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoadingComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

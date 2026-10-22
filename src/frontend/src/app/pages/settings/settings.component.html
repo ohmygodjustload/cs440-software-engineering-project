@@ -31,7 +31,7 @@
     <div class="settings-content">
 
   @if (isLoading) {
-    <p class="settings-status" role="status">Loading your settings…</p>
+    <app-loading class="settings-status" label="Loading your settings…"></app-loading>
   } @else if (loadState === 'error') {
     <div class="settings-alert settings-alert--error" role="alert">
       <p>{{ loadError }}</p>

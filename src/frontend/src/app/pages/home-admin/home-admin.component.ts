@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 
 import { ProviderRequest } from '../../core/models/provider-request';
 import { ProviderRequestsService } from '../../core/services/provider-requests.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 export interface AdminReviewItem {
   id: string;
@@ -22,7 +23,7 @@ export function greetingFor(date: Date): string {
 @Component({
   selector: 'app-home-admin',
   standalone: true,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, LoadingComponent],
   templateUrl: './home-admin.component.html',
   styleUrl: './home-admin.component.css',
 })

@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
 import { AppointmentCategory } from '../../core/models/appointment';
 import { BookedAppointment, Slot } from '../../core/models/slot';
 import { SlotsService } from '../../core/services/slots.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 /**
  * Client booking page: lists the open slots from `GET /api/slots`, lets the client pick one and add notes,
@@ -17,7 +18,7 @@ import { SlotsService } from '../../core/services/slots.service';
 @Component({
   selector: 'app-book-appointment',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LoadingComponent],
   templateUrl: './book-appointment.component.html',
   styleUrl: './book-appointment.component.css'
 })

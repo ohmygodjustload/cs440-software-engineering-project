@@ -13,6 +13,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Subject, catchError, of, switchMap, tap} from 'rxjs';
 import {CalendarItem} from '../../core/models/calendar-item';
 import {CalendarService} from '../../core/services/calendar.service';
+import {LoadingComponent} from '../../core/components/loading/loading.component';
 
 interface CalendarDay {
   date: Date;
@@ -23,7 +24,7 @@ interface CalendarDay {
 
 @Component({
   selector: 'app-calendar',
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingComponent],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
