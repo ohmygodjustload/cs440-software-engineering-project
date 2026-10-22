@@ -7,7 +7,11 @@
 -->
 
 @if (!usesFullPageLayout) {
-  <header class="app-header" [class.app-header--provider]="isProviderWorkspace">
+  <header
+    class="app-header"
+    [class.app-header--provider]="isProviderWorkspace"
+    [class.route-hidden]="!routeVisible"
+  >
     <span class="app-brand">{{ title }}</span>
 
   <nav class="app-nav" aria-label="Main">
@@ -38,7 +42,14 @@
 }
 
 <main class="app-main" [class.app-main--full-page]="usesFullPageLayout">
-  <router-outlet />
+  <!--
+    Browsers with the View Transitions API cross-fade pages natively (withViewTransitions in
+    app.config.ts). Elsewhere, .app-route and the header fade out before a navigation swaps the
+    page, then fade back in together (see app.component.css and AppComponent.routeVisible).
+  -->
+  <div class="app-route" [class.route-hidden]="!routeVisible">
+    <router-outlet />
+  </div>
 </main>
 
 <!-- Global top-right notification popups (login greeting, missed items, appointment + setting confirmations). -->

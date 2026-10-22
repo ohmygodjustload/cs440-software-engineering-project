@@ -7,11 +7,12 @@ import { Subscription } from 'rxjs';
 
 import { Appointment } from '../../core/models/appointment';
 import { ProviderHomeService } from '../../core/services/home-provider.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 @Component({
   selector: 'app-provider-home',
   standalone: true,
-  imports: [DatePipe, FormsModule, RouterLink],
+  imports: [DatePipe, FormsModule, RouterLink, LoadingComponent],
   templateUrl: './home-provider.component.html',
   styleUrl: './home-provider.component.css'
 })

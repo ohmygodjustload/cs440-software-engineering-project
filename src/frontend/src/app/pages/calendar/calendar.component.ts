@@ -17,6 +17,7 @@ import {CALENDAR_VIEWS} from '../../core/models/user-settings';
 import {AuthService} from '../../core/services/auth.service';
 import {CalendarService} from '../../core/services/calendar.service';
 import {CalendarViewId, CalendarViewService, DEFAULT_CALENDAR_VIEW} from '../../core/services/calendar-view.service';
+import {LoadingComponent} from '../../core/components/loading/loading.component';
 
 interface CalendarDay {
   date: Date;
@@ -27,7 +28,7 @@ interface CalendarDay {
 
 @Component({
   selector: 'app-calendar',
-  imports: [CommonModule],
+  imports: [CommonModule, LoadingComponent],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })

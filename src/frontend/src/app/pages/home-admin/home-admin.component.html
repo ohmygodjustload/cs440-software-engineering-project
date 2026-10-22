@@ -15,7 +15,7 @@
   </header>
 
   @if (loading) {
-    <p role="status">Loading admin overview…</p>
+    <app-loading label="Loading admin overview…"></app-loading>
   } @else if (error) {
     <div class="error" role="alert">
       <p>{{ error }}</p>

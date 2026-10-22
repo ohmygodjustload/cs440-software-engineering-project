@@ -21,6 +21,7 @@ import { CalendarViewService } from '../../core/services/calendar-view.service';
 import { UserSettingsPatch } from '../../core/services/user-settings.service';
 import { ToastService } from '../../core/services/toast.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 /** Full-name alphabet: Unicode letters/marks, digits, plus everyday punctuation. */
 const FULL_NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'\-]+$/u;
@@ -47,7 +48,7 @@ export function phoneValidator(): ValidatorFn {
 }
 @Component({
   selector: 'app-settings',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoadingComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

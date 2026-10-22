@@ -7,8 +7,18 @@
  *
  */
 
-import { Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, DestroyRef, inject } from '@angular/core';
+import {
+  NavigationCancel,
+  NavigationEnd,
+  NavigationError,
+  NavigationSkipped,
+  NavigationStart,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet
+} from '@angular/router';
 import { User } from './core/models/user';
 import { AuthService } from './core/services/auth.service';
 import { ToastService } from './core/services/toast.service';
@@ -51,11 +61,44 @@ const PROVIDER_NAV: readonly NavLink[] = [
 })
 export class AppComponent {
   private readonly toastService = inject(ToastService);
+  /**
+   * Whether the routed page (and header) are visible. It starts hidden so opening the site fades
+   * in, and it toggles around navigations only in browsers without the View Transitions API —
+   * capable browsers cross-fade pages natively (see app.config.ts) and skip the manual fade.
+   */
+  routeVisible = false;
+
+  /** Fade-out duration in milliseconds. Kept short so navigation never feels slowed down. */
+  private readonly routeFadeMs = 180;
+
+  /** Identifies the in-flight navigation so a stale timer cannot re-show a page mid-navigation. */
+  private routeFadeToken = 0;
+
+  /** Timestamp of the current navigation's NavigationStart, used to finish the fade-out. */
+  private routeFadeStartedAt = 0;
+
+  /** Pending reveal timer; replaced whenever a new navigation begins. */
+  private routeRevealTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router
-  ) {}
+  ) {
+    // Guard redirects and lazy loading both surface as router events, so the shell listens to the
+    // router instead of individual links to know when a page swap is happening.
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        this.beginRouteFade();
+      } else if (
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError ||
+        event instanceof NavigationSkipped
+      ) {
+        this.endRouteFade();
+      }
+    });
+  }
 
   get title(): string {
     return this.signedInUser?.isServiceProvider && !this.signedInUser?.isAdmin
@@ -121,5 +164,49 @@ export class AppComponent {
     this.toastService.clear();
     this.toastService.showLoggedOut();
     void this.router.navigateByUrl('/login');
+  }
+
+  /**
+   * Starts the fade-out as soon as a navigation begins (covers guards and redirects too).
+   *
+   * Browsers with the View Transitions API cross-fade the pages natively; fading the shell on top
+   * of that would stack two transitions, so the manual fade is only used as a fallback there.
+   */
+  private beginRouteFade(): void {
+    if (typeof document.startViewTransition === 'function') {
+      return;
+    }
+
+    this.routeFadeToken += 1;
+    this.routeFadeStartedAt = Date.now();
+    this.routeVisible = false;
+
+    if (this.routeRevealTimer !== null) {
+      clearTimeout(this.routeRevealTimer);
+      this.routeRevealTimer = null;
+    }
+  }
+
+  /**
+   * Reveals the page once the fade-out has finished (this also performs the initial fade-in on
+   * first load, since routeVisible starts hidden). Waiting out the remaining fade time keeps the
+   * content swap invisible instead of flashing the new page mid-fade; a one-frame buffer
+   * guarantees the fade-out completes first.
+   */
+  private endRouteFade(): void {
+    const token = this.routeFadeToken;
+    const elapsedMs = Date.now() - this.routeFadeStartedAt;
+    const remainingMs = Math.max(0, this.routeFadeMs - elapsedMs);
+
+    if (this.routeRevealTimer !== null) {
+      clearTimeout(this.routeRevealTimer);
+    }
+
+    this.routeRevealTimer = setTimeout(() => {
+      this.routeRevealTimer = null;
+      if (this.routeFadeToken === token) {
+        this.routeVisible = true;
+      }
+    }, remainingMs + 16);
   }
 }

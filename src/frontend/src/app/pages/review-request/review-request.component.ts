@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { ProviderRequest } from '../../core/models/provider-request';
 import { ProviderRequestsService } from '../../core/services/provider-requests.service';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 import {
   ConfirmationPromptComponent,
@@ -22,7 +23,7 @@ import {
 @Component({
   selector: 'app-credential-review',
   standalone: true,
-  imports: [FormsModule, RouterLink, ConfirmationPromptComponent],
+  imports: [FormsModule, RouterLink, ConfirmationPromptComponent, LoadingComponent],
   templateUrl: './review-request.component.html',
   styleUrls: ['./review-request.component.css'],
 })

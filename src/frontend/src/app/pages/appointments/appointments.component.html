@@ -15,7 +15,7 @@
     <p class="error" role="alert">{{ actionError }}</p>
   }
   @if (loading) {
-    <p role="status">Loading appointments…</p>
+    <app-loading label="Loading appointments…"></app-loading>
   } @else if (error) {
     <div class="error" role="alert">
       <p>{{ error }}</p>
