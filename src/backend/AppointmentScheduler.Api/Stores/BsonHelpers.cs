@@ -121,4 +121,28 @@ internal static class BsonHelpers {
                         || s.Value.Trim() == "1",
         _ => false,
     };
+
+    public static DateTimeOffset ReadDateTime(BsonDocument doc, string key, DateTimeOffset fallback = default)
+    {
+        var value = ReadValue(doc, key);
+        return value is null ? fallback : ToDateTime(value, fallback);
+    }
+
+    public static DateTimeOffset? ReadDateTimeNullable(BsonDocument doc, string key)
+    {
+        var value = ReadValue(doc, key);
+        return value is null ? null : (DateTimeOffset?)ToDateTime(value, default);
+    }
+
+    private static DateTimeOffset ToDateTime(BsonValue value, DateTimeOffset fallback)
+    {
+        return value switch
+        {
+            BsonDateTime dt => dt.ToUniversalTime(),
+            BsonString s when DateTimeOffset.TryParse(s.Value, null, System.Globalization.DateTimeStyles.RoundtripKind, out var parsed) => parsed,
+            BsonInt64 l => new DateTimeOffset(l.Value, TimeSpan.Zero),
+            BsonDouble d => new DateTimeOffset((long)d.Value, TimeSpan.Zero),
+            _ => fallback
+        };
+    }
 }

@@ -34,4 +34,10 @@ public sealed class MongoDbSettings
     public string LocationsCollection { get; set; } = "Location";
 
     public string StatusesCollection { get; set; } = "Status";
+
+    /// <summary>Sibling collection keyed on user id for per-user notification preferences.</summary>
+    public string NotificationPreferencesCollection { get; set; } = "NotificationPreference";
+
+    /// <summary>Sibling collection keyed on user id for per-user notification history.</summary>
+    public string NotificationHistoryCollection { get; set; } = "NotificationHistory";
 }

@@ -67,6 +67,62 @@ button {
   font-size: 13px; 
 }
 
+.calendar-view-switch { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 8px; 
+  padding: 12px 0 4px; 
+}
+
+.calendar-view-switch button { 
+  padding: 6px 14px; 
+  font-size: 12px; 
+  border: 1px solid #c9c5b8; 
+}
+
+.calendar-view-switch .calendar-view-switch__active { 
+  background: #344b48; 
+  color: #faf9f6; 
+  border-color: #344b48; 
+}
+
+.calendar-agenda { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  padding: 0; 
+  margin: 16px 0 0; 
+  list-style: none; 
+}
+
+.calendar-agenda__item { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 2px; 
+  padding: 12px; 
+  border-radius: 13px; 
+  font-size: 13px; 
+}
+
+.calendar-agenda__item time { 
+  font-size: 11px; 
+}
+
+.calendar-agenda__empty { 
+  padding: 12px 0; 
+  font-size: 13px; 
+  color: #8b9591; 
+}
+
+.calendar-agenda--day .calendar-agenda__item {
+  padding: 14px 16px;
+}
+
+.calendar-agenda--day .calendar-agenda__item time {
+  font-size: 12px;
+}
+
+
 button:hover { 
   background: #d3d0c6; 
 }

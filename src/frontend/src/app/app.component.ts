@@ -8,6 +8,7 @@
  */
 
 import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   NavigationCancel,
   NavigationEnd,
@@ -20,9 +21,9 @@ import {
   RouterOutlet
 } from '@angular/router';
 import { User } from './core/models/user';
-import { UserSettingsService } from './core/services/user-settings.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from './core/services/auth.service';
+import { ToastService } from './core/services/toast.service';
+import { NotificationPopupComponent } from './shared/notification-popup/notification-popup.component';
 
 /** A destination shown in the main navigation. */
 interface NavLink {
@@ -55,11 +56,12 @@ const PROVIDER_NAV: readonly NavLink[] = [
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationPopupComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  private readonly toastService = inject(ToastService);
   /**
    * Whether the routed page (and header) are visible. It starts hidden so opening the site fades
    * in, and it toggles around navigations only in browsers without the View Transitions API —
@@ -158,6 +160,10 @@ export class AppComponent {
 
   signOut(): void {
     this.authService.clearToken();
+    // Clear any stale popups, then confirm the sign-out so the user sees
+    // the matching "You're Logged Out!" popup on the login page.
+    this.toastService.clear();
+    this.toastService.showLoggedOut();
     void this.router.navigateByUrl('/login');
   }
 

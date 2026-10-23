@@ -1,9 +1,9 @@
 /**
  * notifications.service.spec.ts — unit tests for NotificationsService.
  *
- * Purpose: locks in the honest missing-backend boundary — every method fails
- * descriptively until the documented endpoint exists, and no HTTP request is
- * issued. None of this needs a running backend.
+ * Purpose: locks in the real notification-preferences + history boundary —
+ * every method hits the documented endpoint with the right method and body.
+ * None of this needs a running backend.
  */
 
 import { provideHttpClient } from '@angular/common/http';
@@ -31,37 +31,62 @@ describe('NotificationsService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should fail getPreferences honestly until the endpoint exists', () => {
-    let message = '';
-    service.getPreferences('user-1').subscribe({ error: (err: Error) => (message = err.message) });
+  it('should GET /api/users/{id}/notification-preferences', () => {
+    let actual: unknown;
+    service.getPreferences('user-1').subscribe((prefs) => (actual = prefs));
 
-    httpTesting.expectNone('/api/users/user-1/notification-preferences');
-    expect(message).toContain('GET /api/users/{id}/notification-preferences');
+    const request = httpTesting.expectOne('/api/users/user-1/notification-preferences');
+    expect(request.request.method).toBe('GET');
+    request.flush({ inBrowserEnabled: true, reminderDayBeforeEnabled: true, reminderHourBeforeEnabled: true });
+
+    expect(actual).toBeTruthy();
   });
 
-  it('should fail updatePreferences honestly until the endpoint exists', () => {
-    let message = '';
-    service
-      .updatePreferences('user-1', { inBrowserEnabled: false })
-      .subscribe({ error: (err: Error) => (message = err.message) });
+  it('should fall back to defaults when preferences are missing', () => {
+    let actual: { inBrowserEnabled: boolean } | undefined;
+    service.getPreferences('user-1').subscribe((prefs) => (actual = prefs));
 
-    httpTesting.expectNone('/api/users/user-1/notification-preferences');
-    expect(message).toContain('PATCH /api/users/{id}/notification-preferences');
+    httpTesting.expectOne('/api/users/user-1/notification-preferences').flush('nope', {
+      status: 404,
+      statusText: 'Not Found'
+    });
+
+    expect(actual?.inBrowserEnabled).toBeTrue();
   });
 
-  it('should fail getNotifications honestly until the endpoint exists', () => {
-    let message = '';
-    service.getNotifications('user-1').subscribe({ error: (err: Error) => (message = err.message) });
+  it('should PATCH /api/users/{id}/notification-preferences with the patch', () => {
+    let actual: unknown;
+    service.updatePreferences('user-1', { inBrowserEnabled: false }).subscribe((prefs) => (actual = prefs));
 
-    httpTesting.expectNone('/api/notifications');
-    expect(message).toContain('GET /api/notifications');
+    const request = httpTesting.expectOne('/api/users/user-1/notification-preferences');
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual({ inBrowserEnabled: false });
+    request.flush({ inBrowserEnabled: false, reminderDayBeforeEnabled: true, reminderHourBeforeEnabled: true });
+
+    expect(actual).toBeTruthy();
   });
 
-  it('should fail markAllRead honestly until the endpoint exists', () => {
-    let message = '';
-    service.markAllRead('user-1').subscribe({ error: (err: Error) => (message = err.message) });
+  it('should GET /api/notifications?mine={userId} for history', () => {
+    let actual: unknown[] | undefined;
+    service.getNotifications('user-1').subscribe((items) => (actual = items));
 
-    httpTesting.expectNone('/api/notifications/mark-all-read');
-    expect(message).toContain('POST /api/notifications/mark-all-read');
+    const request = httpTesting.expectOne('/api/notifications?mine=user-1');
+    expect(request.request.method).toBe('GET');
+    request.flush([]);
+
+    expect(actual).toEqual([]);
+  });
+
+  it('should POST /api/notifications/mark-all-read with the user id', () => {
+    let actual: { updated: number } | undefined;
+    service.markAllRead('user-1').subscribe((result) => (actual = result));
+
+    const request = httpTesting.expectOne('/api/notifications/mark-all-read');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ userId: 'user-1' });
+    request.flush({ updated: 1 });
+
+    expect(actual).toEqual({ updated: 1 });
   });
 });
+

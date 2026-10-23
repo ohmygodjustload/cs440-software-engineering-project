@@ -17,11 +17,14 @@ import {
   SettingsTabId,
   TIME_ZONES
 } from '../../core/models/user-settings';
+import { CalendarViewService } from '../../core/services/calendar-view.service';
+import { UserSettingsPatch } from '../../core/services/user-settings.service';
+import { ToastService } from '../../core/services/toast.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
 
-/** Full-name alphabet: Unicode letters/marks plus everyday punctuation. */
-const FULL_NAME_PATTERN = /^[\p{L}\p{M} .'\-]+$/u;
+/** Full-name alphabet: Unicode letters/marks, digits, plus everyday punctuation. */
+const FULL_NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'\-]+$/u;
 
 type LoadState = 'loading' | 'loaded' | 'error';
 
@@ -52,6 +55,8 @@ export function phoneValidator(): ValidatorFn {
 export class SettingsComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly settingsService = inject(UserSettingsService);
+  private readonly toastService = inject(ToastService);
+  private readonly calendarViewService = inject(CalendarViewService);
 
   readonly tabs = SETTINGS_TABS;
   readonly timeZones = TIME_ZONES;
@@ -177,12 +182,29 @@ export class SettingsComponent implements OnInit {
     this.saveError = null;
     this.saveSuccess = false;
 
-    this.settingsService.saveSettings().subscribe({
+    const user = this.currentUser;
+    if (!user) {
+      this.saving = false;
+      this.saveError = 'No account loaded. Your edits have been kept on this page.';
+      return;
+    }
+
+    const nameParts = (this.form.value.fullName ?? '').split(/\s+/).filter((part) => part.length > 0);
+    const patch: UserSettingsPatch = {
+      firstName: nameParts[0] ?? '',
+      lastName: nameParts.slice(1).join(' '),
+      email: this.form.value.email,
+      phone: this.form.value.phone
+    };
+
+    this.settingsService.saveSettings(user.id, patch).subscribe({
       next: () => {
+        this.calendarViewService.setView(user.id, this.form.controls.defaultCalendarView.value);
         this.saving = false;
         this.savedBaseline = { ...this.form.getRawValue() };
         this.saveSuccess = true;
         this.form.markAsPristine();
+        this.toastService.showNotificationSettingChanged('Your settings were saved.');
       },
       error: (error: unknown) => {
         this.saving = false;
@@ -221,7 +243,7 @@ export class SettingsComponent implements OnInit {
       email: user.email ?? '',
       phone: user.phone ?? '',
       timeZone: this.resolveDefaultTimeZone(),
-      defaultCalendarView: 'month',
+      defaultCalendarView: this.calendarViewService.getView(user.id),
       notifyMedical: true,
       notifyBeauty: true,
       notifyFitness: true

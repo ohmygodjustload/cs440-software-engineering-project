@@ -4,6 +4,13 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationsService } from '../../core/services/notifications.service';
+import { ToastService } from '../../core/services/toast.service';
+import { UserSettingsService } from '../../core/services/user-settings.service';
+import { User } from '../../core/models/user';
+
+/** Max missed notifications replayed as popups after the login greeting. */
+const MAX_MISSED_POPUPS = 3;
 
 @Component({
   selector: 'app-login',
@@ -16,6 +23,9 @@ export class LoginComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
+  private readonly settingsService = inject(UserSettingsService);
+  private readonly notificationsService = inject(NotificationsService);
 
   errorMessage: string | null = null;
   loading = false;
@@ -76,7 +86,8 @@ export class LoginComponent implements OnInit {
             : response.user.isServiceProvider
               ? '/home-provider'
               : '/home';
-          void this.router.navigateByUrl(returnUrl ?? home);
+          this.greetAndReplayMissed();
+          void this.router.navigateByUrl(this.resolvePostLoginTarget(returnUrl, response.user, home));
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);
@@ -84,7 +95,72 @@ export class LoginComponent implements OnInit {
       });
   }
 
+  /**
+   * Shows "You're Logged In!" first, then replays up to MAX_MISSED_POPUPS
+   * unread notifications (missed appointment + other notifications) as queued
+   * popups. Read state is left untouched — the user marks items read on the
+   * Notifications page. Failures are silent: the greeting still shows.
+   */
+  private greetAndReplayMissed(): void {
+    this.toastService.showLoggedIn();
+    this.settingsService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.notificationsService.getPreferences(user.id).subscribe({
+          next: (prefs) => {
+            if (!prefs.inBrowserEnabled) {
+              return;
+            }
+            this.notificationsService.getNotifications(user.id).subscribe({
+              next: (items) => {
+                items
+                  .filter((item) => !item.isRead)
+                  .sort(
+                    (a, b) =>
+                      Date.parse(a.createdAt) - Date.parse(b.createdAt)
+                  )
+                  .slice(0, MAX_MISSED_POPUPS)
+                  .forEach((item, index) => {
+                    window.setTimeout(() => {
+                      this.toastService.showMissed(item.eventLabel, item.message);
+                    }, (index + 1) * 1200);
+                  });
+              },
+              error: () => undefined
+            });
+          },
+          error: () => undefined
+        });
+      },
+      error: () => undefined
+    });
+  }
+
   togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
+  }
+
+  /**
+   * Picks the post-login destination, preferring a stored returnUrl only when
+   * it is safe and role-appropriate. Ignored cases fall back to the
+   * role-based home so a stale `?returnUrl=/home` can never misroute a
+   * first-time provider (or admin) to the client home.
+   */
+  private resolvePostLoginTarget(returnUrl: string | null, user: User, home: string): string {
+    if (!returnUrl || !returnUrl.startsWith('/') || returnUrl.startsWith('//')) {
+      return home;
+    }
+
+    const path = returnUrl.split(/[?#]/)[0].toLowerCase();
+    // Default/empty route ('' -> '/home') is captured before the role is known.
+    if (path === '/' || path === '/home') {
+      return home;
+    }
+    if (path === '/home-admin') {
+      return user.isAdmin ? returnUrl : home;
+    }
+    if (path === '/home-provider') {
+      return user.isServiceProvider && !user.isAdmin ? returnUrl : home;
+    }
+    return returnUrl;
   }
 }

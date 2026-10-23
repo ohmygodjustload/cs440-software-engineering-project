@@ -38,11 +38,6 @@
       <button type="button" class="settings-retry" (click)="retryLoad()">Try again</button>
     </div>
   } @else {
-    <div class="settings-unavailable" role="note">
-      <strong>Saving is unavailable.</strong>
-      <span>The API has no user-update endpoint yet. Edits stay on this page.</span>
-    </div>
-
     <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
       @if (activeTabId === 'profile') {
       <div role="tabpanel" id="settings-panel-profile" aria-labelledby="settings-tab-profile" tabindex="0">
@@ -56,7 +51,7 @@
               <p class="field-error" id="settings-fullname-error" role="alert">
                 @if (form.controls.fullName.errors?.['required']) { Enter your full name. }
                 @else if (form.controls.fullName.errors?.['pattern']) {
-                  Use letters, spaces, hyphens, apostrophes, or periods only. }
+                  Use letters, numbers, spaces, hyphens, apostrophes, or periods only. }
                 @else { Keep your name to 200 characters or fewer. }
               </p>
             }
@@ -113,10 +108,6 @@
             <dd>{{ roleSummary }}</dd>
           </div>
         </dl>
-        <div class="settings-unavailable settings-unavailable--inline" role="note">
-          <strong>Password changes unavailable.</strong>
-          <span>The backend exposes no login or password endpoint, so this page shows information only.</span>
-        </div>
       </section>
       </div>
       }
@@ -125,7 +116,7 @@
       <div role="tabpanel" id="settings-panel-preferences" aria-labelledby="settings-tab-preferences" tabindex="0">
       <section class="settings-section" aria-labelledby="prefs-heading">
         <h2 id="prefs-heading">Preferences</h2>
-        <p class="section-lede">Calendar and notification choices. These are collected on this page but not consumed anywhere yet.</p>
+        <p class="section-lede">Calendar and notification choices. The default calendar view is saved to this device and applied by the Calendar page; notification checkboxes are collected but not consumed anywhere yet.</p>
         <div class="field field--narrow">
           <label for="settings-calendar-view">Default calendar view</label>
           <select id="settings-calendar-view" formControlName="defaultCalendarView">
@@ -133,7 +124,7 @@
               <option [value]="view.value">{{ view.label }}</option>
             }
           </select>
-          <p class="field-hint">The Calendar page does not use this preference yet.</p>
+          <p class="field-hint">Applied the next time the Calendar tab opens. Saved in this browser for your account only.</p>
         </div>
         <fieldset class="notify-group">
           <legend>Notification settings</legend>

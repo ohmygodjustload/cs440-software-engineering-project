@@ -11,6 +11,9 @@
     <a class="primary new-appointment" routerLink="/book-appointment">+ New appointment</a>
   </header>
 
+  @if (actionError) {
+    <p class="error" role="alert">{{ actionError }}</p>
+  }
   @if (loading) {
     <app-loading label="Loading appointments…"></app-loading>
   } @else if (error) {
@@ -36,6 +39,10 @@
               <button type="button" class="primary details-button"
                 [attr.aria-expanded]="selectedId === appointment.id" (click)="toggleDetails(appointment.id)">
                 {{ selectedId === appointment.id ? 'Hide details' : 'View details' }}
+              </button>
+              <button type="button" class="details-button"
+                [disabled]="cancellingId === appointment.id" (click)="cancel(appointment.id)">
+                {{ cancellingId === appointment.id ? 'Cancelling…' : 'Cancel' }}
               </button>
             </div>
             @if (selectedId === appointment.id) {
