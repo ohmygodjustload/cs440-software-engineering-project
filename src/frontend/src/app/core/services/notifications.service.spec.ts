@@ -66,11 +66,11 @@ describe('NotificationsService', () => {
     expect(actual).toBeTruthy();
   });
 
-  it('should GET /api/notifications?mine={userId} for history', () => {
+  it('should GET /api/notifications?mine=true for history', () => {
     let actual: unknown[] | undefined;
     service.getNotifications('user-1').subscribe((items) => (actual = items));
 
-    const request = httpTesting.expectOne('/api/notifications?mine=user-1');
+    const request = httpTesting.expectOne('/api/notifications?mine=true');
     expect(request.request.method).toBe('GET');
     request.flush([]);
 
@@ -89,4 +89,3 @@ describe('NotificationsService', () => {
     expect(actual).toEqual({ updated: 1 });
   });
 });
-

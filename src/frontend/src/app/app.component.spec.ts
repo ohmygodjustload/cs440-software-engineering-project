@@ -9,27 +9,33 @@
 
 import { Component } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, Router } from '@angular/router';
 
 import { AuthService } from './core/services/auth.service';
 import { ToastService } from './core/services/toast.service';
+import { NotificationsService } from './core/services/notifications.service';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   let authService: jasmine.SpyObj<AuthService>;
   let toastService: jasmine.SpyObj<ToastService>;
+  let notificationsService: jasmine.SpyObj<NotificationsService>;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['clearToken', 'getCurrentUser']);
     authService.getCurrentUser.and.returnValue(null);
     toastService = jasmine.createSpyObj<ToastService>('ToastService', ['clear', 'showLoggedOut']);
+    notificationsService = jasmine.createSpyObj<NotificationsService>('NotificationsService', ['getNotifications']);
 
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
+        provideHttpClient(),
         provideRouter([]),
         { provide: AuthService, useValue: authService },
-        { provide: ToastService, useValue: toastService }
+        { provide: ToastService, useValue: toastService },
+        { provide: NotificationsService, useValue: notificationsService }
       ]
     }).compileComponents();
   });
@@ -171,12 +177,14 @@ describe('AppComponent route fade (fallback without view transitions)', () => {
   class HomePageComponent {}
 
   let authService: jasmine.SpyObj<AuthService>;
+  let notificationsService: jasmine.SpyObj<NotificationsService>;
   let restoreViewTransitions: () => void;
 
   beforeEach(async () => {
     restoreViewTransitions = setViewTransitionsSupport(false);
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['clearToken', 'getCurrentUser']);
     authService.getCurrentUser.and.returnValue(null);
+    notificationsService = jasmine.createSpyObj<NotificationsService>('NotificationsService', ['getNotifications']);
 
     await TestBed.configureTestingModule({
       imports: [AppComponent],
@@ -187,7 +195,8 @@ describe('AppComponent route fade (fallback without view transitions)', () => {
           { path: 'login', component: LoginPageComponent },
           { path: 'home', component: HomePageComponent }
         ]),
-        { provide: AuthService, useValue: authService }
+        { provide: AuthService, useValue: authService },
+        { provide: NotificationsService, useValue: notificationsService }
       ]
     }).compileComponents();
   });
@@ -293,23 +302,27 @@ describe('AppComponent with native view transitions', () => {
   class HomePageComponent {}
 
   let authService: jasmine.SpyObj<AuthService>;
+  let notificationsService: jasmine.SpyObj<NotificationsService>;
   let restoreViewTransitions: () => void;
 
   beforeEach(async () => {
     restoreViewTransitions = setViewTransitionsSupport(true);
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['clearToken', 'getCurrentUser']);
     authService.getCurrentUser.and.returnValue(null);
+    notificationsService = jasmine.createSpyObj<NotificationsService>('NotificationsService', ['getNotifications']);
 
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
+        provideHttpClient(),
         provideRouter([
           { path: 'first', component: FirstPageComponent },
           { path: 'second', component: SecondPageComponent },
           { path: 'login', component: LoginPageComponent },
           { path: 'home', component: HomePageComponent }
         ]),
-        { provide: AuthService, useValue: authService }
+        { provide: AuthService, useValue: authService },
+        { provide: NotificationsService, useValue: notificationsService }
       ]
     }).compileComponents();
   });

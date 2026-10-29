@@ -53,9 +53,11 @@ if (!string.IsNullOrWhiteSpace(mongoConnectionString))
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderStore, AppointmentScheduler.Api.Stores.MongoProviderStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderRequestStore, AppointmentScheduler.Api.Stores.MongoProviderRequestStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.MongoUserStore>();
+    builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.INotificationStore, AppointmentScheduler.Api.Stores.MongoNotificationStore>();
     builder.Services.AddSingleton<IAppointmentTypeStore, MongoAppointmentTypeStore>();
     builder.Services.AddSingleton<ILocationStore, MongoLocationStore>();
     builder.Services.AddSingleton<INotificationPreferencesStore, NotificationPreferencesStore>();
+builder.Services.AddSingleton<AppointmentScheduler.Api.Services.INotificationService, AppointmentScheduler.Api.Services.NotificationService>();
 }
 else
 {
@@ -65,9 +67,11 @@ else
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderStore, AppointmentScheduler.Api.Stores.InMemoryProviderStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IProviderRequestStore, AppointmentScheduler.Api.Stores.InMemoryProviderRequestStore>();
     builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.IUserStore, AppointmentScheduler.Api.Stores.InMemoryUserStore>();
+builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.INotificationStore, AppointmentScheduler.Api.Stores.InMemoryNotificationStore>();
     builder.Services.AddSingleton<IAppointmentTypeStore, InMemoryAppointmentTypeStore>();
     builder.Services.AddSingleton<ILocationStore, InMemoryLocationStore>();
     builder.Services.AddSingleton<INotificationPreferencesStore, InMemoryNotificationPreferencesStore>();
+builder.Services.AddSingleton<AppointmentScheduler.Api.Services.INotificationService, AppointmentScheduler.Api.Services.NotificationService>();
 }
 
 // The Angular dev server (http://localhost:4200) is a different origin than the API, so browser

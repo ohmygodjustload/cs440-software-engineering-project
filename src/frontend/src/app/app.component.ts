@@ -20,10 +20,13 @@ import {
   RouterLinkActive,
   RouterOutlet
 } from '@angular/router';
+import { EMPTY, distinctUntilChanged, filter, map, startWith, switchMap, tap, timer } from 'rxjs';
 import { User } from './core/models/user';
 import { AuthService } from './core/services/auth.service';
 import { ToastService } from './core/services/toast.service';
 import { NotificationPopupComponent } from './shared/notification-popup/notification-popup.component';
+import { NotificationsService } from './core/services/notifications.service';
+import { AppNotification } from './core/models/notification';
 
 /** A destination shown in the main navigation. */
 interface NavLink {
@@ -62,8 +65,11 @@ const PROVIDER_NAV: readonly NavLink[] = [
 })
 export class AppComponent {
   private readonly toastService = inject(ToastService);
-  /**
-   * Whether the routed page (and header) are visible. It starts hidden so opening the site fades
+  private readonly notificationsService = inject(NotificationsService);
+  private readonly seenNotificationIds = new Set<string>();
+  private suppressNextNotificationToast = true;
+
+  /** Whether the routed page (and header) are visible. It starts hidden so opening the site fades
    * in, and it toggles around navigations only in browsers without the View Transitions API —
    * capable browsers cross-fade pages natively (see app.config.ts) and skip the manual fade.
    */
@@ -99,6 +105,39 @@ export class AppComponent {
         this.endRouteFade();
       }
     });
+
+    // Poll while signed in so notifications created by another account are shown without
+    // requiring a refresh. The first response establishes the baseline and is not replayed.
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map(() => this.authService.getCurrentUser()),
+      startWith(this.authService.getCurrentUser()),
+      map((user) => user?.id ?? null),
+      distinctUntilChanged(),
+      switchMap((userId) => {
+        this.seenNotificationIds.clear();
+        this.suppressNextNotificationToast = true;
+        if (!userId) return EMPTY;
+        return timer(0, 5000).pipe(
+          switchMap(() => this.notificationsService.getNotifications(userId)),
+          tap((items) => this.handlePolledNotifications(items))
+        );
+      }),
+      takeUntilDestroyed()
+    ).subscribe();
+  }
+
+  private handlePolledNotifications(items: AppNotification[]): void {
+    const suppressToasts = this.suppressNextNotificationToast;
+    this.suppressNextNotificationToast = false;
+    for (const item of items) {
+      if (!item.isRead && this.seenNotificationIds.has(item.id) === false) {
+        if (!suppressToasts) {
+          this.toastService.showMissed(item.eventLabel, item.message);
+        }
+        this.seenNotificationIds.add(item.id);
+      }
+    }
   }
 
   get title(): string {
