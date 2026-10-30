@@ -14,18 +14,26 @@
 
     <label class="type-field">
       <span class="visually-hidden">Filter by appointment type</span>
-        <select id="category" name="category">
-          <option value="">All categories</option>
-          @for (option of categories; track option) {
-            <option [value]="option">{{ option }}</option>
-          }
-        </select>
+      <select formControlName="appointmentType" [disabled]="loading">
+        <option value="all">All categories</option>
+        @for (option of categories; track option) {
+          <option [value]="option">{{ option }}</option>
+        }
+      </select>
     </label>
 
-    <label class="start-time-field time-field">
-      <span class="visually-hidden">Start date and time</span>
-      <input type="datetime-local" formControlName="startTime" placeholder="Start date and time" />
+    <label class="date-field time-field" [class.date-filter-empty]="!searchForm.controls.startDate.value">
+      <span>Date</span>
+      <input type="date" formControlName="startDate" aria-label="Filter appointments by date" />
+      @if (!searchForm.controls.startDate.value) {
+        <span class="date-placeholder" aria-hidden="true">All dates</span>
+      }
     </label>
+    @if (searchForm.controls.startDate.value) {
+      <button class="clear-date" type="button" (click)="clearDateFilter()">
+        Clear date
+      </button>
+    }
   </form>
 
   @if (loading) {
@@ -34,25 +42,37 @@
     <div role="alert"><p>{{ error }}</p><button (click)="loadAppointments()">Try again</button></div>
   } @else {
     <section class="appointments" aria-label="Appointments">
-      @for (filteredAppointment of filteredAppointments; track filteredAppointment.title) {
-        <article class="appointment-card">
-          <div>
-            <h3>{{ filteredAppointment.title }}</h3>
-            <p class="slot-category">
-              Status: {{ filteredAppointment.status }}
-            </p>
-            <p>Provider: {{ filteredAppointment.providerName }}</p>
+      @for (appointment of filteredAppointments; track appointment.id) {
+        <article class="appointment-card" [class.expanded]="isExpanded(appointment.id)">
+          <button class="appointment-summary" type="button" (click)="toggleAppointment(appointment.id)"
+            [attr.aria-expanded]="isExpanded(appointment.id)">
+            <span class="summary-title">{{ appointment.title }}</span>
+            <span class="appointment-meta">
+              <span class="status-badge">{{ appointment.status }}</span>
+              <span>{{ appointment.category }}</span>
+            </span>
+            <span class="summary-date">{{ formatDateTime(appointment.startDateTime) }}</span>
+            <span class="expand-indicator" aria-hidden="true">{{ isExpanded(appointment.id) ? '−' : '+' }}</span>
+          </button>
+          @if (isExpanded(appointment.id)) {
+            <div class="appointment-details">
+              <p><strong>When:</strong> {{ formatDateTime(appointment.startDateTime) }} –
+                {{ formatDateTime(appointment.endDateTime) }}</p>
+              <p><strong>Provider:</strong> {{ appointment.providerName || 'Not specified' }}</p>
+              <p><strong>Location:</strong> {{ appointment.location || 'Not specified' }}</p>
+              <p><strong>Client:</strong> {{ clientName(appointment) }}</p>
+              @if (appointment.notes) {
+                <p><strong>Note:</strong> {{ appointment.notes }}</p>
+              }
+            </div>
+          }
+          <div class="appointment-actions">
+            <a class="primary" [routerLink]="['/edit-appointment-admin']" [queryParams]="{ id: appointment.id }">Edit</a>
           </div>
-          <a class="primary" [routerLink]="['/edit-appointment-admin']" [queryParams]="{ id: filteredAppointment.id }">Edit</a>
         </article>
       } @empty {
         <p>No appointments match your search criteria.</p>
       }
     </section>
-
-    <!-- <footer>
-      <a routerLink="/provider">Manage appointments</a>
-      <button (click)="loadAppointments()">Refresh</button>
-    </footer> -->
   }
 </main>

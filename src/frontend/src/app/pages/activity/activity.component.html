@@ -1,53 +1,45 @@
-<main class="appointment-management">
+<main class="activity-terminal">
   <header>
     <div>
       <h1>Activity Log</h1>
-      <p>View user activities.</p>
+      <p>Global feed of account and appointment actions.</p>
     </div>
+    <button class="clear-activity" type="button" aria-label="Delete all activity log entries"
+      title="Delete all activity log entries" [disabled]="clearing || entries.length === 0"
+      [attr.aria-disabled]="clearing || entries.length === 0" (click)="clearActivity()">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 7h12M9 7V5h6v2m-8 0 1 13h6l1-13M10 10v7m4-7v7" />
+      </svg>
+    </button>
   </header>
 
   <form class="controls" role="search" [formGroup]="searchForm">
     <label class="search-field">
-      <span class="visually-hidden">Search Appointments</span>
-      <input type="search" formControlName="search" placeholder="Search Appointments" />
-    </label>
-
-    <label class="type-field">
-      <span class="visually-hidden">Filter by appointment type</span>
-        <select id="category" name="category">
-          <option value="">All categories</option>
-          @for (option of categories; track option) {
-            <option [value]="option">{{ option }}</option>
-          }
-        </select>
+      <span class="visually-hidden">Search activity</span>
+      <input type="search" formControlName="search" placeholder="Search activity" />
     </label>
   </form>
 
   @if (loading) {
-    <app-loading label="Loading appointments…"></app-loading>
+    <app-loading label="Loading activity…"></app-loading>
   } @else if (error) {
-    <div role="alert"><p>{{ error }}</p><button (click)="loadAppointments()">Try again</button></div>
+    <div role="alert"><p>{{ error }}</p><button (click)="loadActivity()">Try again</button></div>
   } @else {
-    <section class="appointments" aria-label="Appointments">
-      @for (appointment of appointments; track appointment.title) {
-        <article class="appointment-card">
-          <div>
-            <h3>{{ appointment.title }}</h3>
-            <p class="slot-category">
-              Status: {{ appointment.status }}
-            </p>
-            <p>Provider: {{ appointment.providerName }}</p>
-          </div>
-          <a class="primary" [routerLink]="['/edit-appointment-admin']" [queryParams]="{ id: appointment.id }">Edit</a>
-        </article>
+    <section class="activity-list" aria-label="Activity log">
+      <div class="activity-header" aria-hidden="true">
+        <span>Date</span>
+        <span>Notification received</span>
+      </div>
+      @for (entry of filteredEntries; track entry.id) {
+        <div class="activity-line">
+          <time>{{ entry.timestamp | date:'medium' }}</time>
+          <span><strong>{{ entry.action }}</strong> {{ entry.message }}</span>
+        </div>
       } @empty {
-        <p>No appointments match your search criteria.</p>
+        <div class="activity-line">
+          <span>No activity found.</span>
+        </div>
       }
     </section>
-
-    <!-- <footer>
-      <a routerLink="/provider">Manage appointments</a>
-      <button (click)="loadAppointments()">Refresh</button>
-    </footer> -->
   }
 </main>

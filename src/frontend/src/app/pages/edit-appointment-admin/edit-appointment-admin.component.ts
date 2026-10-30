@@ -1,24 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule, NgForm } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
-
-import { AuthService } from '../../core/services/auth.service';
-
-import { AppointmentCategory } from '../../core/models/appointment';
-import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
-
-interface AppointmentForm {
-  title: string;
-  category: AppointmentCategory;
-  start: string;
-  end: string;
-  providerId: string;
-  location: string;
-  notes: string;
-}
+import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Appointment, AppointmentCategory, AppointmentStatus } from '../../core/models/appointment';
 
 @Component({
   selector: 'app-edit-appointment-admin',
@@ -28,93 +13,102 @@ interface AppointmentForm {
   styleUrl: './edit-appointment-admin.component.css'
 })
 export class EditAppointmentAdminComponent implements OnInit {
-  private readonly service = inject(SlotsService);
-  private readonly auth = inject(AuthService);
+  private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
-  private readonly destroyRef = inject(DestroyRef);
-
-  get categories(): readonly AppointmentCategory[] {
-    const user = this.auth.getCurrentUser();
-    if (!user?.isServiceProvider || user.isActive === false) return [];
-
-    const allowed: AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
-    return allowed.filter(category => user.serviceTypes?.some(value =>
-      value.trim().toLowerCase() === category.toLowerCase()));
-  }
-
-  get today(): string {
-    return this.localInput(new Date().toISOString()).split('T')[0];
-  }
-
-  providerChanged(): void {
-    this.draft.category = this.categories[0] ?? 'Medical';
-    this.categoryChanged();
-  }
-
-  isPastTime(time: string): boolean {
-    return new Date(`${this.selectedDate}T${time}`).getTime() <= Date.now();
-  }
-  // Half-hour start times from 9:00 AM through 5:30 PM, inclusive (18 options).
-  // Slots are 60 minutes, so the last slot ends at 6:30 PM. 18 options fill the
-  // 3-column picker in six even rows. Generated from a range so gaps (like the
-  // earlier missing noon hour) cannot sneak back in.
-  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17.5, 30);
-
-  private buildStartTimes(startHour: number, endHour: number, stepMinutes: number): string[] {
-    const pad = (n: number) => String(n).padStart(2, '0');
-    const out: string[] = [];
-    for (let m = startHour * 60; m <= endHour * 60; m += stepMinutes) {
-      out.push(`${pad(Math.floor(m / 60))}:${pad(m % 60)}`);
-    }
-    return out;
-  }
-
-  draft = this.emptyDraft();
+  private readonly router = inject(Router);
+  appointment: Appointment | null = null;
+  loading = true;
   saving = false;
-  formError = '';
+  error: string | null = null;
   success = '';
+  private originalValues: string | null = null;
+  readonly categories: readonly AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
+  readonly statuses: readonly AppointmentStatus[] = ['Available', 'Booked', 'Completed', 'Canceled', 'Missed'];
+  readonly startTimes = this.buildStartTimes(9, 17.5, 30);
 
-  categoryChanged(): void {
-    // Providers write their own titles; keep their text when changing category.
-    this.success = '';
-    this.formError = '';
+  ngOnInit(): void {
+    const id = this.route.snapshot.queryParamMap.get('id');
+    if (!id) { this.error = 'No appointment was selected.'; this.loading = false; return; }
+    this.http.get<Appointment>(`/api/appointments/${encodeURIComponent(id)}`).subscribe({
+      next: (appointment) => {
+        this.appointment = {
+          ...appointment,
+          startDateTime: this.toDateTimeLocal(appointment.startDateTime),
+          endDateTime: this.toDateTimeLocal(appointment.endDateTime)
+        };
+        this.originalValues = this.editableValues(this.appointment);
+        this.loading = false;
+      },
+      error: () => { this.error = 'Failed to load appointment.'; this.loading = false; }
+    });
+  }
+
+  save(): void {
+    if (!this.appointment || this.saving || !this.hasChanges) return;
+    const startDateTime = new Date(this.appointment.startDateTime);
+    const endDateTime = new Date(this.appointment.endDateTime);
+    if (Number.isNaN(startDateTime.getTime()) || Number.isNaN(endDateTime.getTime()) ||
+      endDateTime <= startDateTime) {
+      this.error = 'End time must be after start time.'; return;
+    }
+    this.saving = true;
+    this.error = null;
+    this.http.put<Appointment>(`/api/admin/appointments/${encodeURIComponent(this.appointment.id)}`, {
+      title: this.appointment.title, category: this.appointment.category,
+      startDateTime: startDateTime.toISOString(), endDateTime: endDateTime.toISOString(),
+      providerId: this.appointment.providerId, providerName: this.appointment.providerName,
+      location: this.appointment.location, notes: this.appointment.notes, status: this.appointment.status
+    }).subscribe({
+      next: (appointment) => {
+        this.appointment = {
+          ...appointment,
+          startDateTime: this.toDateTimeLocal(appointment.startDateTime),
+          endDateTime: this.toDateTimeLocal(appointment.endDateTime)
+        };
+        this.originalValues = this.editableValues(this.appointment);
+        this.success = 'Appointment saved.';
+        this.saving = false;
+      },
+      error: () => { this.error = 'Could not save this appointment.'; this.saving = false; }
+    });
   }
 
   get selectedDate(): string {
-    return this.draft.start.split('T')[0] || this.localInput(new Date().toISOString()).split('T')[0];
+    return this.appointment?.startDateTime.split('T')[0] ?? '';
+  }
+
+  get hasChanges(): boolean {
+    return this.appointment !== null && this.originalValues !== this.editableValues(this.appointment);
   }
 
   get selectedTime(): string {
-    return this.draft.start.split('T')[1]?.slice(0, 5) || '';
+    return this.appointment?.startDateTime.split('T')[1]?.slice(0, 5) ?? '';
+  }
+
+  get dateLabel(): string {
+    return this.selectedDate
+      ? new Date(`${this.selectedDate}T12:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      : '';
   }
 
   get dateOptions(): { key: string; date: Date }[] {
     const selected = new Date(`${this.selectedDate}T12:00`);
     const monday = new Date(selected);
     monday.setDate(selected.getDate() - ((selected.getDay() + 6) % 7));
-    const count = 7;
-    return Array.from({ length: count }, (_, index) => {
+    return Array.from({ length: 7 }, (_, index) => {
       const date = new Date(monday);
       date.setDate(monday.getDate() + index);
       return { key: this.localInput(date.toISOString()).split('T')[0], date };
     });
   }
 
-  get dateLabel(): string {
-    return new Date(`${this.selectedDate}T12:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  }
-
-  get durationMinutes(): number {
-    return 60;
-  }
-
   chooseDate(date: string): void {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < this.today) return;
+    if (!this.appointment || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
     this.setStart(date, this.selectedTime || '10:30');
   }
 
   chooseTime(time: string): void {
-    if (!this.startTimes.includes(time) || this.isPastTime(time)) return;
+    if (!this.appointment || !this.startTimes.includes(time)) return;
     this.setStart(this.selectedDate, time);
   }
 
@@ -124,90 +118,28 @@ export class EditAppointmentAdminComponent implements OnInit {
   }
 
   private setStart(date: string, time: string): void {
-    const duration = this.durationMinutes;
-    this.draft.start = `${date}T${time}`;
-    this.draft.end = this.localInput(new Date(Date.parse(this.draft.start) + duration * 60000).toISOString());
+    if (!this.appointment) return;
+    const start = new Date(`${date}T${time}`);
+    const end = new Date(start.getTime() + 60 * 60000);
+    this.appointment.startDateTime = this.localInput(start.toISOString());
+    this.appointment.endDateTime = this.localInput(end.toISOString());
   }
 
-  ngOnInit(): void {
-    // User ID and scheduler provider ID are different; do not substitute one for the other.
-    this.draft.providerId = this.route.snapshot.data['providerId'] ?? '';
-    this.providerChanged();
+  private buildStartTimes(startHour: number, endHour: number, stepMinutes: number): string[] {
+    const out: string[] = [];
+    for (let minutes = startHour * 60; minutes <= endHour * 60; minutes += stepMinutes) {
+      out.push(`${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`);
+    }
+    return out;
   }
 
-  save(form: NgForm): void {
-    if (this.saving) return;
-    this.formError = '';
-    this.success = '';
-    if (this.draft.start && Number.isFinite(Date.parse(this.draft.start))) {
-      this.draft.end = this.localInput(
-        new Date(Date.parse(this.draft.start) + 60 * 60000).toISOString()
-      );
-    }
-    const start = new Date(this.draft.start);
-    const end = new Date(this.draft.end);
+  cancel(): void { void this.router.navigate(['/appointments-admin']); }
 
-    if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim()) {
-      form.control.markAllAsTouched();
-      this.formError = 'Enter a category, service title, future date, start time, and location.';
-      return;
-    }
-
-    if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end <= start) {
-      this.formError = 'The end date and time must be after the start.';
-      return;
-    }
-
-    if (start.getTime() <= Date.now()) {
-      this.formError = 'Choose a future appointment time.';
-      return;
-    }
-
-    if (!this.categories.includes(this.draft.category)) {
-      this.formError = 'Choose a category supported by this provider.';
-      return;
-    }
-
-    const body: CreateSlotDraft = {
-      title: this.draft.title.trim(),
-      category: this.draft.category,
-      startDateTime: start.toISOString(),
-      endDateTime: end.toISOString(),
-      providerId: this.draft.providerId.trim(),
-      location: this.draft.location.trim(),
-      notes: this.draft.notes.trim()
-    };
-
-    this.saving = true;
-    this.service.publish(body)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.saving = false)
-      )
-      .subscribe({
-        next: () => {
-          this.success = 'Your available slot has been published.';
-          const category = this.draft.category;
-          this.draft = this.emptyDraft();
-          this.draft.category = category;
-          form.resetForm(this.draft);
-        },
-        error: (error: unknown) => {
-          this.formError = this.auth.getErrorMessage(error);
-        }
-      });
-  }
-
-  private emptyDraft(): AppointmentForm {
-    return {
-      title: '',
-      category: 'Medical',
-      start: '',
-      end: '',
-      providerId: '',
-      location: '',
-      notes: ''
-    };
+  private toDateTimeLocal(value: string): string {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const pad = (part: number) => String(part).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
   private localInput(value: string): string {
@@ -216,4 +148,17 @@ export class EditAppointmentAdminComponent implements OnInit {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
+  private editableValues(appointment: Appointment): string {
+    return JSON.stringify({
+      title: appointment.title,
+      category: appointment.category,
+      startDateTime: appointment.startDateTime,
+      endDateTime: appointment.endDateTime,
+      providerId: appointment.providerId,
+      providerName: appointment.providerName,
+      location: appointment.location,
+      notes: appointment.notes,
+      status: appointment.status
+    });
+  }
 }

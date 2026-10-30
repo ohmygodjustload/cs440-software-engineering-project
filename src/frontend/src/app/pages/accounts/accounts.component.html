@@ -14,12 +14,12 @@
 
     <label class="type-field">
       <span class="visually-hidden">Filter by account type</span>
-        <select id="category" name="category" (ngModelChange)="loadAccounts()" [disabled]="loading">
-          <option value="">All categories</option>
-          @for (option of categories; track option) {
-            <option [value]="option">{{ option }}</option>
-          }
-        </select>
+      <select formControlName="accountType" [disabled]="loading">
+        <option value="all">All categories</option>
+        @for (option of categories; track option) {
+          <option [value]="option.toLowerCase()">{{ option }}</option>
+        }
+      </select>
     </label>
   </form>
 
@@ -29,7 +29,7 @@
     <div role="alert"><p>{{ error }}</p><button (click)="loadAccounts()">Try again</button></div>
   } @else {
     <section class="accounts" aria-label="Accounts">
-      @for (account of accounts; track account.id) {
+      @for (account of filteredAccounts; track account.id) {
         <article class="account-card">
           <div>
             <h3>{{ account.firstName }} {{ account.lastName }}</h3>

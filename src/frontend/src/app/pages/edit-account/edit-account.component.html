@@ -1,93 +1,43 @@
-<section>
-  <main class="account-page">
-    <h1>Edit account</h1>
-
-    <form class="edit-form">
-      <div class="form-row">
-        <label class="field">
-          <span>Full name</span>
-          <input name="fullName" value="Ava Brooks" />
+<main class="account-page">
+  <h1>Edit account</h1>
+  @if (loading) {
+    <p>Loading account...</p>
+  } @else if (error && !account) {
+    <p role="alert">{{ error }}</p>
+    <a routerLink="/accounts">Back to accounts</a>
+  } @else {
+    <form class="settings-form" [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-grid">
+        <label>First name <input formControlName="firstName" />
+          @if (fieldError('firstName', 'First name')) {
+            <span class="field-error" role="alert">{{ fieldError('firstName', 'First name') }}</span>
+          }
         </label>
-
-        <label class="field">
-          <span>Email address</span>
-          <input name="email" type="email" value="ava@example.com" />
+        <label>Last name <input formControlName="lastName" />
+          @if (fieldError('lastName', 'Last name')) {
+            <span class="field-error" role="alert">{{ fieldError('lastName', 'Last name') }}</span>
+          }
+        </label>
+        <label>Email @if (account?.isServiceProvider) { <span>(required for service providers)</span> }
+          <input type="email" formControlName="email" />
+          @if (fieldError('email', 'Email')) {
+            <span class="field-error" role="alert">{{ fieldError('email', 'Email') }}</span>
+          }
+        </label>
+        <label>Phone @if (account?.isServiceProvider) { <span>(required for service providers)</span> }
+          <input type="tel" formControlName="phone" />
+          @if (fieldError('phone', 'Phone number')) {
+            <span class="field-error" role="alert">{{ fieldError('phone', 'Phone number') }}</span>
+          }
         </label>
       </div>
-
-      <div class="form-row">
-        <label class="field">
-          <span>Phone</span>
-          <input name="phone" type="tel" value="(608) 555-0142" />
-        </label>
-
-        <label class="field select-field">
-          <span>Time zone</span>
-          <select name="timeZone">
-            <option selected>Central Time (US)</option>
-            <option>Eastern Time (US)</option>
-            <option>Mountain Time (US)</option>
-            <option>Pacific Time (US)</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="section-divider">
-        <span aria-hidden="true"></span>
-        <strong>Service provider</strong>
-        <span aria-hidden="true"></span>
-      </div>
-
-      <fieldset class="category-fieldset">
-        <legend>Provider categories</legend>
-        <div class="category-options">
-          <label>
-            <input type="checkbox" checked />
-            <span>Beauty</span>
-          </label>
-          <label>
-            <input type="checkbox" checked />
-            <span>Fitness</span>
-          </label>
-          <label>
-            <input type="checkbox" />
-            <span>Medical</span>
-          </label>
-        </div>
-      </fieldset>
-
-      <section class="credentials" aria-labelledby="credentials-heading">
-        <h2 id="credentials-heading">Credentials</h2>
-
-        <label class="field">
-          <span>Beauty credentials</span>
-          <input
-            name="beautyCredentials"
-            value="License: DEMO-COS-104 • 4 years of salon experience"
-          />
-        </label>
-
-        <label class="field">
-          <span>Fitness credentials</span>
-          <input
-            name="fitnessCredentials"
-            value="Certification: DEMO-FIT-208 • 2 years of fitness coaching"
-          />
-        </label>
-
-        <label class="field">
-          <span>Medical credentials</span>
-          <input
-            name="medicalCredentials"
-            value="No medical credential submitted."
-          />
-        </label>
-      </section>
-
+      @if (error) { <p role="alert">{{ error }}</p> }
+      @if (success) { <p role="status">{{ success }}</p> }
       <div class="actions">
-        <button class="primary-action" type="submit">Save changes</button>
-        <button class="secondary-action" type="reset">Reset</button>
+        <button class="primary-action" type="submit" [disabled]="saving || form.pristine"
+          [attr.aria-disabled]="saving || form.pristine">Save changes</button>
+        <button class="secondary-action" type="button" (click)="cancel()">Cancel</button>
       </div>
     </form>
-  </main>
-</section>
+  }
+</main>

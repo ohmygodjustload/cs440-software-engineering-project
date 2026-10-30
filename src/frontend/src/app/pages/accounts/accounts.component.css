@@ -41,6 +41,7 @@ h1 {
 
 .search-field {
   display: flex;
+  height: 48px;
   align-items: center;
   gap: 10px;
   background: #d9e6ed;
@@ -69,27 +70,35 @@ h1 {
 }
 
 .type-field {
-  display: block;
+  display: flex;
   flex: 0 1 240px;
   min-width: 180px;
+  height: 48px;
+  align-items: center;
+  padding: 0;
+  border-radius: 999px;
+  background: #d9e6ed;
 }
 
 select {
   color: inherit;
   width: 100%;
-  height: 100%;
+  min-height: 48px;
   border: none;
   padding: 14px 20px;
   border-radius: 999px;
   cursor: pointer;
-  background: #e2e8d4;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  text-align: center;
 }
 
 /* Appointments Stack Layout */
 .accounts {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
 .account-details {
@@ -100,11 +109,12 @@ select {
   position: relative;
   display: flex;
   width: 100%;
-  height: 160px;
+  min-height: 112px;
+  height: auto;
   align-items: center;
   overflow: hidden;
-  border-radius: 24px;
-  padding: 12px 58px 12px 24px;
+  border-radius: 16px;
+  padding: 14px 18px;
   background: #e0dcd1;
   justify-content: space-between;
 }
@@ -123,6 +133,23 @@ select {
   text-decoration: none;
 }
 
+@media (max-width: 650px) {
+  .account-management {
+    margin: 12px;
+    padding: 24px 18px;
+  }
+
+  .account-card {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .account-card a {
+    margin-left: 0;
+  }
+}
+
 .account-card a:hover {
   background: #253a36;
 }
@@ -133,15 +160,15 @@ select {
 }
 
 .account-card h3 {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 500;
   margin: 0;
   color: #212c2a;
 }
 
 .account-card p {
-  font-size: 14px;
-  margin: 4px 0;
+  font-size: 12px;
+  margin: 2px 0;
   color: #344945;
 }
 

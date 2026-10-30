@@ -1,254 +1,80 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators
-} from '@angular/forms';
-
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { User } from '../../core/models/user';
-import {
-  CALENDAR_VIEWS,
-  SETTINGS_TABS,
-  SettingsFormValue,
-  SettingsTabId,
-  TIME_ZONES
-} from '../../core/models/user-settings';
-import { CalendarViewService } from '../../core/services/calendar-view.service';
-import { UserSettingsPatch } from '../../core/services/user-settings.service';
-import { ToastService } from '../../core/services/toast.service';
-import { UserSettingsService } from '../../core/services/user-settings.service';
-import { LoadingComponent } from '../../core/components/loading/loading.component';
+import { fieldErrorMessage } from '../../core/validation/field-error';
 
-/** Full-name alphabet: Unicode letters/marks, digits, plus everyday punctuation. */
-const FULL_NAME_PATTERN = /^[\p{L}\p{M}\p{N} .'\-]+$/u;
-
-type LoadState = 'loading' | 'loaded' | 'error';
-
-/**
- * Permissive phone check: empty is allowed (phone is optional); otherwise the
- * value must contain at least 7 digits and only telephone punctuation.
- */
-export function phoneValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const raw = (control.value ?? '').toString().trim();
-    if (raw === '') {
-      return null;
-    }
-    const digits = raw.replace(/\D/g, '');
-    const allowed = /^[+()\-.\s\d]+(?:\s*(?:x|ext\.?|extension)\s*\d+)?$/i.test(raw);
-    if (!allowed || digits.length < 7 || raw.length > 50) {
-      return { phone: true };
-    }
-    return null;
-  };
-}
 @Component({
   selector: 'app-edit-account',
-  imports: [CommonModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './edit-account.component.html',
   styleUrl: './edit-account.component.css'
 })
 export class EditAccountComponent implements OnInit {
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly settingsService = inject(UserSettingsService);
-  private readonly toastService = inject(ToastService);
-  private readonly calendarViewService = inject(CalendarViewService);
-
-  readonly tabs = SETTINGS_TABS;
-  readonly timeZones = TIME_ZONES;
-  readonly calendarViews = CALENDAR_VIEWS;
-
-  activeTabId: SettingsTabId = 'profile';
-  loadState: LoadState = 'loading';
-  loadError: string | null = null;
-  saveError: string | null = null;
-  saveSuccess = false;
-  saving = false;
-  currentUser: User | null = null;
-  private savedBaseline: SettingsFormValue | null = null;
-
-  readonly form = this.formBuilder.nonNullable.group({
-    fullName: ['', [Validators.required, Validators.maxLength(200), Validators.pattern(FULL_NAME_PATTERN)]],
-    email: ['', [Validators.required, Validators.email, Validators.maxLength(320)]],
-    phone: ['', [phoneValidator()]],
-    timeZone: ['UTC', [Validators.required]],
-    defaultCalendarView: ['month', [Validators.required]],
-    notifyMedical: [true],
-    notifyBeauty: [true],
-    notifyFitness: [true]
+  private readonly http = inject(HttpClient);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  readonly form = this.fb.nonNullable.group({
+    firstName: ['', [Validators.required, Validators.maxLength(100)]],
+    lastName: ['', [Validators.required, Validators.maxLength(100)]],
+    email: ['', [Validators.email, Validators.maxLength(320)]],
+    phone: ['', [Validators.maxLength(50)]]
   });
+  account: User | null = null;
+  loading = true;
+  saving = false;
+  error: string | null = null;
+  success = '';
 
   ngOnInit(): void {
-    this.loadCurrentUser();
+    const id = this.route.snapshot.queryParamMap.get('id');
+    if (!id) { this.error = 'No account was selected.'; this.loading = false; return; }
+    this.http.get<User>(`/api/users/${encodeURIComponent(id)}`).subscribe({
+      next: (account) => {
+        this.account = account;
+        if (account.isServiceProvider) {
+          this.form.controls.email.addValidators(Validators.required);
+          this.form.controls.phone.addValidators(Validators.required);
+          this.form.controls.email.updateValueAndValidity();
+          this.form.controls.phone.updateValueAndValidity();
+        }
+        this.form.patchValue({
+          firstName: account.firstName, lastName: account.lastName,
+          email: account.email ?? '', phone: account.phone ?? ''
+        });
+        this.loading = false;
+      },
+      error: () => { this.error = 'Failed to load account.'; this.loading = false; }
+    });
   }
 
-  selectTab(id: SettingsTabId): void {
-    const tab = this.tabs.find((entry) => entry.id === id);
-    if (tab?.available) {
-      this.activeTabId = id;
-      this.saveSuccess = false;
-    }
-  }
-
-  /** Keyboard support for the tablist: arrows move between enabled tabs. */
-  onTabKeydown(event: KeyboardEvent, id: SettingsTabId): void {
-    const order = this.tabs.filter((tab) => tab.available).map((tab) => tab.id);
-    const current = order.indexOf(id);
-    if (current < 0) {
-      return;
-    }
-    let next: number | null = null;
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      next = (current + 1) % order.length;
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      next = (current - 1 + order.length) % order.length;
-    } else if (event.key === 'Home') {
-      next = 0;
-    } else if (event.key === 'End') {
-      next = order.length - 1;
-    }
-    if (next !== null) {
-      event.preventDefault();
-      const target = order[next];
-      this.selectTab(target);
-      document.getElementById(`settings-tab-${target}`)?.focus();
-    }
-  }
-
-  get isLoading(): boolean {
-    return this.loadState === 'loading';
-  }
-
-  get isDirty(): boolean {
-    if (!this.savedBaseline) {
-      return false;
-    }
-    return JSON.stringify(this.savedBaseline) !== JSON.stringify(this.form.getRawValue());
-  }
-
-  get canSave(): boolean {
-    return this.loadState === 'loaded' && this.isDirty && !this.saving && this.form.valid;
-  }
-
-  /** Display username from the loaded record (read-only; never invented). */
-  get username(): string {
-    return this.currentUser?.username ?? '—';
-  }
-
-  /** Human-readable account roles from the loaded record. */
-  get roleSummary(): string {
-    const roles: string[] = [];
-    if (this.currentUser?.isAdmin) {
-      roles.push('Admin');
-    }
-    if (this.currentUser?.isServiceProvider) {
-      roles.push('Service provider');
-    }
-    if (this.currentUser?.isClient) {
-      roles.push('Client');
-    }
-    return roles.length > 0 ? roles.join(', ') : '—';
-  }
-
-  resolveDefaultTimeZone(): string {
-    try {
-      const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (zone && this.timeZones.some((o) => o.value === zone)) {
-        return zone;
-      }
-    } catch {
-      // Intl unavailable: fall through to UTC.
-    }
-    return 'UTC';
-  }
-
-  retryLoad(): void {
-    this.loadCurrentUser();
-  }
-
-  onSave(): void {
-    if (this.saving || !this.isDirty) {
-      return;
-    }
+  save(): void {
+    if (!this.account || this.saving || this.form.pristine) return;
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
-      this.form.markAllAsTouched();
+      this.error = 'Please correct the required fields before saving.';
       return;
     }
     this.saving = true;
-    this.saveError = null;
-    this.saveSuccess = false;
-
-    const user = this.currentUser;
-    if (!user) {
-      this.saving = false;
-      this.saveError = 'No account loaded. Your edits have been kept on this page.';
-      return;
-    }
-
-    const nameParts = (this.form.value.fullName ?? '').split(/\s+/).filter((part) => part.length > 0);
-    const patch: UserSettingsPatch = {
-      firstName: nameParts[0] ?? '',
-      lastName: nameParts.slice(1).join(' '),
-      email: this.form.value.email,
-      phone: this.form.value.phone
-    };
-
-    this.settingsService.saveSettings(user.id, patch).subscribe({
-      next: () => {
-        this.calendarViewService.setView(user.id, this.form.controls.defaultCalendarView.value);
+    this.error = null;
+    this.http.put<User>(`/api/admin/accounts/${encodeURIComponent(this.account.id)}`, this.form.getRawValue()).subscribe({
+      next: (account) => {
+        this.account = account;
+        this.success = 'Account Information has been Sucessfully Updated!';
         this.saving = false;
-        this.savedBaseline = { ...this.form.getRawValue() };
-        this.saveSuccess = true;
         this.form.markAsPristine();
-        this.toastService.showNotificationSettingChanged('Your settings were saved.');
       },
-      error: (error: unknown) => {
-        this.saving = false;
-        this.saveError =
-          error instanceof Error && error.message
-            ? error.message
-            : 'Saving failed. Your edits have been kept on this page.';
-      }
+      error: () => { this.error = 'Could not save this account.'; this.saving = false; }
     });
   }
 
-  private loadCurrentUser(): void {
-    this.loadState = 'loading';
-    this.loadError = null;
+  cancel(): void { void this.router.navigate(['/accounts']); }
 
-    this.settingsService.getCurrentUser().subscribe({
-      next: (user) => {
-        this.currentUser = user;
-        const initial = this.toFormValue(user);
-        this.form.reset(initial);
-        this.savedBaseline = { ...initial };
-        this.loadState = 'loaded';
-      },
-      error: (error: unknown) => {
-        this.loadState = 'error';
-        const detail = error instanceof Error && error.message ? ` (${error.message})` : '';
-        this.loadError = `Could not load your settings${detail}. Please try again.`;
-      }
-    });
-  }
-
-  private toFormValue(user: User): SettingsFormValue {
-    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.replace(/\s+/g, ' ').trim();
-    return {
-      fullName,
-      email: user.email ?? '',
-      phone: user.phone ?? '',
-      timeZone: this.resolveDefaultTimeZone(),
-      defaultCalendarView: this.calendarViewService.getView(user.id),
-      notifyMedical: true,
-      notifyBeauty: true,
-      notifyFitness: true
-    };
+  fieldError(controlName: string, label: string): string | null {
+    return fieldErrorMessage(this.form.get(controlName), label);
   }
 }
-
-

@@ -28,6 +28,83 @@ select {
   background: #f7f5f1;
 }
 
+.settings-form,
+.slot-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px;
+  border-radius: 24px;
+  background: #e0dcd1;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 32px;
+}
+
+.settings-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.field-error {
+  color: #8a3b34;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.settings-form [role="alert"] {
+  color: #8a3b34;
+}
+
+.settings-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d4d0c6;
+  border-radius: 12px;
+  background: #f7f5f1;
+  color: inherit;
+  font: inherit;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.actions button {
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.primary-action {
+  background: #344945;
+  color: #f7f5f1;
+}
+
+.secondary-action {
+  background: #e0dcd1;
+}
+
+@media (max-width: 650px) {
+  .account-page {
+    margin: 12px;
+    padding: 24px 18px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 h1 {
   margin: 0 0 10px;
   font-size: 28px;
@@ -126,6 +203,10 @@ h1 {
 .section-divider strong {
   font-size: 13px;
   font-weight: 500;
+}
+
+button:disabled {
+  pointer-events: none;
   line-height: normal;
   white-space: nowrap;
 }

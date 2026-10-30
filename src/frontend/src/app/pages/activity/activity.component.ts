@@ -1,101 +1,81 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-
-import { Appointment } from '../../core/models/appointment';
-import { AppointmentCategory } from '../../core/models/appointment';
+import { HttpClient } from '@angular/common/http';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
+
+interface ActivityEntry {
+  id: string;
+  timestamp: string;
+  action: string;
+  message: string;
+}
 
 @Component({
   selector: 'app-activity',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoadingComponent],
+  imports: [CommonModule, DatePipe, ReactiveFormsModule, RouterModule, LoadingComponent],
   templateUrl: './activity.component.html',
   styleUrls: ['./activity.component.css']
 })
 export class ActivityComponent implements OnInit {
-  appointments: Appointment[] = [];
-  filteredAppointments: Appointment[] = [];
+  private readonly http = inject(HttpClient);
+  entries: ActivityEntry[] = [];
+  filteredEntries: ActivityEntry[] = [];
   loading = false;
+  clearing = false;
   error: string | null = null;
-
-  get categories(): readonly AppointmentCategory[] {
-    const allowed: AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
-    return allowed;
-  }
-
-  searchForm = new FormGroup({
-    search: new FormControl(''),
-    appointmentType: new FormControl('all')
+  readonly searchForm = new FormGroup({
+    search: new FormControl('', { nonNullable: true })
   });
 
   ngOnInit(): void {
-    this.loadAppointments();
+    this.loadActivity();
+    this.searchForm.valueChanges.subscribe(() => this.filterEntries());
+  }
 
-    this.searchForm.valueChanges.subscribe(() => {
-      this.filterAppointments();
+  loadActivity(): void {
+    this.loading = true;
+    this.error = null;
+    this.http.get<ActivityEntry[]>('/api/admin/activity').subscribe({
+      next: (entries) => {
+        this.entries = entries ?? [];
+        this.filterEntries();
+        this.loading = false;
+      },
+      error: () => {
+        this.error = 'Failed to load activity.';
+        this.loading = false;
+      }
     });
   }
 
-  loadAppointments(): void {
-    this.loading = true;
-    this.error = null;
-
-    // Simulating API behavior
-    setTimeout(() => {
-      try {
-        this.appointments = [
-          {
-            status: 'Available',
-            title: 'Dental Checkup',
-            category: 'Medical',
-            startDateTime: '2024-06-01T10:00:00Z',
-            endDateTime: '2024-06-01T11:00:00Z',
-            providerId: 'provider1',
-            providerName: 'Dr. Smith',
-            userId: null,
-            location: 'Dental Clinic',
-            notes: 'Bring previous dental records.',
-            id: '1'     
-          },
-          {
-            status: 'Booked',
-            title: 'Haircut',
-            category: 'Beauty',
-            startDateTime: '2024-06-01T12:00:00Z',
-            endDateTime: '2024-06-01T13:00:00Z',
-            providerId: 'provider2',
-            providerName: 'Stylist Jane',
-            userId: 'user1',
-            location: 'Beauty Salon',
-            notes: 'Customer prefers a trim.',
-            id: '2'
-          }
-        ];
-    } catch (error) {
-      this.error = 'Failed to load appointments.';
-    } finally {
-      this.loading = false;
-    }})
+  filterEntries(): void {
+    const search = this.searchForm.controls.search.value.trim().toLowerCase();
+    this.filteredEntries = this.entries.filter((entry) =>
+      !search || `${entry.action} ${entry.message}`.toLowerCase().includes(search));
   }
 
-  filterAppointments(): void {
-    const { search, appointmentType } = this.searchForm.value;
-    const searchString = (search || '').toLowerCase().trim();
+  clearActivity(): void {
+    if (this.clearing || this.entries.length === 0) return;
+    const confirmed = window.confirm(
+      'Delete all activity log entries? This action cannot be undone.'
+    );
+    if (!confirmed) return;
 
-    this.filteredAppointments = this.appointments.filter(app => {
-      const matchesSearch = 
-        app.title.toLowerCase().includes(searchString) // ||
-        // app.username.toLowerCase().includes(searchString) ||
-        // app.email.toLowerCase().includes(searchString);
-
-      const matchesType = 
-        !appointmentType || 
-        appointmentType === 'all' //|| 
-        // app.appointmentTypeId.toLowerCase() === appointmentType.toLowerCase();
-
-      return matchesSearch && matchesType;
+    this.clearing = true;
+    this.error = null;
+    this.http.delete('/api/admin/activity').subscribe({
+      next: () => {
+        this.entries = [];
+        this.filteredEntries = [];
+        this.clearing = false;
+      },
+      error: () => {
+        this.error = 'Failed to clear activity.';
+        this.clearing = false;
+      }
     });
   }
 }

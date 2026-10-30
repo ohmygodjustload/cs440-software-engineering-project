@@ -14,11 +14,13 @@ public sealed class ProviderRequestsController : ControllerBase
 {
     private readonly IProviderRequestStore _requests;
     private readonly IUserStore _users;
+    private readonly IActivityStore? _activity;
 
-    public ProviderRequestsController(IProviderRequestStore requests, IUserStore users)
+    public ProviderRequestsController(IProviderRequestStore requests, IUserStore users, IActivityStore? activity = null)
     {
         _requests = requests;
         _users = users;
+        _activity = activity;
     }
 
     /// <summary>
@@ -125,6 +127,9 @@ public sealed class ProviderRequestsController : ControllerBase
             }
         }
 
+        _activity?.Add(approved ? "PROVIDER_APPROVED" : "PROVIDER_REJECTED",
+            $"{(approved ? "Approved" : "Rejected")} provider request for {request.ProviderName}",
+            null, request.Id);
         return Ok(request);
     }
 }
