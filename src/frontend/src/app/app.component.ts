@@ -128,13 +128,8 @@ export class AppComponent {
   }
 
   private handlePolledNotifications(items: AppNotification[]): void {
-    const suppressToasts = this.suppressNextNotificationToast;
-    this.suppressNextNotificationToast = false;
     for (const item of items) {
       if (!item.isRead && this.seenNotificationIds.has(item.id) === false) {
-        if (!suppressToasts) {
-          this.toastService.showMissed(item.eventLabel, item.message);
-        }
         this.seenNotificationIds.add(item.id);
       }
     }

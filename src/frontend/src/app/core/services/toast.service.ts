@@ -139,7 +139,7 @@ export class ToastService {
   /** One popup per missed/unread notification, queued after the greeting. */
   showMissed(eventLabel: string, message: string): string {
     const title = eventLabel?.trim() ? eventLabel.trim() : 'Missed notification';
-    return this.show({ title, message, variant: 'reminder' });
+    return this.show({ title, message, variant: 'info' });
   }
 
   /** Appointment created / booked (client books a slot, provider publishes one). */
