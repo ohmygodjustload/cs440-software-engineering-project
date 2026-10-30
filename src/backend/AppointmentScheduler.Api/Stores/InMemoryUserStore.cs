@@ -13,17 +13,20 @@ public sealed class InMemoryUserStore : IUserStore
             Id = SeedIds.ProviderUser, FirstName = "John", LastName = "Smith", Username = "JohnSmith123",
             Email = "test@gmail.com", Phone = "123-123-1234",
             IsServiceProvider = true, IsActive = true,
+            NotifyMedical = true, NotifyBeauty = true, NotifyFitness = true,
             ServiceTypes = [AppointmentCategory.Medical],
         },
         new User
         {
             Id = SeedIds.ClientUser, FirstName = "Jane", LastName = "Porter", Username = "JanePorter123",
             Email = "test2@gmail.com", Phone = "456-456-4567", IsClient = true, IsActive = true,
+            NotifyMedical = true, NotifyBeauty = true, NotifyFitness = true,
         },
         new User
         {
             Id = SeedIds.AdminUser, FirstName = "Ada", LastName = "Admin", Username = "AdaAdmin123",
             Email = "admin@example.com", IsAdmin = true, IsActive = true,
+            NotifyMedical = true, NotifyBeauty = true, NotifyFitness = true,
         },
     };
 

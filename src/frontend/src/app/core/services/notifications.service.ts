@@ -51,10 +51,13 @@ export class NotificationsService {
 
   /** Loads notification history (newest first). */
   getNotifications(userId: string): Observable<AppNotification[]> {
-    const mine = userId !== 'demo-user' && userId ? userId : undefined;
-    return this.http.get<AppNotification[]>(
-      `/api/notifications?mine=${encodeURIComponent(mine ?? '')}`
-    );
+    if (!userId || userId === 'demo-user') {
+      return of([]);
+    }
+
+    // The API derives the recipient from the authenticated account. `mine` is
+    // intentionally a boolean authorization guard, not a user-id parameter.
+    return this.http.get<AppNotification[]>('/api/notifications?mine=true');
   }
 
   /** Marks unread notifications as read. */

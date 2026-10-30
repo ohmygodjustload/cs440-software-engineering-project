@@ -1,66 +1,54 @@
+using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduler.Api.Controllers;
 
 /// <summary>
-/// Per-user notification history and read-state management. No authentication is
-/// enforced here - the user id is accepted as a path parameter and ownership is
-/// guaranteed by the store layer (stores only return records keyed on that id).
+/// Account notifications for client and service provider accounts only (no admin paths).
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public sealed class NotificationsController : ControllerBase
+public sealed class NotificationsController(
+    ICurrentUser currentUser,
+    IUserStore users,
+    INotificationStore notifications) : ControllerBase
 {
-    private readonly INotificationPreferencesStore _preferences;
-
-    public NotificationsController(INotificationPreferencesStore preferences)
-    {
-        _preferences = preferences;
-    }
-
-    /// <summary>
-    /// Returns the signed-in user's recent notification history, newest first.
-    /// No BAAAM.User record is required for reads - notification history is
-    /// independent of the account directory.
-    /// </summary>
     [HttpGet]
-    [ProducesResponseType<IReadOnlyList<AppNotification>>(StatusCodes.Status200OK)]
-    public ActionResult<IReadOnlyList<AppNotification>> List([FromQuery] string? mine = null)
+    [ProducesResponseType<IReadOnlyList<Notification>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public ActionResult<IReadOnlyList<Notification>> List([FromQuery] bool mine = false)
     {
-        if (string.IsNullOrEmpty(mine))
-        {
-            return BadRequest("The 'mine' query parameter is required (e.g. ?mine=true).");
-        }
+        if (!mine) return BadRequest("Query parameter 'mine=true' is required.");
+        if (currentUser.UserId is null) return Unauthorized();
 
-        return Ok(_preferences.GetHistoryForUser(mine).ToList());
+        var user = users.GetById(currentUser.UserId);
+        if (user is null || user.IsAdmin) return Forbid();
+
+        return Ok(notifications.GetAll(currentUser.UserId));
     }
 
-    /// <summary>
-    /// Marks every unread notification for the signed-in user as read.
-    /// </summary>
     [HttpPost("mark-all-read")]
     [ProducesResponseType<MarkAllReadResult>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult<MarkAllReadResult> MarkAllRead([FromBody] MarkAllReadRequest request)
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public ActionResult<MarkAllReadResult> MarkAllRead()
     {
-        if (string.IsNullOrEmpty(request.UserId))
-        {
-            return BadRequest("The 'userId' field is required.");
-        }
+        if (currentUser.UserId is null) return Unauthorized();
 
-        var updated = _preferences.MarkAllRead(request.UserId);
-        return Ok(new MarkAllReadResult { Updated = updated ? 1 : 0 });
+        var user = users.GetById(currentUser.UserId);
+        if (user is null || user.IsAdmin) return Forbid();
+
+        var updated = notifications.MarkAllRead(currentUser.UserId);
+        return Ok(new MarkAllReadResult { Updated = updated });
     }
-}
-
-public sealed class MarkAllReadRequest
-{
-    public string? UserId { get; set; }
 }
 
 public sealed class MarkAllReadResult
 {
-    public int Updated { get; set; }
+    public bool Updated { get; set; }
 }

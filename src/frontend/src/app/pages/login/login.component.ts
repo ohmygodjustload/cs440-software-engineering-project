@@ -9,9 +9,6 @@ import { ToastService } from '../../core/services/toast.service';
 import { UserSettingsService } from '../../core/services/user-settings.service';
 import { User } from '../../core/models/user';
 
-/** Max missed notifications replayed as popups after the login greeting. */
-const MAX_MISSED_POPUPS = 3;
-
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
@@ -96,9 +93,9 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Shows "You're Logged In!" first, then replays up to MAX_MISSED_POPUPS
-   * unread notifications (missed appointment + other notifications) as queued
-   * popups. Read state is left untouched — the user marks items read on the
+   * Shows "You're Logged In!" first, then if there are unread notifications,
+   * shows a single toast telling the user to visit the Notifications tab.
+   * Read state is left untouched — the user marks items read on the
    * Notifications page. Failures are silent: the greeting still shows.
    */
   private greetAndReplayMissed(): void {
@@ -112,18 +109,16 @@ export class LoginComponent implements OnInit {
             }
             this.notificationsService.getNotifications(user.id).subscribe({
               next: (items) => {
-                items
-                  .filter((item) => !item.isRead)
-                  .sort(
-                    (a, b) =>
-                      Date.parse(a.createdAt) - Date.parse(b.createdAt)
-                  )
-                  .slice(0, MAX_MISSED_POPUPS)
-                  .forEach((item, index) => {
-                    window.setTimeout(() => {
-                      this.toastService.showMissed(item.eventLabel, item.message);
-                    }, (index + 1) * 1200);
-                  });
+                const unreadCount = items.filter((item) => !item.isRead).length;
+                if (unreadCount > 0) {
+                  window.setTimeout(() => {
+                    this.toastService.show({
+                      title: 'Unread notifications',
+                      message: `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Notifications tab to read them.`,
+                      variant: 'info'
+                    });
+                  }, 1200);
+                }
               },
               error: () => undefined
             });

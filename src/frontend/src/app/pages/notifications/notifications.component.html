@@ -1,5 +1,15 @@
 <!-- Notifications page: heading + action, preference panel, schedule, history. -->
 <div class="notifications-page">
+  <!-- Missed notifications banner: shown when more than one unread notification exists. -->
+  @if (showMissedBanner) {
+    <div class="notifications-alert notifications-alert--info" role="status">
+      <p>
+        You have {{ unreadCount }} unread notifications — visit the Notifications tab to see them all.
+      </p>
+      <button type="button" class="notifications-retry" (click)="dismissMissedBanner()">Dismiss</button>
+    </div>
+  }
+
   <header class="notifications-head">
     <div class="notifications-head__titles">
       <h1>Notifications</h1>
@@ -125,7 +135,7 @@
         <button type="button" class="notifications-retry" (click)="retryHistory()">Try again</button>
       </div>
     } @else if (history.length === 0) {
-      <p class="notifications-empty" role="status">No notifications yet.</p>
+      <p class="notifications-empty" role="status">No New Notifications!</p>
     } @else {
       <ul class="notifications-history">
         @for (item of history; track item.id) {
