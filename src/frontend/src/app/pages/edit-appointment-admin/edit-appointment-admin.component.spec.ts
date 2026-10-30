@@ -1,14 +1,12 @@
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
-import { AuthService } from '../../core/services/auth.service';
+import { Appointment } from '../../core/models/appointment';
 import { EditAppointmentAdminComponent } from './edit-appointment-admin.component';
 
 describe('EditAppointmentAdminComponent', () => {
-  let auth: jasmine.SpyObj<AuthService>;
-
   function create() {
     TestBed.configureTestingModule({
       imports: [EditAppointmentAdminComponent],
@@ -16,11 +14,27 @@ describe('EditAppointmentAdminComponent', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: AuthService, useValue: auth },
-        { provide: ActivatedRoute, useValue: { snapshot: { data: { providerId: 'p1' } } } }
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: new Map([['id', 'a1']]) } } }
       ]
     });
     const fixture = TestBed.createComponent(EditAppointmentAdminComponent);
+    fixture.detectChanges();
+    const appointment: Appointment = {
+      id: 'a1',
+      title: 'Initial appointment',
+      category: 'Medical',
+      startDateTime: '2026-10-30T10:00:00',
+      endDateTime: '2026-10-30T11:00:00',
+      providerId: 'p1',
+      providerName: 'Dr. Smith',
+      userId: null,
+      location: 'Clinic',
+      notes: null,
+      status: 'Available'
+    };
+    TestBed.inject(HttpTestingController)
+      .expectOne('/api/appointments/a1')
+      .flush(appointment);
     fixture.detectChanges();
     return fixture;
   }
@@ -32,21 +46,6 @@ describe('EditAppointmentAdminComponent', () => {
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
-
-  beforeEach(() => {
-    auth = jasmine.createSpyObj<AuthService>('AuthService', ['getCurrentUser', 'getErrorMessage']);
-    auth.getCurrentUser.and.returnValue({
-      id: 'u1',
-      firstName: 'John',
-      lastName: 'Smith',
-      username: 'JohnSmith123',
-      isClient: false,
-      isServiceProvider: true,
-      isAdmin: false,
-      isActive: true,
-      serviceTypes: ['Medical']
-    });
-  });
 
   it('exposes 18 start times from 9:00 AM through 5:30 PM, including noon', () => {
     const component = create().componentInstance;
@@ -65,8 +64,9 @@ describe('EditAppointmentAdminComponent', () => {
     component.chooseDate(date);
     component.chooseTime('15:30');
 
-    expect(component.draft.start).toBe(`${date}T15:30`);
-    const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
+    expect(component.appointment?.startDateTime).toBe(`${date}T15:30`);
+    const minutes = (Date.parse(component.appointment?.endDateTime ?? '') -
+      Date.parse(component.appointment?.startDateTime ?? '')) / 60000;
     expect(minutes).toBe(60);
   });
 
@@ -77,8 +77,9 @@ describe('EditAppointmentAdminComponent', () => {
     component.chooseDate(date);
     component.chooseTime('17:30');
 
-    expect(component.draft.start).toBe(`${date}T17:30`);
-    const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
+    expect(component.appointment?.startDateTime).toBe(`${date}T17:30`);
+    const minutes = (Date.parse(component.appointment?.endDateTime ?? '') -
+      Date.parse(component.appointment?.startDateTime ?? '')) / 60000;
     expect(minutes).toBe(60);
   });
 
