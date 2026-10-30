@@ -1,0 +1,53 @@
+<main class="appointment-management">
+  <header>
+    <div>
+      <h1>Activity Log</h1>
+      <p>View user activities.</p>
+    </div>
+  </header>
+
+  <form class="controls" role="search" [formGroup]="searchForm">
+    <label class="search-field">
+      <span class="visually-hidden">Search Appointments</span>
+      <input type="search" formControlName="search" placeholder="Search Appointments" />
+    </label>
+
+    <label class="type-field">
+      <span class="visually-hidden">Filter by appointment type</span>
+        <select id="category" name="category">
+          <option value="">All categories</option>
+          @for (option of categories; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+    </label>
+  </form>
+
+  @if (loading) {
+    <app-loading label="Loading appointments…"></app-loading>
+  } @else if (error) {
+    <div role="alert"><p>{{ error }}</p><button (click)="loadAppointments()">Try again</button></div>
+  } @else {
+    <section class="appointments" aria-label="Appointments">
+      @for (appointment of appointments; track appointment.title) {
+        <article class="appointment-card">
+          <div>
+            <h3>{{ appointment.title }}</h3>
+            <p class="slot-category">
+              Status: {{ appointment.status }}
+            </p>
+            <p>Provider: {{ appointment.providerName }}</p>
+          </div>
+          <a class="primary" [routerLink]="['/edit-appointment-admin']" [queryParams]="{ id: appointment.id }">Edit</a>
+        </article>
+      } @empty {
+        <p>No appointments match your search criteria.</p>
+      }
+    </section>
+
+    <!-- <footer>
+      <a routerLink="/provider">Manage appointments</a>
+      <button (click)="loadAppointments()">Refresh</button>
+    </footer> -->
+  }
+</main>

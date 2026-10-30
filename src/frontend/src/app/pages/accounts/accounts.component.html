@@ -1,5 +1,56 @@
-<div class="admin-container">
-  <header class="greeting">
-    <h1>Accounts</h1>
+<main class="account-management">
+  <header>
+    <div>
+      <h1>Account management</h1>
+      <p>Search and manage accounts.</p>
+    </div>
   </header>
-</div>
+
+  <form class="controls" role="search" [formGroup]="searchForm">
+    <label class="search-field">
+      <span class="visually-hidden">Search Accounts</span>
+      <input type="search" formControlName="search" placeholder="Search Accounts" />
+    </label>
+
+    <label class="type-field">
+      <span class="visually-hidden">Filter by account type</span>
+        <select id="category" name="category" (ngModelChange)="loadAccounts()" [disabled]="loading">
+          <option value="">All categories</option>
+          @for (option of categories; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+    </label>
+  </form>
+
+  @if (loading) {
+    <app-loading label="Loading accounts…"></app-loading>
+  } @else if (error) {
+    <div role="alert"><p>{{ error }}</p><button (click)="loadAccounts()">Try again</button></div>
+  } @else {
+    <section class="accounts" aria-label="Accounts">
+      @for (account of accounts; track account.id) {
+        <article class="account-card">
+          <div>
+            <h3>{{ account.firstName }} {{ account.lastName }}</h3>
+            <p class="account-type">Account type: {{ getAccountType(account) }}</p>
+            <p>Username: {{ account.username }}</p>
+            @if (account.email != null) {
+              <p>Email: {{ account.email }}</p>
+            } @else {
+              <p>Email: Not provided</p>
+            }
+            @if (account.phone != null) {
+              <p>Phone: {{ account.phone }}</p>
+            } @else {
+              <p>Phone: Not provided</p>
+            }
+          </div>
+          <a class="primary" [routerLink]="['/edit-account']" [queryParams]="{ id: account.id }">Edit</a>
+        </article>
+      } @empty {
+        <p>No accounts match your search criteria.</p>
+      }
+    </section>
+  }
+</main>

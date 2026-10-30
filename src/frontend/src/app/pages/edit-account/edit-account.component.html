@@ -1,5 +1,93 @@
-<div class="admin-container">
-  <header class="greeting">
-    <h1>Edit Account</h1>
-  </header>
-</div>
+<section>
+  <main class="account-page">
+    <h1>Edit account</h1>
+
+    <form class="edit-form">
+      <div class="form-row">
+        <label class="field">
+          <span>Full name</span>
+          <input name="fullName" value="Ava Brooks" />
+        </label>
+
+        <label class="field">
+          <span>Email address</span>
+          <input name="email" type="email" value="ava@example.com" />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label class="field">
+          <span>Phone</span>
+          <input name="phone" type="tel" value="(608) 555-0142" />
+        </label>
+
+        <label class="field select-field">
+          <span>Time zone</span>
+          <select name="timeZone">
+            <option selected>Central Time (US)</option>
+            <option>Eastern Time (US)</option>
+            <option>Mountain Time (US)</option>
+            <option>Pacific Time (US)</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="section-divider">
+        <span aria-hidden="true"></span>
+        <strong>Service provider</strong>
+        <span aria-hidden="true"></span>
+      </div>
+
+      <fieldset class="category-fieldset">
+        <legend>Provider categories</legend>
+        <div class="category-options">
+          <label>
+            <input type="checkbox" checked />
+            <span>Beauty</span>
+          </label>
+          <label>
+            <input type="checkbox" checked />
+            <span>Fitness</span>
+          </label>
+          <label>
+            <input type="checkbox" />
+            <span>Medical</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <section class="credentials" aria-labelledby="credentials-heading">
+        <h2 id="credentials-heading">Credentials</h2>
+
+        <label class="field">
+          <span>Beauty credentials</span>
+          <input
+            name="beautyCredentials"
+            value="License: DEMO-COS-104 • 4 years of salon experience"
+          />
+        </label>
+
+        <label class="field">
+          <span>Fitness credentials</span>
+          <input
+            name="fitnessCredentials"
+            value="Certification: DEMO-FIT-208 • 2 years of fitness coaching"
+          />
+        </label>
+
+        <label class="field">
+          <span>Medical credentials</span>
+          <input
+            name="medicalCredentials"
+            value="No medical credential submitted."
+          />
+        </label>
+      </section>
+
+      <div class="actions">
+        <button class="primary-action" type="submit">Save changes</button>
+        <button class="secondary-action" type="reset">Reset</button>
+      </div>
+    </form>
+  </main>
+</section>

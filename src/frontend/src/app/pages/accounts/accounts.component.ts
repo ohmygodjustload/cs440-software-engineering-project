@@ -1,87 +1,109 @@
-import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
-export interface AdminReviewItem {
-  id: string;
-  name: string;
-  categories: string;
-}
-
-export interface AdminActivityItem {
-  id: string;
-  at: Date;
-  summary: string;
-}
-
-export function greetingFor(date: Date): string {
-  const hour = date.getHours();
-  if (hour < 12) return 'Good morning, Admin';
-  if (hour < 17) return 'Good afternoon, Admin';
-  return 'Good evening, Admin';
-}
+import { User } from '../../core/models/user';
+import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 @Component({
   selector: 'app-accounts',
   standalone: true,
-  // imports: [RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoadingComponent],
   templateUrl: './accounts.component.html',
-  styleUrl: './accounts.component.css',
+  styleUrls: ['./accounts.component.css']
 })
 export class AccountsComponent implements OnInit {
-  now = new Date();
-  loading = true;
+  accounts: User[] = [];
+  filteredAccounts: User[] = [];
+  loading = false;
   error: string | null = null;
+  category: string = '';
 
-  pendingApprovals = 0;
-  activeProviders = 0;
-  bookedToday = 0;
-  reviews: AdminReviewItem[] = [];
-  activity: AdminActivityItem[] = [];
-
-  get greeting(): string {
-    return greetingFor(this.now);
+  get categories(): readonly string[] {
+    return ["Client", "Service Provider", "Admin"];
   }
+
+  searchForm = new FormGroup({
+    search: new FormControl(''),
+    accountType: new FormControl('all')
+  });
 
   ngOnInit(): void {
-    this.load();
+    this.loadAccounts();
+
+    this.searchForm.valueChanges.subscribe(() => {
+      this.filterAppointments();
+    });
   }
 
-  load(): void {
+  getAccountType(account: User): string {
+    if (account.isClient) {
+      return 'Client';
+    } else if (account.isServiceProvider) {
+      return 'Service Provider';
+    } else if (account.isAdmin) {
+      return 'Admin';
+    }
+    return 'Unknown';
+  }
+
+  loadAccounts(): void {
     this.loading = true;
     this.error = null;
-    this.now = new Date();
 
-    // Replace this stub with the admin overview API when it is available.
-    try {
-      this.pendingApprovals = 3;
-      this.activeProviders = 12;
-      this.bookedToday = 24;
-      this.reviews = [
-        { id: 'pr-104', name: 'Ava Brooks', categories: 'Beauty, Fitness' },
-        { id: 'pr-105', name: 'Sally Smith', categories: 'Medical' },
-      ];
-      this.activity = [
-        {
-          id: 'act-1',
-          at: new Date(2026, 8, 22, 10, 42),
-          summary: 'Andrew Peirce marked appointment #A-208 Completed',
-        },
-        {
-          id: 'act-2',
-          at: new Date(2026, 8, 22, 10, 18),
-          summary: 'Maya Chen created an Available slot',
-        },
-        {
-          id: 'act-3',
-          at: new Date(2026, 8, 22, 9, 56),
-          summary: 'Ava Brooks submitted credentials for review',
-        },
-      ];
+    // Simulating API behavior
+    setTimeout(() => {
+      try {
+        this.accounts = [
+          {
+            firstName:'Priya',
+            lastName: 'Nair',
+            username: 'priya.nair',
+            isClient: true,
+            isServiceProvider: false,
+            isAdmin: false,
+            isActive: true,
+            serviceTypes: null,
+            id: '1',
+          },
+          {
+            firstName: 'Elena',
+            lastName: 'Rossi',
+            username: 'elena.rossi',
+            email: 'elena.rossi@email.com',
+            phone: '098-765-4321',
+            isClient: false,
+            isServiceProvider: true,
+            isAdmin: false,
+            isActive: true,
+            serviceTypes: ['Haircut', 'Beard Trim'],
+            id: '2'
+          }
+        ];
+    } catch (error) {
+      this.error = 'Failed to load accounts.';
+    } finally {
       this.loading = false;
-    } catch {
-      this.error = 'Could not load the admin overview.';
-      this.loading = false;
-    }
+    }})
+  }
+
+  filterAppointments(): void {
+    const { search, accountType } = this.searchForm.value;
+    const searchString = (search || '').toLowerCase().trim();
+
+    this.filteredAccounts = this.accounts.filter(app => {
+      const matchesSearch = 
+        app.firstName.toLowerCase().includes(searchString) || 
+        app.lastName.toLowerCase().includes(searchString) || 
+        app.username.toLowerCase().includes(searchString);
+
+      const matchesType = 
+        !accountType || 
+        accountType === 'all' //|| 
+        // app.accountTypeId.toLowerCase() === accountType.toLowerCase();
+
+      return matchesSearch && matchesType;
+    });
   }
 }

@@ -1,87 +1,96 @@
-import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 
-export interface AdminReviewItem {
-  id: string;
-  name: string;
-  categories: string;
-}
+import { AuthService } from '../../core/services/auth.service';
+import { EditAppointmentAdminComponent } from './edit-appointment-admin.component';
 
-export interface AdminActivityItem {
-  id: string;
-  at: Date;
-  summary: string;
-}
+describe('EditAppointmentAdminComponent', () => {
+  let auth: jasmine.SpyObj<AuthService>;
 
-export function greetingFor(date: Date): string {
-  const hour = date.getHours();
-  if (hour < 12) return 'Good morning, Admin';
-  if (hour < 17) return 'Good afternoon, Admin';
-  return 'Good evening, Admin';
-}
-
-@Component({
-  selector: 'app-edit-appointment-admin',
-  standalone: true,
-  // imports: [RouterLink],
-  templateUrl: './edit-appointment-admin.component.html',
-  styleUrl: './edit-appointment-admin.component.css',
-})
-export class EditAppointmentAdminComponent implements OnInit {
-  now = new Date();
-  loading = true;
-  error: string | null = null;
-
-  pendingApprovals = 0;
-  activeProviders = 0;
-  bookedToday = 0;
-  reviews: AdminReviewItem[] = [];
-  activity: AdminActivityItem[] = [];
-
-  get greeting(): string {
-    return greetingFor(this.now);
+  function create() {
+    TestBed.configureTestingModule({
+      imports: [EditAppointmentAdminComponent],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: auth },
+        { provide: ActivatedRoute, useValue: { snapshot: { data: { providerId: 'p1' } } } }
+      ]
+    });
+    const fixture = TestBed.createComponent(EditAppointmentAdminComponent);
+    fixture.detectChanges();
+    return fixture;
   }
 
-  ngOnInit(): void {
-    this.load();
+  function futureDate(): string {
+    // One week out so 'isPastTime' never trips, no matter when the test runs.
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
-  load(): void {
-    this.loading = true;
-    this.error = null;
-    this.now = new Date();
+  beforeEach(() => {
+    auth = jasmine.createSpyObj<AuthService>('AuthService', ['getCurrentUser', 'getErrorMessage']);
+    auth.getCurrentUser.and.returnValue({
+      id: 'u1',
+      firstName: 'John',
+      lastName: 'Smith',
+      username: 'JohnSmith123',
+      isClient: false,
+      isServiceProvider: true,
+      isAdmin: false,
+      isActive: true,
+      serviceTypes: ['Medical']
+    });
+  });
 
-    // Replace this stub with the admin overview API when it is available.
-    try {
-      this.pendingApprovals = 3;
-      this.activeProviders = 12;
-      this.bookedToday = 24;
-      this.reviews = [
-        { id: 'pr-104', name: 'Ava Brooks', categories: 'Beauty, Fitness' },
-        { id: 'pr-105', name: 'Sally Smith', categories: 'Medical' },
-      ];
-      this.activity = [
-        {
-          id: 'act-1',
-          at: new Date(2026, 8, 22, 10, 42),
-          summary: 'Andrew Peirce marked appointment #A-208 Completed',
-        },
-        {
-          id: 'act-2',
-          at: new Date(2026, 8, 22, 10, 18),
-          summary: 'Maya Chen created an Available slot',
-        },
-        {
-          id: 'act-3',
-          at: new Date(2026, 8, 22, 9, 56),
-          summary: 'Ava Brooks submitted credentials for review',
-        },
-      ];
-      this.loading = false;
-    } catch {
-      this.error = 'Could not load the admin overview.';
-      this.loading = false;
-    }
-  }
-}
+  it('exposes 18 start times from 9:00 AM through 5:30 PM, including noon', () => {
+    const component = create().componentInstance;
+
+    expect(component.startTimes.length).toBe(18);
+    expect(component.startTimes[0]).toBe('09:00');
+    expect(component.startTimes[component.startTimes.length - 1]).toBe('17:30');
+    expect(component.startTimes).toContain('12:00');
+    expect(component.startTimes).toContain('12:30');
+  });
+
+  it('selects 3:30 PM on a future date and sets the end 60 minutes later', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+
+    component.chooseDate(date);
+    component.chooseTime('15:30');
+
+    expect(component.draft.start).toBe(`${date}T15:30`);
+    const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
+    expect(minutes).toBe(60);
+  });
+
+  it('selects 5:30 PM on a future date and sets the end 60 minutes later', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+
+    component.chooseDate(date);
+    component.chooseTime('17:30');
+
+    expect(component.draft.start).toBe(`${date}T17:30`);
+    const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
+    expect(minutes).toBe(60);
+  });
+
+  it('renders 18 start-time buttons with 5:30 PM last and 12:00 PM present', () => {
+    const fixture = create();
+    const buttons: HTMLButtonElement[] = Array.from(
+      fixture.nativeElement.querySelectorAll('.time-options button')
+    );
+    const labels = buttons.map((button) => button.textContent?.trim());
+
+    expect(buttons.length).toBe(18);
+    expect(labels[labels.length - 1]).toBe('5:30 PM');
+    expect(labels).toContain('12:00 PM');
+  });
+});

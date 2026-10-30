@@ -1,5 +1,58 @@
-<div class="admin-container">
-  <header class="greeting">
-    <h1>Appointments</h1>
+<main class="appointment-management">
+  <header>
+    <div>
+      <h1>Appointment management</h1>
+      <p>Search and manage appointments.</p>
+    </div>
   </header>
-</div>
+
+  <form class="controls" role="search" [formGroup]="searchForm">
+    <label class="search-field">
+      <span class="visually-hidden">Search Appointments</span>
+      <input type="search" formControlName="search" placeholder="Search Appointments" />
+    </label>
+
+    <label class="type-field">
+      <span class="visually-hidden">Filter by appointment type</span>
+        <select id="category" name="category">
+          <option value="">All categories</option>
+          @for (option of categories; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+    </label>
+
+    <label class="start-time-field time-field">
+      <span class="visually-hidden">Start date and time</span>
+      <input type="datetime-local" formControlName="startTime" placeholder="Start date and time" />
+    </label>
+  </form>
+
+  @if (loading) {
+    <app-loading label="Loading appointments…"></app-loading>
+  } @else if (error) {
+    <div role="alert"><p>{{ error }}</p><button (click)="loadAppointments()">Try again</button></div>
+  } @else {
+    <section class="appointments" aria-label="Appointments">
+      @for (filteredAppointment of filteredAppointments; track filteredAppointment.title) {
+        <article class="appointment-card">
+          <div>
+            <h3>{{ filteredAppointment.title }}</h3>
+            <p class="slot-category">
+              Status: {{ filteredAppointment.status }}
+            </p>
+            <p>Provider: {{ filteredAppointment.providerName }}</p>
+          </div>
+          <a class="primary" [routerLink]="['/edit-appointment-admin']" [queryParams]="{ id: filteredAppointment.id }">Edit</a>
+        </article>
+      } @empty {
+        <p>No appointments match your search criteria.</p>
+      }
+    </section>
+
+    <!-- <footer>
+      <a routerLink="/provider">Manage appointments</a>
+      <button (click)="loadAppointments()">Refresh</button>
+    </footer> -->
+  }
+</main>
