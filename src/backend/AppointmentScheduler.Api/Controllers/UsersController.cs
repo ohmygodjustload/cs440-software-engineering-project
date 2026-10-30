@@ -11,11 +11,13 @@ public sealed class UsersController : ControllerBase
 {
     private readonly IUserStore _store;
     private readonly INotificationPreferencesStore _preferences;
+    private readonly IActivityStore _activity;
 
-    public UsersController(IUserStore store, INotificationPreferencesStore preferences)
+    public UsersController(IUserStore store, INotificationPreferencesStore preferences, IActivityStore activity)
     {
         _store = store;
         _preferences = preferences;
+        _activity = activity;
     }
 
     /// <summary>
@@ -67,6 +69,7 @@ public sealed class UsersController : ControllerBase
             return Conflict("The account was modified by another process. Please retry.");
         }
 
+        _activity.Add("ACCOUNT_UPDATED", $"Account updated: {user.Username}", user.Id, user.Id);
         return Ok(user);
     }
 
@@ -113,6 +116,7 @@ public sealed class UsersController : ControllerBase
         prefs.UpdatedAt = DateTimeOffset.UtcNow;
 
         _preferences.UpsertByUserId(id, prefs);
+        _activity.Add("NOTIFICATION_SETTINGS_UPDATED", $"Notification settings updated for {user.Username}", id, id);
         return Ok(prefs);
     }
 

@@ -31,15 +31,15 @@ const pending: ProviderRequest[] = [
 
 describe('greetingFor', () => {
   it('returns morning before noon', () => {
-    expect(greetingFor(new Date(2026, 8, 22, 9, 0))).toBe('Good morning, Admin');
+    expect(greetingFor(new Date(2026, 8, 22, 9, 0))).toBe('Good morning, Admin.');
   });
 
   it('returns afternoon from 12:00 to 16:59', () => {
-    expect(greetingFor(new Date(2026, 8, 22, 14, 0))).toBe('Good afternoon, Admin');
+    expect(greetingFor(new Date(2026, 8, 22, 14, 0))).toBe('Good afternoon, Admin.');
   });
 
   it('returns evening from 17:00', () => {
-    expect(greetingFor(new Date(2026, 8, 22, 19, 0))).toBe('Good evening, Admin');
+    expect(greetingFor(new Date(2026, 8, 22, 19, 0))).toBe('Good evening, Admin.');
   });
 });
 
