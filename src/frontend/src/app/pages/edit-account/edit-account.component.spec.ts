@@ -1,226 +1,84 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { User } from '../../core/models/user';
-import { UserSettingsPatch, UserSettingsService } from '../../core/services/user-settings.service';
 import { EditAccountComponent } from './edit-account.component';
 
-const demoUser: User = {
-  id: 'user-1',
-  firstName: 'Jane',
-  lastName: 'Porter',
-  username: 'JanePorter123',
-  email: 'jane@example.com',
-  phone: '456-456-4567',
-  isClient: true,
-  isServiceProvider: false,
-  isAdmin: false
-};
-
-function configure(serviceStub: Partial<UserSettingsService>): ComponentFixture<EditAccountComponent> {
-  TestBed.configureTestingModule({
-    imports: [EditAccountComponent],
-    providers: [{ provide: UserSettingsService, useValue: serviceStub }]
-  });
-  TestBed.compileComponents();
-  const fixture = TestBed.createComponent(EditAccountComponent);
-  fixture.detectChanges();
-  return fixture;
-}
-
 describe('EditAccountComponent', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
+  const account: User = {
+    id: 'user-1',
+    firstName: 'Jane',
+    lastName: 'Porter',
+    username: 'JanePorter123',
+    email: 'jane@example.com',
+    phone: '456-456-4567',
+    isClient: true,
+    isServiceProvider: false,
+    isAdmin: false
+  };
 
-  afterEach(() => {
-    localStorage.clear();
-  });
-
-  it('should create and load the current user into the form', () => {
-    const fixture = configure({ getCurrentUser: () => of(demoUser) });
-
-    expect(fixture.componentInstance).toBeTruthy();
-    expect(fixture.componentInstance.form.controls.fullName.value).toBe('Jane Porter');
-    expect(fixture.componentInstance.form.controls.email.value).toBe('jane@example.com');
-    expect(fixture.nativeElement.querySelector('.settings-save').disabled).toBe(true);
-  });
-
-  it('should show a retry state when loading fails', () => {
-    const fixture = configure({ getCurrentUser: () => throwError(() => new Error('down')) });
-
-    expect(fixture.nativeElement.textContent).toContain('Could not load your settings');
-    expect(fixture.nativeElement.querySelector('.settings-retry')).not.toBeNull();
-  });
-
-  it('should enable Save only after a meaningful change', () => {
-    const fixture = configure({ getCurrentUser: () => of(demoUser) });
-    const component = fixture.componentInstance;
-
-    expect(component.isDirty).toBe(false);
-    component.form.controls.notifyFitness.setValue(false);
+  function create(): EditAccountComponent {
+    TestBed.configureTestingModule({
+      imports: [EditAccountComponent],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: new Map([['id', 'user-1']]) } } }
+      ]
+    });
+    const fixture = TestBed.createComponent(EditAccountComponent);
     fixture.detectChanges();
-    expect(component.isDirty).toBe(true);
-    const save = fixture.nativeElement.querySelector('.settings-save') as HTMLButtonElement;
-    expect(save.disabled).toBe(false);
+    TestBed.inject(HttpTestingController).expectOne('/api/users/user-1').flush(account);
+    fixture.detectChanges();
+    return fixture.componentInstance;
+  }
+
+  afterEach(() => TestBed.inject(HttpTestingController).verify());
+
+  it('loads account details into the form', () => {
+    const component = create();
+
+    expect(component.account).toEqual(account);
+    expect(component.form.getRawValue()).toEqual({
+      firstName: 'Jane',
+      lastName: 'Porter',
+      email: 'jane@example.com',
+      phone: '456-456-4567'
+    });
+    expect(component.loading).toBeFalse();
   });
 
-  it('should flag invalid email and phone values', () => {
-    const fixture = configure({ getCurrentUser: () => of(demoUser) });
-    const component = fixture.componentInstance;
+  it('saves edited account details', () => {
+    const component = create();
+    component.form.controls.lastName.setValue('Updated');
+    component.form.controls.lastName.markAsDirty();
+    component.save();
 
+    const request = TestBed.inject(HttpTestingController).expectOne('/api/admin/accounts/user-1');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({
+      firstName: 'Jane',
+      lastName: 'Updated',
+      email: 'jane@example.com',
+      phone: '456-456-4567'
+    });
+    request.flush({ ...account, lastName: 'Updated' });
+
+    expect(component.success).toBe('Account Information has been Sucessfully Updated!');
+    expect(component.saving).toBeFalse();
+    expect(component.form.pristine).toBeTrue();
+  });
+
+  it('rejects invalid account details without saving', () => {
+    const component = create();
     component.form.controls.email.setValue('not-an-email');
-    component.form.controls.email.markAsTouched();
-    component.form.controls.phone.setValue('abc');
-    component.form.controls.phone.markAsTouched();
-    fixture.detectChanges();
+    component.form.controls.email.markAsDirty();
+    component.save();
 
-    expect(component.form.invalid).toBe(true);
-    expect(component.canSave).toBe(false);
-    expect(fixture.nativeElement.querySelector('#settings-email-error')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('#settings-phone-error')).not.toBeNull();
-  });
-
-  it('should accept international names, numbered names, and phone formats', () => {
-    const fixture = configure({ getCurrentUser: () => of(demoUser) });
-    const component = fixture.componentInstance;
-
-    component.form.controls.fullName.setValue('José García-López');
-    component.form.controls.phone.setValue('+44 20 7946 0958');
-    expect(component.form.controls.fullName.valid).toBe(true);
-    expect(component.form.controls.phone.valid).toBe(true);
-
-    component.form.controls.fullName.setValue('User 123');
-    expect(component.form.controls.fullName.valid).toBe(true);
-  });
-
-  it('should save to the loaded account id with a clean first/last split', () => {
-    let savedId = '';
-    let savedPatch: UserSettingsPatch | null = null;
-    const fixture = configure({
-      getCurrentUser: () => of(demoUser),
-      saveSettings: (id: string, patch: UserSettingsPatch) => {
-        savedId = id;
-        savedPatch = patch;
-        return of({ ...demoUser, firstName: 'Jane', lastName: 'Updated' });
-      }
-    });
-    const component = fixture.componentInstance;
-
-    component.form.controls.fullName.setValue('Jane Updated');
-    fixture.detectChanges();
-    (fixture.nativeElement.querySelector('.settings-save') as HTMLButtonElement).click();
-    fixture.detectChanges();
-
-    expect(savedId).toBe('user-1');
-    expect(savedPatch).toEqual(
-      jasmine.objectContaining({ firstName: 'Jane', lastName: 'Updated' })
-    );
-    expect(component.saving).toBe(false);
-    expect(component.saveSuccess).toBe(true);
-    expect(component.saveError).toBeNull();
-  });
-
-  it('should preserve edits and report save failures', () => {
-    const fixture = configure({
-      getCurrentUser: () => of(demoUser),
-      saveSettings: (id: string, patch: UserSettingsPatch) => throwError(() => new Error('Saving is unavailable: no endpoint.'))
-    });
-    const component = fixture.componentInstance;
-
-    component.form.controls.fullName.setValue('Jane Updated');
-    fixture.detectChanges();
-    (fixture.nativeElement.querySelector('.settings-save') as HTMLButtonElement).click();
-    fixture.detectChanges();
-
-    expect(component.saving).toBe(false);
-    expect(component.saveError).toContain('no endpoint');
-    expect(component.form.controls.fullName.value).toBe('Jane Updated');
-  });
-
-  it('should expose accessible tablist, panels, and per-tab content', () => {
-    const fixture = configure({ getCurrentUser: () => of(demoUser) });
-    const component = fixture.componentInstance;
-    const root = fixture.nativeElement as HTMLElement;
-
-    expect(root.querySelector('[role="tablist"]')).not.toBeNull();
-    const tabs = Array.from(root.querySelectorAll('[role="tab"]')).map((t) =>
-      (t as HTMLElement).textContent?.trim()
-    );
-    expect(tabs).toEqual(['Profile', 'Login & security', 'Preferences', 'Privacy']);
-
-    // Profile panel is visible initially with the identity form.
-    expect(root.querySelector('label[for="settings-fullname"]')).not.toBeNull();
-    expect(root.querySelector('#settings-panel-preferences')).toBeNull();
-
-    // Login & security panel shows read-only facts and no password controls.
-    component.selectTab('login');
-    fixture.detectChanges();
-    expect(root.querySelector('#settings-panel-login')).not.toBeNull();
-    expect(root.textContent).toContain('JanePorter123');
-    expect(root.textContent).toContain('No password or verification changes are available');
-    expect(root.querySelector('input[type="password"]')).toBeNull();
-
-    // Preferences panel holds the calendar + notification controls.
-    component.selectTab('preferences');
-    fixture.detectChanges();
-    expect(root.querySelector('#settings-panel-preferences')).not.toBeNull();
-    expect(root.querySelector('label[for="settings-calendar-view"]')).not.toBeNull();
-    expect(root.querySelectorAll('.notify-option').length).toBe(3);
-
-    // Privacy panel explains data handling with no security-boundary claim.
-    component.selectTab('privacy');
-    fixture.detectChanges();
-    expect(root.querySelector('#settings-panel-privacy')).not.toBeNull();
-    expect(root.textContent).toContain('How your information is handled in this application.');
-
-    // Active tab is exposed via aria-selected on the vertical sidebar item.
-    const active = root.querySelector('#settings-tab-privacy') as HTMLElement;
-    expect(active.getAttribute('aria-selected')).toBe('true');
-    expect(active.classList.contains('settings-side__item--active')).toBe(true);
-    expect(root.querySelector('.settings-side')?.getAttribute('aria-orientation')).toBe('vertical');
-  });
-
-  it('should render sidebar items with a non-pill flat style', () => {
-    const fixture = configure({ getCurrentUser: () => of(demoUser) });
-    const root = fixture.nativeElement as HTMLElement;
-    const items = Array.from(root.querySelectorAll('.settings-side__item'));
-    expect(items.length).toBe(4);
-    expect(root.querySelector('.settings-section')).not.toBeNull();
-  });
-
-  it('should derive username and roles from the loaded record', () => {
-    const fixture = configure({
-      getCurrentUser: () => of({ ...demoUser, isAdmin: true, isServiceProvider: true })
-    });
-    const component = fixture.componentInstance;
-    expect(component.username).toBe('JanePorter123');
-    expect(component.roleSummary).toContain('Admin');
-    expect(component.roleSummary).toContain('Client');
-  });
-
-  it('should load the saved calendar view for the signed-in user', () => {
-    localStorage.setItem('baaam.calendar.view.user-1', 'week');
-
-    const fixture = configure({ getCurrentUser: () => of(demoUser) });
-
-    expect(fixture.componentInstance.form.controls.defaultCalendarView.value).toBe('week');
-  });
-
-  it('should save the calendar view to this device when settings are saved', () => {
-    const fixture = configure({
-      getCurrentUser: () => of(demoUser),
-      saveSettings: () => of(demoUser)
-    });
-    const component = fixture.componentInstance;
-
-    component.form.controls.defaultCalendarView.setValue('agenda');
-    fixture.detectChanges();
-    (fixture.nativeElement.querySelector('.settings-save') as HTMLButtonElement).click();
-    fixture.detectChanges();
-
-    expect(component.saveError).toBeNull();
-    expect(localStorage.getItem('baaam.calendar.view.user-1')).toBe('agenda');
+    expect(component.error).toBe('Please correct the required fields before saving.');
+    expect(TestBed.inject(HttpTestingController).match('/api/admin/accounts/user-1')).toEqual([]);
   });
 });
-

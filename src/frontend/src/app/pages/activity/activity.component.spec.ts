@@ -1,77 +1,52 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivityComponent } from './activity.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
 describe('ActivityComponent', () => {
-  let component: ActivityComponent;
   let fixture: ComponentFixture<ActivityComponent>;
+  let http: HttpTestingController;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [
-        ActivityComponent,
-        ReactiveFormsModule,
-        RouterModule.forRoot([])
-      ]
-    }).compileComponents();
-
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [ActivityComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
     fixture = TestBed.createComponent(ActivityComponent);
-    component = fixture.componentInstance;
+    http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
+  afterEach(() => http.verify());
+
+  it('loads and filters activity entries', () => {
+    http.expectOne('/api/admin/activity').flush([
+      { id: '1', timestamp: '2026-10-30T10:00:00Z', action: 'Updated', message: 'Jane Porter' },
+      { id: '2', timestamp: '2026-10-30T11:00:00Z', action: 'Booked', message: 'Medical appointment' }
+    ]);
+    const component = fixture.componentInstance;
+
+    expect(component.entries.length).toBe(2);
+    expect(component.filteredEntries.length).toBe(2);
+
+    component.searchForm.controls.search.setValue('porter');
+
+    expect(component.filteredEntries.length).toBe(1);
+    expect(component.filteredEntries[0].id).toBe('1');
   });
 
-  it('should display loaders and populate data on init', fakeAsync(() => {
-    component.ngOnInit();
-    expect(component.loading).toBeTrue();
+  it('clears activity after confirmation', () => {
+    http.expectOne('/api/admin/activity').flush([
+      { id: '1', timestamp: '2026-10-30T10:00:00Z', action: 'Updated', message: 'Jane Porter' }
+    ]);
+    spyOn(window, 'confirm').and.returnValue(true);
 
-    tick(600); // Account for simulated API delay
-    fixture.detectChanges();
+    fixture.componentInstance.clearActivity();
 
-    expect(component.loading).toBeFalse();
-    expect(component.appointments.length).toBe(4);
-    expect(component.filteredAppointments.length).toBe(4);
-  }));
-
-  it('should filter appointments by search string match', fakeAsync(() => {
-    component.ngOnInit();
-    tick(600);
-    fixture.detectChanges();
-
-    component.searchForm.patchValue({ search: 'Nair' });
-    fixture.detectChanges();
-
-    expect(component.filteredAppointments.length).toBe(1);
-    expect(component.filteredAppointments[0].providerName).toBe('Priya Nair');
-  }));
-
-  it('should filter appointments by type selection match', fakeAsync(() => {
-    component.ngOnInit();
-    tick(600);
-    fixture.detectChanges();
-
-    component.searchForm.patchValue({ appointmentType: 'client' });
-    fixture.detectChanges();
-
-    expect(component.filteredAppointments.length).toBe(1);
-    expect(component.filteredAppointments[0].appointmentTypeId).toBe('Client');
-  }));
-
-  it('should log edit messages on clicking edit action', () => {
-    spyOn(console, 'log');
-    const mockApp = {
-      providerId: 'Elena Rossi',
-      category: 'Medical',
-      appointmentTypeId: 'Client',
-      username: 'elena.rossi',
-      email: 'elena.rossi@email.com'
-    };
-
-    // component.editAppointment(mockApp);
-    expect(console.log).toHaveBeenCalledWith('Editing appointment for:', 'Elena Rossi');
+    const request = http.expectOne('/api/admin/activity');
+    expect(request.request.method).toBe('DELETE');
+    request.flush(null);
+    expect(fixture.componentInstance.entries).toEqual([]);
+    expect(fixture.componentInstance.filteredEntries).toEqual([]);
   });
 });

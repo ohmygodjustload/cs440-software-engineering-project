@@ -1,78 +1,37 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { AccountsComponent } from './accounts.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
 describe('AccountsComponent', () => {
   let component: AccountsComponent;
-  let fixture: ComponentFixture<AccountsComponent>;
+  let http: HttpTestingController;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [
-        AccountsComponent,
-        ReactiveFormsModule,
-        RouterModule.forRoot([])
-      ]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(AccountsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [AccountsComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
+    component = TestBed.createComponent(AccountsComponent).componentInstance;
+    http = TestBed.inject(HttpTestingController);
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
-  });
+  afterEach(() => http.verify());
 
-  it('should display loaders and populate data on init', fakeAsync(() => {
+  it('loads accounts and filters by search and type', () => {
     component.ngOnInit();
-    expect(component.loading).toBeTrue();
-
-    tick(600); // Account for simulated API delay
-    fixture.detectChanges();
+    http.expectOne('/api/admin/accounts').flush([
+      { id: '1', firstName: 'Priya', lastName: 'Nair', username: 'priya', email: 'priya@example.com',
+        isClient: true, isServiceProvider: false, isAdmin: false },
+      { id: '2', firstName: 'Elena', lastName: 'Rossi', username: 'elena', email: 'elena@example.com',
+        isClient: false, isServiceProvider: true, isAdmin: false }
+    ]);
 
     expect(component.loading).toBeFalse();
-    expect(component.accounts.length).toBe(4);
-    expect(component.filteredAccounts.length).toBe(4);
-  }));
-
-  it('should filter accounts by search string match', fakeAsync(() => {
-    component.ngOnInit();
-    tick(600);
-    fixture.detectChanges();
-
+    expect(component.filteredAccounts.length).toBe(2);
     component.searchForm.patchValue({ search: 'Nair' });
-    fixture.detectChanges();
-
-    expect(component.filteredAccounts.length).toBe(1);
-    expect(component.filteredAccounts[0].firstName).toBe('Priya');
-    expect(component.filteredAccounts[0].lastName).toBe('Nair');
-  }));
-
-  it('should filter accounts by type selection match', fakeAsync(() => {
-    component.ngOnInit();
-    tick(600);
-    fixture.detectChanges();
-
-    component.searchForm.patchValue({ accountType: 'client' });
-    fixture.detectChanges();
-
-    // expect(component.filteredAccounts.length).toBe(1);
-    // expect(component.filteredAccounts[0].accountTypeId).toBe('Client');
-  }));
-
-  it('should log edit messages on clicking edit action', () => {
-    spyOn(console, 'log');
-    const mockApp = {
-      providerId: 'Elena Rossi',
-      category: 'Medical',
-      accountTypeId: 'Client',
-      username: 'elena.rossi',
-      email: 'elena.rossi@email.com'
-    };
-
-    // component.editAppointment(mockApp);
-    expect(console.log).toHaveBeenCalledWith('Editing account for:', 'Elena Rossi');
+    expect(component.filteredAccounts.map(account => account.id)).toEqual(['1']);
+    component.searchForm.patchValue({ search: '', accountType: 'Service Provider' });
+    expect(component.filteredAccounts.map(account => account.id)).toEqual(['2']);
   });
 });

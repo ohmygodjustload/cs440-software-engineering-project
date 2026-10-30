@@ -1,77 +1,52 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { AppointmentsAdminComponent } from './appointments-admin.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
 describe('AppointmentsAdminComponent', () => {
   let component: AppointmentsAdminComponent;
-  let fixture: ComponentFixture<AppointmentsAdminComponent>;
+  let http: HttpTestingController;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [
-        AppointmentsAdminComponent,
-        ReactiveFormsModule,
-        RouterModule.forRoot([])
-      ]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(AppointmentsAdminComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [AppointmentsAdminComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
+    component = TestBed.createComponent(AppointmentsAdminComponent).componentInstance;
+    http = TestBed.inject(HttpTestingController);
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
-  });
+  afterEach(() => http.verify());
 
-  it('should display loaders and populate data on init', fakeAsync(() => {
+  it('loads appointments and accounts, then filters appointments', () => {
     component.ngOnInit();
-    expect(component.loading).toBeTrue();
-
-    tick(600); // Account for simulated API delay
-    fixture.detectChanges();
+    http.expectOne('/api/admin/appointments').flush([
+      {
+        id: '1', title: 'Physical', category: 'Medical',
+        startDateTime: '2026-10-30T10:00:00Z', endDateTime: '2026-10-30T11:00:00Z',
+        providerId: 'p1', providerName: 'Priya Nair', userId: 'u1',
+        location: 'Clinic', notes: null, status: 'Booked'
+      },
+      {
+        id: '2', title: 'Yoga', category: 'Fitness',
+        startDateTime: '2026-10-30T12:00:00Z', endDateTime: '2026-10-30T13:00:00Z',
+        providerId: 'p2', providerName: 'Elena Rossi', userId: null,
+        location: 'Studio', notes: null, status: 'Available'
+      }
+    ]);
+    http.expectOne('/api/admin/accounts').flush([
+      {
+        id: 'u1', firstName: 'Alex', lastName: 'Client', username: 'alex',
+        isClient: true, isServiceProvider: false, isAdmin: false
+      }
+    ]);
 
     expect(component.loading).toBeFalse();
-    expect(component.appointments.length).toBe(4);
-    expect(component.filteredAppointments.length).toBe(4);
-  }));
-
-  it('should filter appointments by search string match', fakeAsync(() => {
-    component.ngOnInit();
-    tick(600);
-    fixture.detectChanges();
-
+    expect(component.filteredAppointments.length).toBe(2);
     component.searchForm.patchValue({ search: 'Nair' });
-    fixture.detectChanges();
-
-    expect(component.filteredAppointments.length).toBe(1);
-    expect(component.filteredAppointments[0].providerName).toBe('Priya Nair');
-  }));
-
-  it('should filter appointments by type selection match', fakeAsync(() => {
-    component.ngOnInit();
-    tick(600);
-    fixture.detectChanges();
-
-    component.searchForm.patchValue({ appointmentType: 'client' });
-    fixture.detectChanges();
-
-    expect(component.filteredAppointments.length).toBe(1);
-    expect(component.filteredAppointments[0].appointmentTypeId).toBe('Client');
-  }));
-
-  it('should log edit messages on clicking edit action', () => {
-    spyOn(console, 'log');
-    const mockApp = {
-      providerId: 'Elena Rossi',
-      category: 'Medical',
-      appointmentTypeId: 'Client',
-      username: 'elena.rossi',
-      email: 'elena.rossi@email.com'
-    };
-
-    // component.editAppointment(mockApp);
-    expect(console.log).toHaveBeenCalledWith('Editing appointment for:', 'Elena Rossi');
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1']);
+    component.searchForm.patchValue({ search: '', appointmentType: 'Fitness' });
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['2']);
   });
 });
