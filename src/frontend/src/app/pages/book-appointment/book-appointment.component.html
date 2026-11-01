@@ -199,7 +199,6 @@
           <p class="booking-reminder">Times use your device's local timezone.</p>
 
           <div class="booking-actions">
-            <button type="button" class="secondary-button" (click)="chooseDifferentDate()">Choose different time</button>
             <button type="button" class="primary-button" [disabled]="booking" (click)="book()">
               {{ booking ? 'Booking...' : 'Book appointment' }}
             </button>
