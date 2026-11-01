@@ -10,9 +10,13 @@
 
   @if (booked; as confirmed) {
     <section class="confirmation-card" role="status" aria-labelledby="confirmed-title">
-      <p class="eyebrow">Confirmed</p>
-      <h2 id="confirmed-title">Appointment booked</h2>
-      <dl>
+      <div class="confirmation-heading">
+        <p class="eyebrow">Confirmed</p>
+        <h2 id="confirmed-title">Appointment booked</h2>
+        <p>Your appointment has been added to your schedule.</p>
+      </div>
+
+      <dl class="confirmation-details">
         <dt>Service</dt>
         <dd>{{ confirmed.title }}</dd>
         <dt>Provider</dt>
@@ -26,7 +30,8 @@
           <dd>{{ confirmed.notes }}</dd>
         }
       </dl>
-      <div class="booking-actions">
+
+      <div class="booking-actions confirmation-actions">
         <a routerLink="/appointments" class="primary-button">View appointments</a>
         <button type="button" class="secondary-button" (click)="bookAnother()">Book another</button>
       </div>
@@ -55,7 +60,7 @@
         @if (selectedProvider; as provider) {
           <div class="collapsed-summary">
             <strong>{{ provider.name }}</strong>
-            <span>{{ provider.categories.join(', ') }} · {{ provider.openings }} open slots</span>
+            <span>{{ provider.categories.join(', ') }}</span>
           </div>
         }
 
@@ -132,7 +137,7 @@
         @if (selectedProviderId && !selected) {
           <div class="toolbar">
             <div class="week-picker" aria-label="Choose appointment week">
-              <button type="button" class="secondary-button" [disabled]="loading" (click)="previousWeek()">Previous</button>
+              <button type="button" class="secondary-button" [disabled]="loading || !canGoPreviousWeek" (click)="previousWeek()">Previous</button>
               <span>{{ weekRangeLabel }}</span>
               <button type="button" class="secondary-button" [disabled]="loading" (click)="nextWeek()">Next</button>
             </div>

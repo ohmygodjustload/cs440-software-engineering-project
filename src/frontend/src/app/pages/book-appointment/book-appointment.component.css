@@ -27,7 +27,7 @@ button:disabled{cursor:not-allowed;opacity:.65}
 .slot-time{color:#344b48;font-size:14px;font-weight:500}
 .slot-meta,.booking-reminder,.empty-state,.review-summary p,.collapsed-summary span{color:#60736f;font-size:13px}
 .collapsed-summary{display:grid;margin-top:12px}
-.review-summary{margin-top:18px;padding:16px;border:1px solid #e0dcd1;border-radius:18px;background:#fffdfa}
+.review-summary{margin-top:18px;padding:16px;border-radius:18px;background:#fffdfa}
 .review-panel label{display:block;margin:18px 0 9px;font-size:13px}
 .review-panel label span{color:#60736f}
 .empty-state p,.error-message p{margin:0}
@@ -42,6 +42,10 @@ textarea{width:100%;min-height:112px;padding:13px 14px;border:1px solid #e0dcd1;
 .secondary-button{border:1px solid #e0dcd1;background:#fffdfa;color:#344945}
 .text-button{border:0;padding:0;background:transparent;color:#344945;text-decoration:underline;text-underline-offset:3px}
 .error-message{display:grid;gap:8px;margin:16px 0;color:#7a3d2a;font-size:14px}
+.confirmation-card{padding:34px}
+.confirmation-details{display:grid;grid-template-columns:110px 1fr;gap:12px 20px;margin:28px 0 0}
+.confirmation-details dt{color:#60736f;font-size:13px}
+.confirmation-details dd{margin:0}
 @media (max-width:860px){.appointments-page{padding-top:36px}}
 @media (max-width:980px){.slot-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.slot-list{grid-template-columns:1fr}}

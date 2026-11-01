@@ -88,6 +88,8 @@ describe('BookAppointmentComponent', () => {
     slots.getAvailable.and.returnValue(of([slot, nextWeekSlot]));
     const component = create().componentInstance;
 
+    component.weekStart = new Date(2027, 0, 1);
+
     expect(component.weekRangeLabel).toContain('Jan 1');
     expect(component.visibleSlots).toEqual([slot]);
 
@@ -109,6 +111,7 @@ describe('BookAppointmentComponent', () => {
     slots.getAvailable.and.returnValue(of([slot, beautySlot]));
     const component = create().componentInstance;
 
+    component.weekStart = new Date(2027, 0, 1);
     component.chooseProvider('6abc1939a313dfdf8ecc0999');
 
     expect(component.selectedProvider?.name).toBe('Jane Doe');
@@ -123,6 +126,18 @@ describe('BookAppointmentComponent', () => {
     component.nextWeek();
 
     expect(component.selected).toBeNull();
+  });
+
+  it('does not page into a week before today', () => {
+    const component = create().componentInstance;
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    component.weekStart = today;
+    component.previousWeek();
+
+    expect(component.weekStart).toEqual(today);
+    expect(component.canGoPreviousWeek).toBeFalse();
   });
 
   it('returns to slot selection when choosing a different date', () => {

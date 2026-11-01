@@ -31,6 +31,7 @@ interface ProviderOption {
 })
 export class BookAppointmentComponent implements OnInit {
   private readonly dayMs = 24 * 60 * 60 * 1000;
+  private readonly minWeekStart = this.startOfDay(new Date());
   private readonly slotsService = inject(SlotsService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -91,6 +92,10 @@ export class BookAppointmentComponent implements OnInit {
 
   get weekRangeLabel(): string {
     return `${this.shortDate(this.weekStart)} - ${this.shortDate(this.addDays(this.weekStart, 6))}`;
+  }
+
+  get canGoPreviousWeek(): boolean {
+    return this.addDays(this.weekStart, -7) >= this.minWeekStart;
   }
 
   ngOnInit(): void {
@@ -155,6 +160,10 @@ export class BookAppointmentComponent implements OnInit {
   }
 
   previousWeek(): void {
+    if (!this.canGoPreviousWeek) {
+      return;
+    }
+
     this.moveWeek(-1);
   }
 
@@ -218,8 +227,8 @@ export class BookAppointmentComponent implements OnInit {
   }
 
   private alignWeekToSlots(): void {
-    if (this.providerSlots.length && !this.visibleSlots.length) {
-      this.weekStart = this.startOfDay(new Date(this.providerSlots[0].startDateTime));
+    if (this.weekStart < this.minWeekStart) {
+      this.weekStart = this.minWeekStart;
     }
   }
 
