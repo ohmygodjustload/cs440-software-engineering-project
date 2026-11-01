@@ -33,18 +33,18 @@
     </section>
   } @else {
     <div class="booking-flow">
-      <section class="slots-panel" [class.is-collapsed]="selected" aria-labelledby="slots-title">
+      <section class="provider-panel" [class.is-collapsed]="selectedProviderId" aria-labelledby="provider-title">
         <div class="panel-heading">
           <button
             type="button"
             class="panel-title"
-            [disabled]="!selected"
-            (click)="chooseDifferentDate()"
+            [disabled]="!selectedProviderId"
+            (click)="chooseDifferentProvider()"
           >
             <p class="eyebrow">Step 1</p>
-            <h2 id="slots-title">Choose a time</h2>
-            @if (selected) {
-              <span>Change time</span>
+            <h2 id="provider-title">Choose provider</h2>
+            @if (selectedProviderId) {
+              <span>Change provider</span>
             }
           </button>
           @if (loading) {
@@ -52,7 +52,14 @@
           }
         </div>
 
-        @if (!selected) {
+        @if (selectedProvider; as provider) {
+          <div class="collapsed-summary">
+            <strong>{{ provider.name }}</strong>
+            <span>{{ provider.categories.join(', ') }} · {{ provider.openings }} open slots</span>
+          </div>
+        }
+
+        @if (!selectedProviderId) {
           <div class="toolbar">
             <div class="category-chips" aria-label="Filter by category">
               <button type="button" [class.selected]="category === ''" [disabled]="loading" (click)="selectCategory('')">All</button>
@@ -61,12 +68,6 @@
                   {{ option }}
                 </button>
               }
-            </div>
-
-            <div class="week-picker" aria-label="Choose appointment week">
-              <button type="button" class="secondary-button" [disabled]="loading" (click)="previousWeek()">Previous</button>
-              <span>{{ weekRangeLabel }}</span>
-              <button type="button" class="secondary-button" [disabled]="loading" (click)="nextWeek()">Next</button>
             </div>
           </div>
 
@@ -80,10 +81,67 @@
               <p>No open slots right now.</p>
               <span>Try another category or check back soon.</span>
             </div>
-          } @else if (!loading && !visibleSlots.length) {
+          } @else if (!loading && !providers.length) {
+            <div class="empty-state">
+              <p>No providers have open slots right now.</p>
+              <span>Try another category or check back soon.</span>
+            </div>
+          }
+
+          <ul class="slot-list" aria-label="Providers with open slots">
+            @for (provider of providers; track provider.id) {
+              <li class="slot-card">
+                <button
+                  type="button"
+                  class="slot-choice"
+                  [disabled]="booking"
+                  (click)="chooseProvider(provider.id)"
+                >
+                  <span class="slot-title">{{ provider.name }}</span>
+                  <span class="slot-meta">{{ provider.categories.join(', ') }} · {{ provider.openings }} open slots</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="slots-panel" [class.is-collapsed]="!selectedProviderId || selected" aria-labelledby="slots-title">
+        <div class="panel-heading">
+          <button
+            type="button"
+            class="panel-title"
+            [disabled]="!selected"
+            (click)="chooseDifferentDate()"
+          >
+            <p class="eyebrow">Step 2</p>
+            <h2 id="slots-title">Choose a time</h2>
+            @if (selected) {
+              <span>Change time</span>
+            }
+          </button>
+        </div>
+
+        @if (selected; as chosen) {
+          <div class="collapsed-summary">
+            <strong>{{ chosen.title }}</strong>
+            <span>{{ chosen.startDateTime | date:'EEE, MMM d, h:mm a' }} to {{ chosen.endDateTime | date:'h:mm a' }}</span>
+          </div>
+        }
+
+        @if (selectedProviderId && !selected) {
+          <div class="toolbar">
+            <div class="week-picker" aria-label="Choose appointment week">
+              <button type="button" class="secondary-button" [disabled]="loading" (click)="previousWeek()">Previous</button>
+              <span>{{ weekRangeLabel }}</span>
+              <button type="button" class="secondary-button" [disabled]="loading" (click)="nextWeek()">Next</button>
+            </div>
+          </div>
+
+          @if (!loading && !visibleSlots.length) {
             <div class="empty-state">
               <p>No open slots for {{ weekRangeLabel }}.</p>
-              <span>Try the next week or another category.</span>
+              <span>Try the next week or choose another provider.</span>
             </div>
           }
 
@@ -101,22 +159,22 @@
                     {{ slot.startDateTime | date:'EEE, MMM d, h:mm a' }} to {{ slot.endDateTime | date:'h:mm a' }}
                   </span>
                   <span class="slot-meta">
-                    {{ slot.providerName }} · {{ slot.category }}@if (slot.location) { · {{ slot.location }} }
+                    {{ slot.category }}@if (slot.location) { · {{ slot.location }} }
                   </span>
                 </button>
               </li>
             }
           </ul>
+        }
 
-          @if (formError) {
-            <p class="error-message" role="alert">{{ formError }}</p>
-          }
+        @if (formError) {
+          <p class="error-message" role="alert">{{ formError }}</p>
         }
       </section>
 
       @if (selected; as slot) {
         <section class="review-panel" aria-labelledby="review-title">
-          <p class="eyebrow">Step 2</p>
+          <p class="eyebrow">Step 3</p>
           <h2 id="review-title">Review booking</h2>
 
           <div class="review-summary">
@@ -141,7 +199,7 @@
           <p class="booking-reminder">Times use your device's local timezone.</p>
 
           <div class="booking-actions">
-            <button type="button" class="secondary-button" (click)="chooseDifferentDate()">Choose different date</button>
+            <button type="button" class="secondary-button" (click)="chooseDifferentDate()">Choose different time</button>
             <button type="button" class="primary-button" [disabled]="booking" (click)="book()">
               {{ booking ? 'Booking...' : 'Book appointment' }}
             </button>
@@ -149,7 +207,7 @@
         </section>
       } @else {
         <section class="review-panel is-collapsed" aria-labelledby="review-title">
-          <p class="eyebrow">Step 2</p>
+          <p class="eyebrow">Step 3</p>
           <h2 id="review-title">Review booking</h2>
         </section>
       }

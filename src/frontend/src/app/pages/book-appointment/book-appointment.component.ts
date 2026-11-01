@@ -11,6 +11,13 @@ import { BookedAppointment, Slot } from '../../core/models/slot';
 import { SlotsService } from '../../core/services/slots.service';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
 
+interface ProviderOption {
+  id: string;
+  name: string;
+  categories: AppointmentCategory[];
+  openings: number;
+}
+
 /**
  * Client booking page: lists the open slots from `GET /api/slots`, lets the client pick one and add notes,
  * then books it with `POST /api/slots/{id}/book`. The API takes the client from the signed-in JWT.
@@ -31,6 +38,7 @@ export class BookAppointmentComponent implements OnInit {
 
   category: AppointmentCategory | '' = '';
   slots: Slot[] = [];
+  selectedProviderId = '';
   weekStart = this.startOfDay(new Date());
   selectedId = '';
   notes = '';
@@ -44,9 +52,38 @@ export class BookAppointmentComponent implements OnInit {
     return this.slots.find((slot) => slot.id === this.selectedId) ?? null;
   }
 
+  get providers(): ProviderOption[] {
+    const providers = new Map<string, ProviderOption>();
+    for (const slot of this.slots) {
+      const provider: ProviderOption = providers.get(slot.providerId) ?? {
+        id: slot.providerId,
+        name: slot.providerName ?? 'Unknown provider',
+        categories: [],
+        openings: 0
+      };
+      provider.openings += 1;
+      if (!provider.categories.includes(slot.category)) {
+        provider.categories.push(slot.category);
+      }
+      providers.set(slot.providerId, provider);
+    }
+
+    return [...providers.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  get selectedProvider(): ProviderOption | null {
+    return this.providers.find((provider) => provider.id === this.selectedProviderId) ?? null;
+  }
+
+  get providerSlots(): Slot[] {
+    return this.selectedProviderId
+      ? this.slots.filter((slot) => slot.providerId === this.selectedProviderId)
+      : this.slots;
+  }
+
   get visibleSlots(): Slot[] {
     const weekEnd = this.addDays(this.weekStart, 7);
-    return this.slots.filter((slot) => {
+    return this.providerSlots.filter((slot) => {
       const start = new Date(slot.startDateTime);
       return start >= this.weekStart && start < weekEnd;
     });
@@ -66,6 +103,8 @@ export class BookAppointmentComponent implements OnInit {
     }
 
     this.category = category;
+    this.selectedProviderId = '';
+    this.selectedId = '';
     this.loadSlots();
   }
 
@@ -82,11 +121,27 @@ export class BookAppointmentComponent implements OnInit {
         next: (slots) => {
           this.slots = [...slots].sort((a, b) =>
             new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
-          this.alignWeekToSlots();
+          if (this.selectedProviderId && !this.providers.some((provider) => provider.id === this.selectedProviderId)) {
+            this.selectedProviderId = '';
+          }
           if (!slots.some((slot) => slot.id === this.selectedId)) this.selectedId = '';
+          this.alignWeekToSlots();
         },
         error: () => this.loadError = 'Open slots could not be loaded. Check the API and retry.'
       });
+  }
+
+  chooseProvider(id: string): void {
+    this.selectedProviderId = id;
+    this.selectedId = '';
+    this.formError = '';
+    this.alignWeekToSlots();
+  }
+
+  chooseDifferentProvider(): void {
+    this.selectedProviderId = '';
+    this.selectedId = '';
+    this.formError = '';
   }
 
   choose(id: string): void {
@@ -124,6 +179,7 @@ export class BookAppointmentComponent implements OnInit {
           this.booked = booked;
           this.notes = '';
           this.selectedId = '';
+          this.selectedProviderId = '';
         },
         error: (error: unknown) => {
           this.formError = this.errorMessage(error);
@@ -137,6 +193,7 @@ export class BookAppointmentComponent implements OnInit {
 
   bookAnother(): void {
     this.booked = null;
+    this.selectedProviderId = '';
     this.loadSlots();
   }
 
@@ -161,8 +218,8 @@ export class BookAppointmentComponent implements OnInit {
   }
 
   private alignWeekToSlots(): void {
-    if (this.slots.length && !this.visibleSlots.length) {
-      this.weekStart = this.startOfDay(new Date(this.slots[0].startDateTime));
+    if (this.providerSlots.length && !this.visibleSlots.length) {
+      this.weekStart = this.startOfDay(new Date(this.providerSlots[0].startDateTime));
     }
   }
 

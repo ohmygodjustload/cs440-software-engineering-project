@@ -31,6 +31,14 @@ describe('BookAppointmentComponent', () => {
     startDateTime: '2027-01-08T10:00:00Z',
     endDateTime: '2027-01-08T10:30:00Z'
   };
+  const beautySlot: Slot = {
+    ...slot,
+    id: 's3',
+    title: 'Hair styling',
+    category: 'Beauty',
+    providerId: '6abc1939a313dfdf8ecc0999',
+    providerName: 'Jane Doe'
+  };
 
   let slots: jasmine.SpyObj<SlotsService>;
 
@@ -54,8 +62,8 @@ describe('BookAppointmentComponent', () => {
 
     expect(slots.getAvailable).toHaveBeenCalledWith({});
     expect(fixture.componentInstance.slots).toEqual([slot]);
-    expect(fixture.nativeElement.textContent).toContain('General checkup');
     expect(fixture.nativeElement.textContent).toContain('John Smith');
+    expect(fixture.nativeElement.textContent).toContain('Medical');
   });
 
   it('reloads the slots with the chosen category', () => {
@@ -87,6 +95,24 @@ describe('BookAppointmentComponent', () => {
 
     expect(component.weekRangeLabel).toContain('Jan 8');
     expect(component.visibleSlots).toEqual([nextWeekSlot]);
+  });
+
+  it('groups available slots by provider', () => {
+    slots.getAvailable.and.returnValue(of([slot, nextWeekSlot, beautySlot]));
+    const component = create().componentInstance;
+
+    expect(component.providers.map((provider) => provider.name)).toEqual(['Jane Doe', 'John Smith']);
+    expect(component.providers.find((provider) => provider.name === 'John Smith')?.openings).toBe(2);
+  });
+
+  it('shows only the chosen provider slots', () => {
+    slots.getAvailable.and.returnValue(of([slot, beautySlot]));
+    const component = create().componentInstance;
+
+    component.chooseProvider('6abc1939a313dfdf8ecc0999');
+
+    expect(component.selectedProvider?.name).toBe('Jane Doe');
+    expect(component.visibleSlots).toEqual([beautySlot]);
   });
 
   it('clears the selected slot when paging to another week', () => {
