@@ -16,12 +16,6 @@ import { Appointment } from '../../core/models/appointment';
 import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
 
-interface AppointmentMonth {
-  key: string;
-  label: string;
-  items: Appointment[];
-}
-
 @Component({
   selector: 'app-appointments',
   standalone: true,
@@ -37,31 +31,20 @@ export class AppointmentsComponent implements OnInit {
   loading = false;
   error = '';
   selectedId = '';
-  cancellingId: string | null = null;
-  actionError = '';
 
-  get months(): AppointmentMonth[] {
-    const groups = new Map<string, AppointmentMonth>();
-    const sorted = this.appointments
+  get bookedAppointments(): Appointment[] {
+    return this.appointments
       .filter((item) => item.status === 'Booked')
       .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
+  }
 
-    for (const item of sorted) {
-      const date = new Date(item.startDateTime);
-      const key = `${date.getFullYear()}-${date.getMonth()}`;
-      let group = groups.get(key);
+  get upcomingAppointments(): Appointment[] {
+    const now = Date.now();
+    return this.bookedAppointments.filter((item) => Date.parse(item.endDateTime) >= now);
+  }
 
-      if (!group) {
-        group = {
-          key,
-          label: date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-          items: []
-        };
-        groups.set(key, group);
-      }
-      group.items.push(item);
-    }
-    return Array.from(groups.values());
+  get nextAppointment(): Appointment | null {
+    return this.upcomingAppointments[0] ?? null;
   }
 
   ngOnInit(): void {
@@ -92,29 +75,4 @@ export class AppointmentsComponent implements OnInit {
     this.selectedId = this.selectedId === id ? '' : id;
   }
 
-  /** Cancels one appointment; the service pops the "Appointment cancelled" popup. */
-  cancel(id: string): void {
-    if (this.cancellingId) {
-      return;
-    }
-    const target = this.appointments.find((item) => item.id === id);
-    this.cancellingId = id;
-    this.actionError = '';
-
-    this.service.cancelAppointment(id, target?.title ?? 'Appointment')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.cancellingId = null;
-          if (this.selectedId === id) {
-            this.selectedId = '';
-          }
-          this.load();
-        },
-        error: () => {
-          this.cancellingId = null;
-          this.actionError = 'That appointment could not be cancelled. Please try again.';
-        }
-      });
-  }
 }

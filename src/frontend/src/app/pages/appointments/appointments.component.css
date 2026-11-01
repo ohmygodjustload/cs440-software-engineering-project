@@ -1,15 +1,11 @@
-/*
-  appointments.component.css — styles for the Appointments page only.
-
-  Purpose: reserved for rules used by this page alone. It is intentionally empty while the page is a
-  placeholder.
-
-*/
-
 :host {
+  --appointments-paper: #f7f5f1;
+  --appointments-ink: #344945;
+  --appointments-soft: #e0dcd1;
+
   display: block;
-  background: #f7f5f1;
-  color: #344945;
+  background: var(--appointments-paper);
+  color: var(--appointments-ink);
 }
 
 .overview {
@@ -18,10 +14,11 @@
   padding: 12px 24px 80px;
 }
 
-header {
+.page-header,
+.upcoming-card {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 24px;
 }
 
@@ -32,64 +29,33 @@ h1 {
   letter-spacing: -0.6px;
 }
 
-.month-group {
-  margin-top: 44px;
-}
-
-.month-group:first-of-type {
-  margin-top: 16px;
-}
-
 h2 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 26px;
   font-weight: 500;
   letter-spacing: -0.6px;
 }
 
-.appointment-card {
-  box-sizing: border-box;
-  padding: 22px 38px;
-  margin-bottom: 24px;
-  border-radius: 24px;
-  background: #e0dcd1;
+.page-header {
+  margin-bottom: 28px;
 }
 
-.fitness {
-  background: #d5e3e8;
-}
-
-.beauty {
-  background: #e4e3bc;
-}
-
-.card-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  min-height: 112px;
-}
-
+.eyebrow,
 .meta {
   margin: 0;
-  font-size: 13px;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
-h3 {
-  margin: 24px 0 6px;
-  font-size: 26px;
-  font-weight: 500;
-  overflow-wrap: anywhere;
-}
-
+.eyebrow,
+.meta,
 .provider {
-  margin: 0;
-  font-size: 15px;
-  overflow-wrap: anywhere;
+  color: rgb(52 73 69 / 78%);
 }
 
-button, a {
+button,
+a {
   font: inherit;
   color: inherit;
 }
@@ -98,47 +64,79 @@ button {
   cursor: pointer;
 }
 
-.primary {
-  display: inline-block;
-  box-sizing: border-box;
-  flex-shrink: 0;
-  padding: 14px 24px;
-  border: 0;
+.primary,
+.secondary,
+.refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 999px;
-  background: #344945;
-  color: #f7f5f1;
-  text-align: center;
   text-decoration: none;
   font-size: 14px;
 }
 
-.new-appointment {
-  min-width: 210px;
+.primary {
+  flex-shrink: 0;
+  padding: 14px 24px;
+  border: 0;
+  background: var(--appointments-ink);
+  color: var(--appointments-paper);
 }
 
-.details-button {
-  min-width: 222px;
+.secondary,
+.danger {
+  padding: 10px 16px;
+  border: 1px solid rgb(52 73 69 / 24%);
+  background: transparent;
+}
+
+.error button {
+  margin-top: 10px;
+  padding: 10px 16px;
+  border: 1px solid rgb(52 73 69 / 24%);
+  border-radius: 999px;
+  background: transparent;
+}
+
+.upcoming-card {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 28px;
+  border: 1px solid var(--appointments-soft);
+  border-radius: 28px;
+  background: rgb(250 249 246 / 72%);
+}
+
+.upcoming-card h2 {
+  margin-top: 8px;
+}
+
+.provider {
+  margin: 6px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .details {
   display: grid;
-  grid-template-columns: 80px minmax(0, 1fr);
+  grid-template-columns: 92px minmax(0, 1fr);
   gap: 12px;
+  width: 100%;
+  margin: 18px 0 0;
   padding-top: 20px;
-  border-top: 1px solid #34494533;
+  border-top: 1px solid rgb(52 73 69 / 20%);
   font-size: 14px;
 }
 
 dd {
   margin: 0;
   overflow-wrap: anywhere;
-}
-
-.refresh, .error button {
-  padding: 10px 18px;
-  border: 1px solid #344945;
-  border-radius: 999px;
-  background: transparent;
 }
 
 .error {
@@ -148,17 +146,57 @@ dd {
   border-radius: 16px;
 }
 
+.empty-state {
+  max-width: 520px;
+}
+
+.empty-state h2 {
+  margin-top: 8px;
+}
+
+.empty-state p:not(.eyebrow) {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+button:hover:not(:disabled),
+a:hover {
+  filter: brightness(0.94);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--appointments-ink);
+  outline-offset: 3px;
+}
+
 @media (max-width: 760px) {
-  header, .card-content {
+  .overview {
+    padding-inline: 20px;
+  }
+
+  .page-header,
+  .upcoming-card {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .appointment-card {
-    padding: 24px;
+  .card-actions {
+    width: 100%;
   }
 
-  .details-button {
-    min-width: 0;
+  .card-actions button,
+  .primary {
+    width: 100%;
+  }
+
+  .details {
+    grid-template-columns: 1fr;
   }
 }

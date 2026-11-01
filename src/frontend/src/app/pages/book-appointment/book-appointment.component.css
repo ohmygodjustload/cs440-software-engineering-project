@@ -103,7 +103,7 @@ button, a.secondary-button{
   cursor: pointer;
 }
 
-.primary-button, .secondary-button, .danger-button{
+.primary-button, .secondary-button{
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -122,12 +122,6 @@ button, a.secondary-button{
   border: 1px solid #cccfc5;
   background: transparent;
   color: #344b48;
-}
-
-.danger-button{
-  border: 1px solid #8a3636;
-  background: #8a3636;
-  color: #fff;
 }
 
 .text-button{
@@ -163,46 +157,12 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   margin-top: 20px;
 }
 
-.success-message{
-  padding: 14px 18px;
-  background: #e4ebdc;
-  border-radius: 12px;
-  font-size: 14px;
-}
-
 .error-message{
   padding: 12px;
   background: #fceeee;
   color: #8a3636;
   border-radius: 10px;
   font-size: 13px;
-}
-
-.appointment-list{
-  list-style: none;
-  padding: 0;
-  margin: 20px 0;
-  display: grid;
-  gap: 14px;
-}
-
-.appointment-card{
-  padding: 18px;
-  border-radius: 14px;
-  overflow-wrap: anywhere;
-  font-size: 13px;
-}
-
-.medical{
-  background: #dfddd3;
-}
-
-.beauty{
-  background: #e5e6ba;
-}
-
-.fitness{
-  background: #d6e5eb;
 }
 
 .card-heading{
@@ -229,14 +189,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 .cancel-link{
   color: #8a3636;
-}
-
-.cancel-confirmation{
-  margin-top: 18px;
-  padding: 16px;
-  border: 1px solid #deb8b8;
-  background: #fff4f1;
-  border-radius: 12px;
 }
 
 .empty-state{
@@ -273,7 +225,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 }
 
-/* Figma Willow palette and the two-column client booking layout. */
 :host{
   --booking-ink: #344945;
   --booking-paper: #f7f5f1;
@@ -590,7 +541,6 @@ summary{
 
 }
 
-/* Slot picker. */
 .category-filter{
   max-width: 320px;
   margin-bottom: 20px;
