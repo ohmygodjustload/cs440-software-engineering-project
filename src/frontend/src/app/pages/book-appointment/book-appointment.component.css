@@ -1,6 +1,6 @@
 :host{display:block;background:#f7f5f1;color:#344945}
 .appointments-page{max-width:1120px;margin:0 auto;padding:52px 24px 64px}
-.back-link{display:inline-flex;align-items:center;gap:8px;min-height:38px;margin-bottom:26px;padding:0 15px;border:1px solid #e0dcd1;border-radius:999px;background:#fffdfa;color:inherit;font-size:13px;text-decoration:none}
+.app-breadcrumb{margin-bottom:26px}
 h1,h2,h3{margin:0;color:#344b48;font-weight:500}
 .page-header{margin-bottom:28px}
 .page-header p{margin:9px 0 0;color:#60736f;font-size:14px}
