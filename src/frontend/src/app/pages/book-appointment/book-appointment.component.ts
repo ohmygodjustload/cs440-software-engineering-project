@@ -23,6 +23,7 @@ import { LoadingComponent } from '../../core/components/loading/loading.componen
   styleUrl: './book-appointment.component.css'
 })
 export class BookAppointmentComponent implements OnInit {
+  private readonly dayMs = 24 * 60 * 60 * 1000;
   private readonly slotsService = inject(SlotsService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -30,6 +31,7 @@ export class BookAppointmentComponent implements OnInit {
 
   category: AppointmentCategory | '' = '';
   slots: Slot[] = [];
+  weekStart = this.startOfDay(new Date());
   selectedId = '';
   notes = '';
   loading = false;
@@ -42,7 +44,28 @@ export class BookAppointmentComponent implements OnInit {
     return this.slots.find((slot) => slot.id === this.selectedId) ?? null;
   }
 
+  get visibleSlots(): Slot[] {
+    const weekEnd = this.addDays(this.weekStart, 7);
+    return this.slots.filter((slot) => {
+      const start = new Date(slot.startDateTime);
+      return start >= this.weekStart && start < weekEnd;
+    });
+  }
+
+  get weekRangeLabel(): string {
+    return `${this.shortDate(this.weekStart)} - ${this.shortDate(this.addDays(this.weekStart, 6))}`;
+  }
+
   ngOnInit(): void {
+    this.loadSlots();
+  }
+
+  selectCategory(category: AppointmentCategory | ''): void {
+    if (this.category === category || this.loading) {
+      return;
+    }
+
+    this.category = category;
     this.loadSlots();
   }
 
@@ -57,7 +80,9 @@ export class BookAppointmentComponent implements OnInit {
       )
       .subscribe({
         next: (slots) => {
-          this.slots = slots;
+          this.slots = [...slots].sort((a, b) =>
+            new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
+          this.alignWeekToSlots();
           if (!slots.some((slot) => slot.id === this.selectedId)) this.selectedId = '';
         },
         error: () => this.loadError = 'Open slots could not be loaded. Check the API and retry.'
@@ -67,6 +92,19 @@ export class BookAppointmentComponent implements OnInit {
   choose(id: string): void {
     this.selectedId = id;
     this.formError = '';
+  }
+
+  chooseDifferentDate(): void {
+    this.selectedId = '';
+    this.formError = '';
+  }
+
+  previousWeek(): void {
+    this.moveWeek(-1);
+  }
+
+  nextWeek(): void {
+    this.moveWeek(1);
   }
 
   book(): void {
@@ -113,5 +151,30 @@ export class BookAppointmentComponent implements OnInit {
       case 400: return body || 'That slot has already started. Pick another time.';
       default: return 'The appointment could not be booked. Check the API and try again.';
     }
+  }
+
+  private moveWeek(offset: number): void {
+    this.weekStart = this.addDays(this.weekStart, offset * 7);
+    if (!this.visibleSlots.some((slot) => slot.id === this.selectedId)) {
+      this.selectedId = '';
+    }
+  }
+
+  private alignWeekToSlots(): void {
+    if (this.slots.length && !this.visibleSlots.length) {
+      this.weekStart = this.startOfDay(new Date(this.slots[0].startDateTime));
+    }
+  }
+
+  private startOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private addDays(date: Date, days: number): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+  }
+
+  private shortDate(date: Date): string {
+    return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(date);
   }
 }

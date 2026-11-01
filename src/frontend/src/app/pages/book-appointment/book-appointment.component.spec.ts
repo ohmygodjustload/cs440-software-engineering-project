@@ -25,6 +25,12 @@ describe('BookAppointmentComponent', () => {
   const booking: BookedAppointment = {
     ...slot, status: 'Booked', userId: '6abc20bda313dfdf8ecc0286', notes: 'First visit'
   };
+  const nextWeekSlot: Slot = {
+    ...slot,
+    id: 's2',
+    startDateTime: '2027-01-08T10:00:00Z',
+    endDateTime: '2027-01-08T10:30:00Z'
+  };
 
   let slots: jasmine.SpyObj<SlotsService>;
 
@@ -59,6 +65,48 @@ describe('BookAppointmentComponent', () => {
     component.loadSlots();
 
     expect(slots.getAvailable).toHaveBeenCalledWith({ category: 'Beauty' });
+  });
+
+  it('selects a category from the filter chips', () => {
+    const component = create().componentInstance;
+
+    component.selectCategory('Fitness');
+
+    expect(component.category).toBe('Fitness');
+    expect(slots.getAvailable).toHaveBeenCalledWith({ category: 'Fitness' });
+  });
+
+  it('shows one week of slots at a time', () => {
+    slots.getAvailable.and.returnValue(of([slot, nextWeekSlot]));
+    const component = create().componentInstance;
+
+    expect(component.weekRangeLabel).toContain('Jan 1');
+    expect(component.visibleSlots).toEqual([slot]);
+
+    component.nextWeek();
+
+    expect(component.weekRangeLabel).toContain('Jan 8');
+    expect(component.visibleSlots).toEqual([nextWeekSlot]);
+  });
+
+  it('clears the selected slot when paging to another week', () => {
+    slots.getAvailable.and.returnValue(of([slot, nextWeekSlot]));
+    const component = create().componentInstance;
+
+    component.choose('s1');
+    component.nextWeek();
+
+    expect(component.selected).toBeNull();
+  });
+
+  it('returns to slot selection when choosing a different date', () => {
+    const component = create().componentInstance;
+
+    component.choose('s1');
+    expect(component.selected).toEqual(slot);
+
+    component.chooseDifferentDate();
+    expect(component.selected).toBeNull();
   });
 
   it('books the selected slot with the notes and shows the confirmation', () => {
