@@ -30,6 +30,7 @@ interface ProviderOption {
   styleUrl: './book-appointment.component.css'
 })
 export class BookAppointmentComponent implements OnInit {
+  // Week navigation should start at today; users should not browse past ranges.
   private readonly minWeekStart = this.startOfDay(new Date());
   private readonly slotsService = inject(SlotsService);
   private readonly destroyRef = inject(DestroyRef);
@@ -52,6 +53,7 @@ export class BookAppointmentComponent implements OnInit {
     return this.slots.find((slot) => slot.id === this.selectedId) ?? null;
   }
 
+  // Until there is a provider lookup endpoint for booking, derive provider choices from open slots.
   get providers(): ProviderOption[] {
     const providers = new Map<string, ProviderOption>();
     for (const slot of this.slots) {
@@ -226,6 +228,7 @@ export class BookAppointmentComponent implements OnInit {
   }
 
   private alignWeekToSlots(): void {
+    // Keep the current range anchored at today if data or navigation would otherwise move it into the past.
     if (this.weekStart < this.minWeekStart) {
       this.weekStart = this.minWeekStart;
     }
