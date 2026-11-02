@@ -30,7 +30,6 @@ interface ProviderOption {
   styleUrl: './book-appointment.component.css'
 })
 export class BookAppointmentComponent implements OnInit {
-  private readonly dayMs = 24 * 60 * 60 * 1000;
   private readonly minWeekStart = this.startOfDay(new Date());
   private readonly slotsService = inject(SlotsService);
   private readonly destroyRef = inject(DestroyRef);
