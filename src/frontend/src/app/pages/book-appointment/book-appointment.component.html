@@ -1,18 +1,22 @@
 <section class="appointments-page" aria-labelledby="page-title">
+  <a class="app-breadcrumb" routerLink="/appointments"><span aria-hidden="true">&larr;</span> Appointments</a>
+
   <header class="page-header">
-    <h1 id="page-title">
-      Book appointment
-    </h1>
-    <p>
-      Pick an open time from one of our service providers.
-    </p>
+    <div>
+      <h1 id="page-title">Book appointment</h1>
+      <p>Choose an available provider slot and confirm your booking.</p>
+    </div>
   </header>
-  <p><a routerLink="/appointments">Back to appointments</a></p>
 
   @if (booked; as confirmed) {
     <section class="confirmation-card" role="status" aria-labelledby="confirmed-title">
-      <h2 id="confirmed-title">Appointment booked</h2>
-      <dl>
+      <div class="confirmation-heading">
+        <p class="eyebrow">Confirmed</p>
+        <h2 id="confirmed-title">Appointment booked</h2>
+        <p>Your appointment has been added to your schedule.</p>
+      </div>
+
+      <dl class="confirmation-details">
         <dt>Service</dt>
         <dd>{{ confirmed.title }}</dd>
         <dt>Provider</dt>
@@ -26,90 +30,191 @@
           <dd>{{ confirmed.notes }}</dd>
         }
       </dl>
-      <div class="slot-actions">
-        <a routerLink="/appointments" class="primary-button">View my appointments</a>
+
+      <div class="booking-actions confirmation-actions">
+        <a routerLink="/appointments" class="primary-button">View appointments</a>
         <button type="button" class="secondary-button" (click)="bookAnother()">Book another</button>
       </div>
     </section>
   } @else {
-    <div class="field category-filter">
-      <label for="category">
-        Category
-      </label>
-      <select id="category" name="category" [(ngModel)]="category" (ngModelChange)="loadSlots()" [disabled]="loading">
-        <option value="">All categories</option>
-        @for (option of categories; track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
-    </div>
-
-    @if (loading) {
-      <app-loading class="field-help" label="Loading open slots…"></app-loading>
-    }
-    @if (loadError) {
-      <p class="error-message" role="alert">
-        {{ loadError }}
-        <button type="button" class="text-button" (click)="loadSlots()" [disabled]="loading">Retry</button>
-      </p>
-    } @else if (!loading && !slots.length) {
-      <p class="field-help">No open slots right now. Check back soon or try another category.</p>
-    }
-
-    <ul class="slot-list" aria-label="Open slots">
-      @for (slot of slots; track slot.id) {
-        <li>
+    <div class="booking-flow">
+      <section class="provider-panel" [class.is-collapsed]="selectedProviderId" aria-labelledby="provider-title">
+        <div class="panel-heading">
           <button
             type="button"
-            class="slot-choice"
-            [class.selected]="selectedId === slot.id"
-            [attr.aria-pressed]="selectedId === slot.id"
-            [disabled]="booking"
-            (click)="choose(slot.id)"
+            class="panel-title"
+            [disabled]="!selectedProviderId"
+            (click)="chooseDifferentProvider()"
           >
-            <span class="slot-title">{{ slot.title }}</span>
-            <span class="slot-time">
-              {{ slot.startDateTime | date:'EEE, MMM d, h:mm a' }} to {{ slot.endDateTime | date:'h:mm a' }}
-            </span>
-            <span class="slot-meta">
-              {{ slot.providerName }} · {{ slot.category }}@if (slot.location) { · {{ slot.location }} }
-            </span>
+            <p class="eyebrow">Step 1</p>
+            <h2 id="provider-title">Choose provider</h2>
+            @if (selectedProviderId) {
+              <span>Change provider</span>
+            }
           </button>
-        </li>
+          @if (loading) {
+            <app-loading label="Loading..."></app-loading>
+          }
+        </div>
+
+        @if (selectedProvider; as provider) {
+          <div class="collapsed-summary">
+            <strong>{{ provider.name }}</strong>
+            <span>{{ provider.categories.join(', ') }}</span>
+          </div>
+        }
+
+        @if (!selectedProviderId) {
+          <div class="toolbar">
+            <div class="category-chips" aria-label="Filter by category">
+              <button type="button" [class.selected]="category === ''" [disabled]="loading" (click)="selectCategory('')">All</button>
+              @for (option of categories; track option) {
+                <button type="button" [class.selected]="category === option" [disabled]="loading" (click)="selectCategory(option)">
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (loadError) {
+            <div class="error-message" role="alert">
+              <p>{{ loadError }}</p>
+              <button type="button" class="text-button" (click)="loadSlots()" [disabled]="loading">Retry</button>
+            </div>
+          } @else if (!loading && !slots.length) {
+            <div class="empty-state">
+              <p>No open slots right now.</p>
+              <span>Try another category or check back soon.</span>
+            </div>
+          } @else if (!loading && !providers.length) {
+            <div class="empty-state">
+              <p>No providers have open slots right now.</p>
+              <span>Try another category or check back soon.</span>
+            </div>
+          }
+
+          <ul class="slot-list" aria-label="Providers with open slots">
+            @for (provider of providers; track provider.id) {
+              <li class="slot-card">
+                <button
+                  type="button"
+                  class="slot-choice"
+                  [disabled]="booking"
+                  (click)="chooseProvider(provider.id)"
+                >
+                  <span class="slot-title">{{ provider.name }}</span>
+                  <span class="slot-meta">{{ provider.categories.join(', ') }} · {{ provider.openings }} open slots</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="slots-panel" [class.is-collapsed]="!selectedProviderId || selected" aria-labelledby="slots-title">
+        <div class="panel-heading">
+          <button
+            type="button"
+            class="panel-title"
+            [disabled]="!selected"
+            (click)="chooseDifferentDate()"
+          >
+            <p class="eyebrow">Step 2</p>
+            <h2 id="slots-title">Choose a time</h2>
+            @if (selected) {
+              <span>Change time</span>
+            }
+          </button>
+        </div>
+
+        @if (selected; as chosen) {
+          <div class="collapsed-summary">
+            <strong>{{ chosen.title }}</strong>
+            <span>{{ chosen.startDateTime | date:'EEE, MMM d, h:mm a' }} to {{ chosen.endDateTime | date:'h:mm a' }}</span>
+          </div>
+        }
+
+        @if (selectedProviderId && !selected) {
+          <div class="toolbar">
+            <div class="week-picker" aria-label="Choose appointment week">
+              <button type="button" class="secondary-button" [disabled]="loading || !canGoPreviousWeek" (click)="previousWeek()">Previous</button>
+              <span>{{ weekRangeLabel }}</span>
+              <button type="button" class="secondary-button" [disabled]="loading" (click)="nextWeek()">Next</button>
+            </div>
+          </div>
+
+          @if (!loading && !visibleSlots.length) {
+            <div class="empty-state">
+              <p>No open slots for {{ weekRangeLabel }}.</p>
+              <span>Try the next week or choose another provider.</span>
+            </div>
+          }
+
+          <ul class="slot-list" aria-label="Open slots">
+            @for (slot of visibleSlots; track slot.id) {
+              <li class="slot-card">
+                <button
+                  type="button"
+                  class="slot-choice"
+                  [disabled]="booking"
+                  (click)="choose(slot.id)"
+                >
+                  <span class="slot-title">{{ slot.title }}</span>
+                  <span class="slot-time">
+                    {{ slot.startDateTime | date:'EEE, MMM d, h:mm a' }} to {{ slot.endDateTime | date:'h:mm a' }}
+                  </span>
+                  <span class="slot-meta">
+                    {{ slot.category }}@if (slot.location) { · {{ slot.location }} }
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (formError) {
+          <p class="error-message" role="alert">{{ formError }}</p>
+        }
+      </section>
+
+      @if (selected; as slot) {
+        <section class="review-panel" aria-labelledby="review-title">
+          <p class="eyebrow">Step 3</p>
+          <h2 id="review-title">Review booking</h2>
+
+          <div class="review-summary">
+            <h3>{{ slot.title }}</h3>
+            <p>{{ slot.providerName }}</p>
+            <p>{{ slot.startDateTime | date:'EEEE, MMM d, h:mm a' }} to {{ slot.endDateTime | date:'h:mm a' }}</p>
+            @if (slot.location) {
+              <p>{{ slot.location }}</p>
+            }
+          </div>
+
+          <label for="notes">Notes / access instructions <span>(optional)</span></label>
+          <textarea
+            id="notes"
+            name="notes"
+            [(ngModel)]="notes"
+            maxlength="1000"
+            rows="4"
+            placeholder="Anything your provider should know"
+          ></textarea>
+
+          <p class="booking-reminder">Times use your device's local timezone.</p>
+
+          <div class="booking-actions">
+            <button type="button" class="primary-button" [disabled]="booking" (click)="book()">
+              {{ booking ? 'Booking...' : 'Book appointment' }}
+            </button>
+          </div>
+        </section>
+      } @else {
+        <section class="review-panel is-collapsed" aria-labelledby="review-title">
+          <p class="eyebrow">Step 3</p>
+          <h2 id="review-title">Review booking</h2>
+        </section>
       }
-    </ul>
-
-    @if (selected) {
-      <div class="field notes-field">
-        <label for="notes">
-          Notes / access instructions (optional)
-        </label>
-        <textarea
-          id="notes"
-          name="notes"
-          [(ngModel)]="notes"
-          maxlength="1000"
-          rows="3"
-          placeholder="Anything your provider should know"
-        ></textarea>
-      </div>
-    }
-
-    <p class="booking-reminder">
-      Times use your device's local timezone.
-    </p>
-
-    @if (formError) {
-      <p class="error-message" role="alert">
-        {{ formError }}
-      </p>
-    }
-
-    <div class="slot-actions">
-      <a routerLink="/appointments" class="secondary-button">Cancel</a>
-      <button type="button" class="primary-button" [disabled]="!selected || booking" (click)="book()">
-        {{ booking ? 'Booking…' : 'Book appointment' }}
-      </button>
     </div>
   }
 </section>
