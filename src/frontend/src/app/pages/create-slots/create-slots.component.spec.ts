@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { Slot } from '../../core/models/slot';
 import { CreateSlotsComponent } from './create-slots.component';
 
 describe('CreateSlotsComponent', () => {
@@ -92,5 +93,29 @@ describe('CreateSlotsComponent', () => {
     expect(buttons.length).toBe(18);
     expect(labels[labels.length - 1]).toBe('5:30 PM');
     expect(labels).toContain('12:00 PM');
+  });
+
+  it('marks overlapping start times unavailable for existing 60-minute slots', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+    component.chooseDate(date);
+    component.existingSlots = [{
+      id: 'slot-1',
+      title: 'General checkup',
+      category: 'Medical',
+      startDateTime: new Date(`${date}T14:00`).toISOString(),
+      endDateTime: new Date(`${date}T15:00`).toISOString(),
+      providerId: 'p1',
+      providerName: 'John Smith',
+      userId: null,
+      appointmentTypeId: 'type-1',
+      location: 'Clinic',
+      notes: '',
+      status: 'Available'
+    } satisfies Slot];
+
+    expect(component.isTimeUnavailable('14:00')).toBeTrue();
+    expect(component.isTimeUnavailable('14:30')).toBeTrue();
+    expect(component.isTimeUnavailable('15:00')).toBeFalse();
   });
 });

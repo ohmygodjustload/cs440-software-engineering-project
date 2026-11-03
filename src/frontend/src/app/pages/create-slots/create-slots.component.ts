@@ -8,6 +8,7 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 
 import { AppointmentCategory } from '../../core/models/appointment';
+import { Slot } from '../../core/models/slot';
 import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
 
 interface AppointmentForm {
@@ -70,6 +71,7 @@ export class CreateSlotsComponent implements OnInit {
   }
 
   draft = this.emptyDraft();
+  existingSlots: Slot[] = [];
   saving = false;
   formError = '';
   success = '';
@@ -114,8 +116,12 @@ export class CreateSlotsComponent implements OnInit {
   }
 
   chooseTime(time: string): void {
-    if (!this.startTimes.includes(time) || this.isPastTime(time)) return;
+    if (!this.startTimes.includes(time) || this.isTimeUnavailable(time)) return;
     this.setStart(this.selectedDate, time);
+  }
+
+  isTimeUnavailable(time: string): boolean {
+    return this.isPastTime(time) || this.overlapsExistingSlot(time);
   }
 
   timeLabel(time: string): string {
@@ -133,6 +139,7 @@ export class CreateSlotsComponent implements OnInit {
     // User ID and scheduler provider ID are different; do not substitute one for the other.
     this.draft.providerId = this.route.snapshot.data['providerId'] ?? '';
     this.providerChanged();
+    this.loadExistingSlots();
   }
 
   save(form: NgForm): void {
@@ -185,8 +192,9 @@ export class CreateSlotsComponent implements OnInit {
         finalize(() => this.saving = false)
       )
       .subscribe({
-        next: () => {
+        next: (slot) => {
           this.success = 'Your available slot has been published.';
+          this.existingSlots = [...this.existingSlots, slot];
           const category = this.draft.category;
           this.draft = this.emptyDraft();
           this.draft.category = category;
@@ -196,6 +204,25 @@ export class CreateSlotsComponent implements OnInit {
           this.formError = this.auth.getErrorMessage(error);
         }
       });
+  }
+
+  private loadExistingSlots(): void {
+    this.service.getMine()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (slots) => this.existingSlots = slots,
+        error: () => this.existingSlots = []
+      });
+  }
+
+  private overlapsExistingSlot(time: string): boolean {
+    const candidateStart = Date.parse(`${this.selectedDate}T${time}`);
+    const candidateEnd = candidateStart + this.durationMinutes * 60000;
+    return this.existingSlots.some((slot) => {
+      const slotStart = Date.parse(slot.startDateTime);
+      const slotEnd = Date.parse(slot.endDateTime);
+      return candidateStart < slotEnd && candidateEnd > slotStart;
+    });
   }
 
   private emptyDraft(): AppointmentForm {

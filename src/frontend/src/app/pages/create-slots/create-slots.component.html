@@ -53,7 +53,7 @@
           <div class="time-options" aria-label="Slot start times">
             @for (time of startTimes; track time) {
               <button type="button" [class.selected]="selectedTime === time"
-                [attr.aria-pressed]="selectedTime === time" [disabled]="isPastTime(time)"
+                [attr.aria-pressed]="selectedTime === time" [disabled]="isTimeUnavailable(time)"
                 (click)="chooseTime(time)">{{ timeLabel(time) }}</button>
             }
           </div>
@@ -70,7 +70,7 @@
             placeholder="For example: use the main entrance."></textarea>
         </div>
       </div>
-      <p class="rule">Slots last 60 minutes. Overlapping slots cannot be published.</p>
+      <p class="rule">Slots last 60 minutes. Greyed out times are in the past or overlap a slot you already published.</p>
       @if (success) {
         <p role="status">{{ success }}</p>
       }
