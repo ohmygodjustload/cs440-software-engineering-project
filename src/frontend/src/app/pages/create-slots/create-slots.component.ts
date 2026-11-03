@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormsModule, NgForm, NgModel } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { AppointmentCategory } from '../../core/models/appointment';
 import { Slot } from '../../core/models/slot';
 import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
+import { fieldErrorMessage } from '../../core/validation/field-error';
 
 interface AppointmentForm {
   title: string;
@@ -73,6 +74,7 @@ export class CreateSlotsComponent implements OnInit {
   draft = this.emptyDraft();
   existingSlots: Slot[] = [];
   saving = false;
+  validationAttempted = false;
   formError = '';
   success = '';
 
@@ -124,6 +126,19 @@ export class CreateSlotsComponent implements OnInit {
     return this.isPastTime(time) || this.overlapsExistingSlot(time);
   }
 
+  fieldInvalid(control: NgModel | null): boolean {
+    return fieldErrorMessage(control?.control ?? null, 'Field', this.validationAttempted) !== null;
+  }
+
+  requiredTextInvalid(control: NgModel | null, value: string): boolean {
+    const shouldShow = control?.control.touched || this.validationAttempted;
+    return (shouldShow && !value.trim()) || this.fieldInvalid(control);
+  }
+
+  timeInvalid(form: NgForm): boolean {
+    return (form.submitted || this.validationAttempted) && !this.draft.start;
+  }
+
   timeLabel(time: string): string {
     const [hour, minute] = time.split(':').map(Number);
     return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`;
@@ -144,6 +159,7 @@ export class CreateSlotsComponent implements OnInit {
 
   save(form: NgForm): void {
     if (this.saving) return;
+    this.validationAttempted = true;
     this.formError = '';
     this.success = '';
     if (this.draft.start && Number.isFinite(Date.parse(this.draft.start))) {
@@ -154,9 +170,9 @@ export class CreateSlotsComponent implements OnInit {
     const start = new Date(this.draft.start);
     const end = new Date(this.draft.end);
 
-    if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim()) {
+    if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim() || !this.draft.start) {
       form.control.markAllAsTouched();
-      this.formError = 'Enter a category, service title, future date, start time, and location.';
+      this.formError = 'Fix the highlighted fields.';
       return;
     }
 
@@ -195,6 +211,7 @@ export class CreateSlotsComponent implements OnInit {
         next: (slot) => {
           this.success = 'Your available slot has been published.';
           this.existingSlots = [...this.existingSlots, slot];
+          this.validationAttempted = false;
           const category = this.draft.category;
           this.draft = this.emptyDraft();
           this.draft.category = category;

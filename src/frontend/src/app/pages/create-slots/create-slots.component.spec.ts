@@ -95,6 +95,21 @@ describe('CreateSlotsComponent', () => {
     expect(labels).toContain('12:00 PM');
   });
 
+  it('highlights invalid fields after submitting missing required values', () => {
+    const fixture = create();
+
+    fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    const invalidFields = fixture.nativeElement.querySelectorAll('.field-invalid');
+    const locationInput: HTMLInputElement = fixture.nativeElement.querySelector('#location');
+    expect(invalidFields.length).toBeGreaterThanOrEqual(2);
+    expect(locationInput.classList).toContain('field-invalid');
+    expect(fixture.nativeElement.querySelector('.field-invalid-label')).not.toBeNull();
+    expect(text).toContain('Fix the highlighted fields.');
+  });
+
   it('marks overlapping start times unavailable for existing 60-minute slots', () => {
     const component = create().componentInstance;
     const date = futureDate();

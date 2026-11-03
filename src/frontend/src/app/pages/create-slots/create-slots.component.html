@@ -14,6 +14,8 @@
         <div>
           <label for="category">Category</label>
           <select id="category" name="category" required [(ngModel)]="draft.category"
+            #categoryModel="ngModel" [class.field-invalid]="fieldInvalid(categoryModel)"
+            [attr.aria-invalid]="fieldInvalid(categoryModel) || null"
             (ngModelChange)="categoryChanged()" [disabled]="categories.length === 0">
             @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
           </select>
@@ -30,6 +32,9 @@
             required
             maxlength="200"
             [(ngModel)]="draft.title"
+            #titleModel="ngModel"
+            [class.field-invalid]="requiredTextInvalid(titleModel, draft.title)"
+            [attr.aria-invalid]="requiredTextInvalid(titleModel, draft.title) || null"
             placeholder="Enter your service name"
           />
         </div>
@@ -37,7 +42,8 @@
         <section class="date-section">
           <label for="date">Select date · {{ dateLabel }}</label>
           <input id="date" type="date" name="date" required [min]="today"
-            [ngModel]="selectedDate" (ngModelChange)="chooseDate($event)">
+            [ngModel]="selectedDate" #dateModel="ngModel" [class.field-invalid]="fieldInvalid(dateModel)"
+            [attr.aria-invalid]="fieldInvalid(dateModel) || null" (ngModelChange)="chooseDate($event)">
           <div class="date-options" aria-label="Dates in selected week">
             @for (option of dateOptions; track option.key) {
               <button type="button" class="date-option" [class.selected]="option.key === selectedDate"
@@ -49,7 +55,7 @@
           </div>
         </section>
         <section>
-          <h2>Start time · 60-minute duration</h2>
+          <h2 [class.field-invalid-label]="timeInvalid(slotForm)">Start time · 60-minute duration</h2>
           <div class="time-options" aria-label="Slot start times">
             @for (time of startTimes; track time) {
               <button type="button" [class.selected]="selectedTime === time"
@@ -62,11 +68,14 @@
 
         <div>
           <label for="location">Location</label>
-          <input id="location" name="location" required maxlength="300" [(ngModel)]="draft.location" placeholder="Studio or clinic location">
+          <input id="location" name="location" required maxlength="300" [(ngModel)]="draft.location" #locationModel="ngModel"
+            [class.field-invalid]="requiredTextInvalid(locationModel, draft.location)"
+            [attr.aria-invalid]="requiredTextInvalid(locationModel, draft.location) || null" placeholder="Studio or clinic location">
         </div>
         <div>
           <label for="notes">Access instructions (optional)</label>
-          <textarea id="notes" name="notes" maxlength="2000" [(ngModel)]="draft.notes"
+          <textarea id="notes" name="notes" maxlength="2000" [(ngModel)]="draft.notes" #notesModel="ngModel"
+            [class.field-invalid]="fieldInvalid(notesModel)" [attr.aria-invalid]="fieldInvalid(notesModel) || null"
             placeholder="For example: use the main entrance."></textarea>
         </div>
       </div>
