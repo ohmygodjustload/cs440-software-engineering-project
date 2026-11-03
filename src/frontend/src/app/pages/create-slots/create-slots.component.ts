@@ -172,7 +172,7 @@ export class CreateSlotsComponent implements OnInit {
 
     if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim() || !this.draft.start) {
       form.control.markAllAsTouched();
-      this.formError = 'Fix the highlighted fields.';
+      this.formError = 'Highlighted fields are required.';
       return;
     }
 

@@ -107,7 +107,7 @@ describe('CreateSlotsComponent', () => {
     expect(invalidFields.length).toBeGreaterThanOrEqual(2);
     expect(locationInput.classList).toContain('field-invalid');
     expect(fixture.nativeElement.querySelector('.field-invalid-label')).not.toBeNull();
-    expect(text).toContain('Fix the highlighted fields.');
+    expect(text).toContain('Highlighted fields are required.');
   });
 
   it('marks overlapping start times unavailable for existing 60-minute slots', () => {
