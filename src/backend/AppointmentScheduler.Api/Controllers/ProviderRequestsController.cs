@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using AppointmentScheduler.Api.Models;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Mvc;
@@ -9,16 +10,19 @@ namespace AppointmentScheduler.Api.Controllers;
 /// (reviewed) log, and approve/reject decisions with an optional note.
 /// </summary>
 [ApiController]
+[Authorize(Roles = "Admin")]
 [Route("api/provider-requests")]
 public sealed class ProviderRequestsController : ControllerBase
 {
     private readonly IProviderRequestStore _requests;
     private readonly IUserStore _users;
+    private readonly AccountModeWorkflow? _accountModes;
 
-    public ProviderRequestsController(IProviderRequestStore requests, IUserStore users)
+    public ProviderRequestsController(IProviderRequestStore requests, IUserStore users, AccountModeWorkflow? accountModes = null)
     {
         _requests = requests;
         _users = users;
+        _accountModes = accountModes;
     }
 
     /// <summary>
@@ -97,6 +101,11 @@ public sealed class ProviderRequestsController : ControllerBase
 
     private ActionResult<ProviderRequest> Decide(string id, bool approved, ProviderRequestDecisionDto? dto)
     {
+        if (_accountModes is not null)
+        {
+            try { return Ok(_accountModes.Review(id, approved, dto?.Notes)); }
+            catch (AccountModeException error) { return StatusCode(error.Status, error.Message); }
+        }
         var request = _requests.GetById(id);
         if (request is null)
         {

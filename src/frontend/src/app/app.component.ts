@@ -20,6 +20,7 @@ import {
   RouterLinkActive,
   RouterOutlet
 } from '@angular/router';
+import { isEnhancedUser } from './core/routing/home-route';
 import { User } from './core/models/user';
 import { AuthService } from './core/services/auth.service';
 import { ToastService } from './core/services/toast.service';
@@ -32,7 +33,7 @@ interface NavLink {
 }
 
 const CLIENT_NAV: readonly NavLink[] = [
-  { label: 'Home', path: '/' },
+  { label: 'Home', path: '/home' },
   { label: 'Calendar', path: '/calendar' },
   { label: 'Appointments', path: '/appointments' },
   { label: 'Notifications', path: '/notifications' },
@@ -52,6 +53,15 @@ const PROVIDER_NAV: readonly NavLink[] = [
   { label: 'Notification', path: '/notifications' },
   { label: 'Settings', path: '/settings' },
   { label: 'Stats', path: '/statistics' }
+];
+
+const ENHANCED_NAV: readonly NavLink[] = [
+  { label: 'Home', path: '/enhanced-home' },
+  { label: 'Calendar', path: '/calendar' },
+  { label: 'Appointments', path: '/appointments' },
+  { label: 'Create appointments', path: '/create-slots' },
+  { label: 'Notifications', path: '/notifications' },
+  { label: 'Settings', path: '/settings' }
 ];
 
 @Component({
@@ -102,6 +112,7 @@ export class AppComponent {
   }
 
   get title(): string {
+    if (isEnhancedUser(this.signedInUser)) return 'BAAAM / ENHANCED';
     return this.signedInUser?.isServiceProvider && !this.signedInUser?.isAdmin
       ? 'BAAAM / PROVIDER'
       : 'BAAAM Scheduling System';
@@ -117,6 +128,10 @@ export class AppComponent {
 
     if (user?.isAdmin) {
       return ADMIN_NAV;
+    }
+
+    if (isEnhancedUser(user)){
+      return ENHANCED_NAV;
     }
 
     if (user?.isServiceProvider) {

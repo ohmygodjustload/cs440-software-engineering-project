@@ -1,0 +1,60 @@
+<section aria-labelledby="account-type-title">
+  <h2 id="account-type-title">Account type</h2>
+  <p>Book services, offer services, or do both with the same account.</p>
+  @if (loading) { <app-loading label="Loading your account type…"></app-loading> }
+  @if (error) { <p class="error" role="alert">{{ error }}</p> }
+  @if (message) { <p class="success" role="status">{{ message }}</p> }
+  @if (!loading && status; as account) {
+    @if (account.user.isClient && account.user.isServiceProvider) {
+      <div class="account-card">
+        <span class="badge">Client + Service provider</span>
+        <h3>You can do both</h3>
+        <p>Book appointments for yourself and publish availability for your clients.</p>
+        <button type="button" (click)="openEnhanced()" [disabled]="saving">{{ saving ? 'Opening…' : 'Open Enhanced Home' }}</button>
+      </div>
+    } @else if (account.user.isServiceProvider) {
+      <div class="account-card">
+        <span class="badge">Service provider</span>
+        <h3>Also book services as a client</h3>
+        <p>Keep your provider profile and add client booking to this account.</p>
+        <button type="button" (click)="enableClient()" [disabled]="saving">{{ saving ? 'Enabling…' : 'Enable client booking' }}</button>
+      </div>
+    } @else if (account.user.isClient) {
+      <div class="account-card">
+        <span class="badge">Client</span>
+        <h3>Also offer services</h3>
+        @if (account.application?.status === 'pending') {
+          <p role="status">Your provider application is awaiting admin approval. Your client account stays active.</p>
+        } @else {
+          @if (account.application?.status === 'rejected') {
+            <p>Your previous provider application was not approved.</p>
+            @if (account.application?.notes) { <p>Admin feedback: {{ account.application?.notes }}</p> }
+          }
+          <p>Select the services you want to offer. Provider access starts after admin approval.</p>
+          <form [formGroup]="form" (ngSubmit)="apply()">
+            <fieldset [disabled]="saving">
+              <legend>Service categories</legend>
+              @for (category of categories; track category) {
+                <label class="category"><input type="checkbox" [formControlName]="category" />{{ category }}</label>
+              }
+              @if (form.controls.Medical.value) {
+                <label for="medical-qualification">Medical qualifications (optional)</label>
+                <textarea id="medical-qualification" formControlName="medicalInfo" maxlength="500" rows="3"></textarea>
+              }
+              @if (form.controls.Beauty.value) {
+                <label for="beauty-qualification">Beauty qualifications (optional)</label>
+                <textarea id="beauty-qualification" formControlName="beautyInfo" maxlength="500" rows="3"></textarea>
+              }
+              @if (form.controls.Fitness.value) {
+                <label for="fitness-qualification">Fitness qualifications (optional)</label>
+                <textarea id="fitness-qualification" formControlName="fitnessInfo" maxlength="500" rows="3"></textarea>
+              }
+            </fieldset>
+            <button type="submit" [disabled]="saving">{{ saving ? 'Submitting…' : 'Request provider access' }}</button>
+          </form>
+        }
+      </div>
+    }
+  }
+  <button type="button" class="secondary" (click)="load()" [disabled]="loading || saving">Refresh account status</button>
+</section>

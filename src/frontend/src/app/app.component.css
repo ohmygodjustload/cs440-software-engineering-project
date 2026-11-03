@@ -283,3 +283,29 @@
     transition: none;
   }
 }
+
+.app-header--provider .app-nav {
+  min-width: 0;
+}
+
+.app-header--provider .app-nav__list {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (min-width: 1151px) and (max-width: 1450px) {
+  .app-header--provider {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .app-header--provider .app-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+  }
+
+  .app-header--provider .app-account {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}

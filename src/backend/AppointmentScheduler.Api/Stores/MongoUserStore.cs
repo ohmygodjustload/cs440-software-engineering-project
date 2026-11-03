@@ -124,7 +124,7 @@ public sealed class MongoUserStore : IUserStore
         return result.MatchedCount > 0;
     }
 
-    private static User Map(BsonDocument d) => new()
+    internal static User Map(BsonDocument d) => new()
     {
         Id = ReadId(d, "_id") ?? Guid.NewGuid().ToString("N"),
         FirstName = ReadString(d, "FirstName") ?? string.Empty,

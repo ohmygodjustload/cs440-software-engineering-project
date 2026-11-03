@@ -124,6 +124,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<AppointmentScheduler.Api.Auth.ICurrentUser, AppointmentScheduler.Api.Auth.DevCurrentUser>();
 
+builder.Services.AddSingleton<AppointmentScheduler.Api.Stores.AccountModeWorkflow>();
+
 var app = builder.Build();
 
 // Global safety net: a Mongo outage must surface as 503 with NO stack trace,

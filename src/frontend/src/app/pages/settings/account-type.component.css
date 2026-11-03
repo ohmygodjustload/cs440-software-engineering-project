@@ -1,0 +1,19 @@
+:host { display: block; color: #344945; }
+h2 { margin-top: 0; font-size: 22px; font-weight: 500; }
+h3 { font-size: 20px; }
+p { line-height: 1.5; }
+.account-card { padding: 24px; margin: 20px 0; border: 1px solid #e0dcd1; border-radius: 24px; background: #f7f5f1; }
+.badge { display: inline-block; padding: 7px 14px; border-radius: 999px; background: #d5e3e8; font-size: 13px; }
+button { padding: 12px 20px; border: 0; border-radius: 999px; background: #344945; color: #f7f5f1; font: inherit; cursor: pointer; }
+button.secondary { background: #e0dcd1; color: #344945; }
+button:disabled { opacity: .6; cursor: default; }
+fieldset { border: 0; padding: 0; margin: 20px 0; min-width: 0; }
+legend { margin-bottom: 12px; }
+label { display: block; margin: 16px 0 8px; }
+.category { display: inline-flex; gap: 8px; align-items: center; margin: 0 20px 16px 0; }
+textarea { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #c7c7bc; border-radius: 14px; color: inherit; background: transparent; font: inherit; resize: vertical; }
+.error, .success { padding: 16px; border-radius: 16px; overflow-wrap: anywhere; }
+.error { background: #fbeaea; }
+.success { background: #e4ebdc; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid #344945; outline-offset: 3px; }
+@media (max-width: 600px) { .account-card { padding: 18px; } }
