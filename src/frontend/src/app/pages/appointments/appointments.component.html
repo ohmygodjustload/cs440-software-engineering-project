@@ -6,14 +6,11 @@
 
 -->
 <section class="overview" aria-labelledby="appointments-title">
-  <header>
+  <header class="page-header">
     <h1 id="appointments-title">Appointments</h1>
-    <a class="primary new-appointment" routerLink="/book-appointment">+ New appointment</a>
+    <a class="primary" routerLink="/book-appointment">+ New appointment</a>
   </header>
 
-  @if (actionError) {
-    <p class="error" role="alert">{{ actionError }}</p>
-  }
   @if (loading) {
     <app-loading label="Loading appointments…"></app-loading>
   } @else if (error) {
@@ -22,44 +19,43 @@
       <button type="button" (click)="load()">Try again</button>
     </div>
   } @else {
-    @for (month of months; track month.key) {
-      <section class="month-group">
-        <h2>{{ month.label }}</h2>
-        @for (appointment of month.items; track appointment.id) {
-          <article class="appointment-card" [class.fitness]="appointment.category === 'Fitness'"
-            [class.beauty]="appointment.category === 'Beauty'">
-            <div class="card-content">
-              <div>
-                <p class="meta">{{ appointment.category }} · {{ appointment.startDateTime | date:'MMM d, h:mm a' }}</p>
-                <h3>{{ appointment.title }}</h3>
-                <p class="provider">{{ appointment.providerName || appointment.providerId }}
-                  @if (appointment.location) { <span> · {{ appointment.location }}</span> }
-                </p>
-              </div>
-              <button type="button" class="primary details-button"
-                [attr.aria-expanded]="selectedId === appointment.id" (click)="toggleDetails(appointment.id)">
-                {{ selectedId === appointment.id ? 'Hide details' : 'View details' }}
-              </button>
-              <button type="button" class="details-button"
-                [disabled]="cancellingId === appointment.id" (click)="cancel(appointment.id)">
-                {{ cancellingId === appointment.id ? 'Cancelling…' : 'Cancel' }}
-              </button>
-            </div>
-            @if (selectedId === appointment.id) {
-              <dl class="details">
-                <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
-                <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
-                <dt>Status</dt><dd>{{ appointment.status }}</dd>
-                <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
-                <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
-              </dl>
-            }
-          </article>
+    <section class="upcoming-card" aria-labelledby="upcoming-title">
+      @if (nextAppointment; as appointment) {
+        <div>
+          <p class="eyebrow">Upcoming appointment</p>
+          <h2 id="upcoming-title">{{ appointment.title }}</h2>
+          <p class="meta">
+            {{ appointment.category }} · {{ appointment.startDateTime | date:'EEEE, MMM d, h:mm a' }}
+          </p>
+          <p class="provider">
+            {{ appointment.providerName || appointment.providerId }}
+            @if (appointment.location) { <span> · {{ appointment.location }}</span> }
+          </p>
+        </div>
+
+        <div class="card-actions">
+          <button type="button" class="secondary"
+            [attr.aria-expanded]="selectedId === appointment.id" (click)="toggleDetails(appointment.id)">
+            {{ selectedId === appointment.id ? 'Hide details' : 'View details' }}
+          </button>
+        </div>
+
+        @if (selectedId === appointment.id) {
+          <dl class="details">
+            <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
+            <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
+            <dt>Status</dt><dd>{{ appointment.status }}</dd>
+            <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
+            <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
+          </dl>
         }
-      </section>
-    } @empty {
-      <p>No scheduled appointments yet. Choose “+ New appointment” to book one.</p>
-    }
+      } @else {
+        <div class="empty-state">
+          <p class="eyebrow">No upcoming appointment</p>
+          <h2 id="upcoming-title">Book your next visit.</h2>
+          <p>Choose an available provider slot to create your first appointment.</p>
+        </div>
+      }
+    </section>
   }
-  <button type="button" class="refresh" (click)="load()" [disabled]="loading">Refresh</button>
 </section>

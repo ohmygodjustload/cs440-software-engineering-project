@@ -2,9 +2,9 @@
   <section class="signup-card signup-card--wide" aria-labelledby="signup-provider-title">
     <p class="signup-card__brand">BAAAM Scheduling System</p>
     @if (isResubmit) {
-      <a class="signup-back" routerLink="/login">&larr; Back to sign in</a>
+      <a class="app-breadcrumb" routerLink="/login"><span aria-hidden="true">&larr;</span> Sign in</a>
     } @else {
-      <a class="signup-back" routerLink="/signup">&larr; Back to account type</a>
+      <a class="app-breadcrumb" routerLink="/signup"><span aria-hidden="true">&larr;</span> Account type</a>
     }
     <h1 id="signup-provider-title" class="signup-card__title">{{ titleText }}</h1>
     <p class="signup-card__lede">{{ ledeText }}</p>

@@ -17,6 +17,7 @@ public sealed class AppointmentsController(
     ICurrentUser? currentUser = null,
     IUserStore? users = null,
     INotificationService? notificationService = null) : ControllerBase {
+    IActivityStore? activity = null) : ControllerBase {
     /// <summary>
     /// List appointments with optional filtering and paging.
     /// </summary>
@@ -163,6 +164,7 @@ public sealed class AppointmentsController(
                 null);
         }
 
+        activity?.Add("APPOINTMENT_CREATED", $"Appointment created: {created.Title}", currentUser?.UserId, created.Id);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
@@ -281,6 +283,11 @@ public sealed class AppointmentsController(
         }
 
         store.Update(existing);
+        if (!store.Update(existing)) {
+            return Conflict("The appointment was modified by another process. Please retry.");
+        }
+
+        activity?.Add("APPOINTMENT_UPDATED", $"Appointment updated: {existing.Title}", currentUser?.UserId, existing.Id);
         return Ok(existing);
     }
 
