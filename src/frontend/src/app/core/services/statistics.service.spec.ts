@@ -12,7 +12,12 @@ describe('StatisticsService', () => {
   const client: User = { id: 'client-1', firstName: 'Jane', lastName: 'Doe', username: 'jane',
     isClient: true, isAdmin: false, isServiceProvider: false };
   beforeEach(() => {
-    auth = jasmine.createSpyObj<AuthService>('AuthService', ['getCurrentUser']);
+    auth = jasmine.createSpyObj<AuthService>(
+      'AuthService',
+      ['getCurrentUser', 'getToken']
+    );
+    auth.getCurrentUser.and.returnValue(client);
+    auth.getToken.and.returnValue('test-jwt');
     auth.getCurrentUser.and.returnValue(client);
     auth.getToken.and.returnValue('test-jwt');
     TestBed.configureTestingModule({ providers: [

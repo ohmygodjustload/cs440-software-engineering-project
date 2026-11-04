@@ -107,6 +107,6 @@ describe('StatisticsComponent', () => {
     fixture.componentInstance.load();
     fixture.detectChanges();
     expect(service.loadAppointments).toHaveBeenCalledWith('client');
-    expect(fixture.nativeElement.textContent).toContain('Appointments you have booked with service providers. ');
+    expect(fixture.nativeElement.textContent).toContain('Appointments you have booked with service providers.');
   });
 });
