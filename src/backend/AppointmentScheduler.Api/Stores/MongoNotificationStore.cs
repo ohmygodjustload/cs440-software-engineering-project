@@ -23,19 +23,19 @@ public sealed class MongoNotificationStore : INotificationStore
 
     public IReadOnlyList<Notification> GetAll()
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("IsDeleted", false);
+        var filter = ActiveFilter();
         return _raw.Find(filter).ToList().Select(Map).OrderByDescending(n => n.CreatedAt).ToList();
     }
 
     public IReadOnlyList<Notification> GetAll(string userId)
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId) & Builders<BsonDocument>.Filter.Eq("IsDeleted", false);
+        var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId) & ActiveFilter();
         return _raw.Find(filter).ToList().Select(Map).OrderByDescending(n => n.CreatedAt).ToList();
     }
 
     public Notification? GetById(string id)
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("_id", id) & Builders<BsonDocument>.Filter.Eq("IsDeleted", false);
+        var filter = Builders<BsonDocument>.Filter.Eq("_id", id) & ActiveFilter();
         var doc = _raw.Find(filter).FirstOrDefault();
         return doc is null ? null : Map(doc);
     }
@@ -85,23 +85,29 @@ public sealed class MongoNotificationStore : INotificationStore
 
     public bool MarkRead(string id)
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("_id", id) & Builders<BsonDocument>.Filter.Eq("IsDeleted", false) & Builders<BsonDocument>.Filter.Eq("IsRead", false);
+        var filter = Builders<BsonDocument>.Filter.Eq("_id", id) & ActiveFilter() & UnreadFilter();
         var result = _raw.UpdateOne(filter, Builders<BsonDocument>.Update.Set("IsRead", true));
         return result.MatchedCount > 0;
     }
 
     public bool MarkAllRead(string userId)
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId) & Builders<BsonDocument>.Filter.Eq("IsDeleted", false) & Builders<BsonDocument>.Filter.Eq("IsRead", false);
+        var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId) & ActiveFilter() & UnreadFilter();
         var result = _raw.UpdateMany(filter, Builders<BsonDocument>.Update.Set("IsRead", true));
         return result.MatchedCount > 0;
     }
 
     public int GetUnreadCount(string userId)
     {
-        var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId) & Builders<BsonDocument>.Filter.Eq("IsDeleted", false) & Builders<BsonDocument>.Filter.Eq("IsRead", false);
+        var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId) & ActiveFilter() & UnreadFilter();
         return (int)_raw.CountDocuments(filter);
     }
+
+    private static FilterDefinition<BsonDocument> ActiveFilter() =>
+        Builders<BsonDocument>.Filter.Ne("IsDeleted", true);
+
+    private static FilterDefinition<BsonDocument> UnreadFilter() =>
+        Builders<BsonDocument>.Filter.Ne("IsRead", true);
 
     private static Notification Map(BsonDocument doc)
     {

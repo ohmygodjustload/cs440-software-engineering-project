@@ -147,6 +147,7 @@ public sealed class AdminController(
             Timestamp = notification.CreatedAt,
             Action = notification.Event.Replace('-', '_').ToUpperInvariant(),
             Message = $"{notification.EventLabel}: {notification.Message}",
+            IsRead = notification.IsRead,
             EntityId = notification.AppointmentId
         };
 

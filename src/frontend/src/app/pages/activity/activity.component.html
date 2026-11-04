@@ -4,6 +4,14 @@
       <h1>Activity Log</h1>
       <p>Global feed of account and appointment actions.</p>
     </div>
+    <button
+      type="button"
+      class="activity-mark-read"
+      [disabled]="markAllReadSaving || unreadCount === 0"
+      (click)="markAllRead()"
+    >
+      {{ markAllReadSaving ? 'Marking…' : 'Mark all as read' }}
+    </button>
   </header>
 
   <form class="controls" role="search" [formGroup]="searchForm">
@@ -18,13 +26,16 @@
   } @else if (error) {
     <div role="alert"><p>{{ error }}</p><button (click)="loadActivity()">Try again</button></div>
   } @else {
+    @if (markAllReadError) {
+      <div class="activity-error" role="alert">{{ markAllReadError }}</div>
+    }
     <section class="activity-list" aria-label="Activity log">
       <div class="activity-header" aria-hidden="true">
         <span>Date</span>
         <span>Notification received</span>
       </div>
       @for (entry of paginatedEntries; track entry.id) {
-        <div class="activity-line">
+        <div class="activity-line" [class.activity-line--unread]="!entry.isRead">
           <time>{{ entry.timestamp | date:'medium' }}</time>
           <span><strong>{{ entry.action }}</strong> {{ entry.message }}</span>
         </div>

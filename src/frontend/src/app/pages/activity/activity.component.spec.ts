@@ -21,8 +21,8 @@ describe('ActivityComponent', () => {
 
   it('loads and filters activity entries', () => {
     http.expectOne('/api/admin/activity').flush([
-      { id: '1', timestamp: '2026-10-30T10:00:00Z', action: 'Updated', message: 'Jane Porter' },
-      { id: '2', timestamp: '2026-10-30T11:00:00Z', action: 'Booked', message: 'Medical appointment' }
+      { id: '1', timestamp: '2026-10-30T10:00:00Z', action: 'Updated', message: 'Jane Porter', isRead: false },
+      { id: '2', timestamp: '2026-10-30T11:00:00Z', action: 'Booked', message: 'Medical appointment', isRead: true }
     ]);
     const component = fixture.componentInstance;
 
@@ -40,7 +40,8 @@ describe('ActivityComponent', () => {
       id: `${index + 1}`,
       timestamp: '2026-10-30T10:00:00Z',
       action: 'Updated',
-      message: `Account ${index + 1}`
+      message: `Account ${index + 1}`,
+      isRead: true
     }));
     http.expectOne('/api/admin/activity').flush(entries);
     const component = fixture.componentInstance;
@@ -63,7 +64,8 @@ describe('ActivityComponent', () => {
       id: `${index + 1}`,
       timestamp: '2026-10-30T10:00:00Z',
       action: 'Updated',
-      message: index === 10 ? 'Jane Porter' : `Account ${index + 1}`
+      message: index === 10 ? 'Jane Porter' : `Account ${index + 1}`,
+      isRead: true
     }));
     http.expectOne('/api/admin/activity').flush(entries);
     const component = fixture.componentInstance;

@@ -12,6 +12,7 @@ interface ActivityEntry {
   timestamp: string;
   action: string;
   message: string;
+  isRead: boolean;
 }
 
 @Component({
@@ -29,6 +30,8 @@ export class ActivityComponent implements OnInit {
   filteredEntries: ActivityEntry[] = [];
   loading = false;
   error: string | null = null;
+  markAllReadError: string | null = null;
+  markAllReadSaving = false;
   readonly pageSize = 10;
   currentPage = 1;
   readonly searchForm = new FormGroup({
@@ -36,16 +39,30 @@ export class ActivityComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.markNotificationsRead();
     this.loadActivity();
     this.searchForm.valueChanges.subscribe(() => this.filterEntries());
   }
 
-  private markNotificationsRead(): void {
+  get unreadCount(): number {
+    return this.entries.filter((entry) => !entry.isRead).length;
+  }
+
+  markAllRead(): void {
     const user = this.authService.getCurrentUser();
-    if (!user?.isAdmin) return;
+    if (!user?.isAdmin || this.markAllReadSaving || this.unreadCount === 0) return;
+
+    this.markAllReadSaving = true;
+    this.markAllReadError = null;
     this.notificationsService.markAllRead(user.id).subscribe({
-      error: () => undefined
+      next: () => {
+        this.entries = this.entries.map((entry) => ({ ...entry, isRead: true }));
+        this.filterEntries();
+        this.markAllReadSaving = false;
+      },
+      error: () => {
+        this.markAllReadError = 'Failed to mark notifications as read.';
+        this.markAllReadSaving = false;
+      }
     });
   }
 

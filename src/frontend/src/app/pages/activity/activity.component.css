@@ -191,6 +191,36 @@ footer a {
   font-weight: 500;
 }
 
+.activity-mark-read {
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 18px;
+  background: #344945;
+  color: #f7f5f1;
+  cursor: pointer;
+  font: inherit;
+}
+
+.activity-mark-read:hover:not(:disabled),
+.activity-mark-read:focus-visible {
+  background: #253a36;
+}
+
+.activity-mark-read:focus-visible {
+  outline: 2px solid #344945;
+  outline-offset: 3px;
+}
+
+.activity-mark-read:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.activity-error {
+  margin-bottom: 16px;
+  color: #9b3028;
+}
+
 .controls {
   display: flex;
   margin: 24px 0 32px;
@@ -229,6 +259,14 @@ footer a {
   padding: 9px 14px;
   border-bottom: 1px solid rgba(52, 73, 69, .16);
   font-size: 13px;
+}
+
+.activity-line--unread {
+  font-weight: 700;
+}
+
+.activity-line--unread time {
+  color: #344945;
 }
 
 .activity-line:last-child {

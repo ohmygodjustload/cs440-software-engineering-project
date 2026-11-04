@@ -7,8 +7,11 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationsService } from '../../core/services/notifications.service';
 import { ToastService } from '../../core/services/toast.service';
-import { UserSettingsService } from '../../core/services/user-settings.service';
 import { User } from '../../core/models/user';
+
+interface AdminActivityEntry {
+  isRead: boolean;
+}
 
 @Component({
   selector: 'app-login',
@@ -22,7 +25,6 @@ export class LoginComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
-  private readonly settingsService = inject(UserSettingsService);
   private readonly notificationsService = inject(NotificationsService);
   private readonly http = inject(HttpClient, { optional: true });
 
@@ -104,55 +106,76 @@ export class LoginComponent implements OnInit {
    */
   private greetAndReplayMissed(user: User, continueLogin: () => void): void {
     this.toastService.showLoggedIn();
-    this.settingsService.getCurrentUser().subscribe({
-      next: () => {
-        this.notificationsService.getPreferences(user.id).subscribe({
-          next: (prefs) => {
-            if (!prefs.inBrowserEnabled) {
-              continueLogin();
-              return;
-            }
-            this.notificationsService.getNotifications(user.id).subscribe({
-              next: (items) => {
-                const unreadItems = items.filter((item) => !item.isRead);
-                const unreadCount = unreadItems.length;
-                const destination = user.isAdmin ? '/activity' : '/notifications';
-                if (unreadCount > 0) {
-                  window.setTimeout(() => {
-                    this.toastService.show({
-                      title: 'Unread notifications',
-                      message: user.isAdmin
-                        ? `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Activity Log to review them.`
-                        : `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Notifications tab to read them.`,
-                      variant: 'info',
-                      actionUrl: destination
-                    });
-                  }, 1200);
-                }
-                continueLogin();
-              },
-              error: () => continueLogin()
-            });
-            if (user.isAdmin) {
-              this.http?.get<unknown[]>('/api/provider-requests?status=pending').subscribe({
-                next: (requests) => {
-                  if (requests.length > 0) {
-                    this.toastService.show({
-                      title: 'Unreviewed approval requests',
-                      message: `You have ${requests.length} request${requests.length === 1 ? '' : 's'} to review.`,
-                      variant: 'info',
-                      actionUrl: '/requests'
-                    });
-                  }
-                },
-                error: () => undefined
+    const loadNotifications = (onLoaded: () => void): void => {
+      this.notificationsService.getNotifications(user.id).subscribe({
+        next: (items) => {
+          const unreadCount = items.filter((item) => !item.isRead).length;
+          const destination = user.isAdmin ? '/activity' : '/notifications';
+          if (unreadCount > 0) {
+            window.setTimeout(() => {
+              this.toastService.show({
+                title: 'Unread notifications',
+                message: user.isAdmin
+                  ? `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Activity Log to review them.`
+                  : `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Notifications tab to read them.`,
+                variant: 'info',
+                actionUrl: destination
               });
-            }
-          },
-          error: () => continueLogin()
-        });
+            }, 1200);
+          }
+          onLoaded();
+        },
+        error: onLoaded
+      });
+    };
+
+    if (user.isAdmin) {
+      if (!this.http) {
+        continueLogin();
+        return;
+      }
+      this.http.get<AdminActivityEntry[]>('/api/admin/activity').subscribe({
+        next: (entries) => {
+          const unreadCount = entries.filter((entry) => !entry.isRead).length;
+          if (unreadCount > 0) {
+            window.setTimeout(() => {
+              this.toastService.show({
+                title: 'Unread notifications',
+                message: `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Activity Log to review them.`,
+                variant: 'info',
+                actionUrl: '/activity'
+              });
+            }, 1200);
+          }
+          continueLogin();
+        },
+        error: continueLogin
+      });
+      this.http.get<unknown[]>('/api/provider-requests?status=pending').subscribe({
+        next: (requests) => {
+          if (requests.length > 0) {
+            this.toastService.show({
+              title: 'Unreviewed approval requests',
+              message: `You have ${requests.length} request${requests.length === 1 ? '' : 's'} to review.`,
+              variant: 'info',
+              actionUrl: '/requests'
+            });
+          }
+        },
+        error: () => undefined
+      });
+      return;
+    }
+
+    this.notificationsService.getPreferences(user.id).subscribe({
+      next: (prefs) => {
+        if (prefs.inBrowserEnabled) {
+          loadNotifications(continueLogin);
+        } else {
+          continueLogin();
+        }
       },
-      error: () => continueLogin()
+      error: continueLogin
     });
   }
 
