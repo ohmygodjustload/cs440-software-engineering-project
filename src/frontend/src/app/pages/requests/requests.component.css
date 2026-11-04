@@ -72,7 +72,7 @@ h2 {
 
 .closed-list {
   margin-top: 28px;
-  background: #e0dcd1;
+  background: #e4e3bc;
 }
 
 .request-list h2 {
@@ -99,7 +99,7 @@ h2 {
   padding: 16px;
   border: 1px solid #344945;
   border-radius: 16px;
-  background: #e4e3bc;
+  background: #e0dcd1;
 }
 
 .request-card:first-of-type {
