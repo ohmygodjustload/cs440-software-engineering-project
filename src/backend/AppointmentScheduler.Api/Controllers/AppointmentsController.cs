@@ -16,7 +16,7 @@ public sealed class AppointmentsController(
     IProviderStore? providerStore = null,
     ICurrentUser? currentUser = null,
     IUserStore? users = null,
-    INotificationService? notificationService = null) : ControllerBase {
+    INotificationService? notificationService = null,
     IActivityStore? activity = null) : ControllerBase {
     /// <summary>
     /// List appointments with optional filtering and paging.
@@ -282,7 +282,6 @@ public sealed class AppointmentsController(
             }
         }
 
-        store.Update(existing);
         if (!store.Update(existing)) {
             return Conflict("The appointment was modified by another process. Please retry.");
         }
