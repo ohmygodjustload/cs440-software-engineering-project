@@ -28,45 +28,6 @@ header > div {
   min-width: 0;
 }
 
-.clear-activity {
-  display: inline-flex;
-  width: 42px;
-  height: 42px;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  border: 0;
-  border-radius: 50%;
-  background: #e0dcd1;
-  color: #344945;
-  cursor: pointer;
-}
-
-.clear-activity svg {
-  width: 21px;
-  height: 21px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.8;
-}
-
-.clear-activity:hover:not(:disabled) {
-  background: #d4d0c6;
-}
-
-.clear-activity:focus-visible {
-  outline: 2px solid #344945;
-  outline-offset: 3px;
-}
-
-.clear-activity:disabled {
-  cursor: not-allowed;
-  opacity: .45;
-  pointer-events: none;
-}
-
 h1 {
   font-size: 32px;
   font-weight: 500;
@@ -254,6 +215,7 @@ footer a {
 
 .activity-list {
   overflow: auto;
+  min-height: 420px;
   max-height: 70vh;
   padding: 0;
   border-radius: 20px;
@@ -288,6 +250,45 @@ footer a {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: .04em;
+}
+
+.activity-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 52px;
+  margin: 20px auto 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #d9e6ed;
+  overflow-x: auto;
+}
+
+.activity-pagination button {
+  min-width: 34px;
+  height: 34px;
+  border: 1px solid #c9c5bb;
+  border-radius: 8px;
+  background: #f7f5f1;
+  color: #344945;
+  cursor: pointer;
+  font: inherit;
+}
+
+.activity-pagination button:hover,
+.activity-pagination button:focus-visible,
+.activity-pagination .activity-page--active {
+  border-color: #344945;
+  background: #344945;
+  color: #f7f5f1;
+}
+
+.activity-pagination button:focus-visible {
+  outline: 2px solid #344945;
+  outline-offset: 3px;
 }
 
 @media (max-width: 700px) {

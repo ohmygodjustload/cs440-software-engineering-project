@@ -149,7 +149,16 @@ public sealed class SlotsController(
         if (check.Error is not null) return check.Error;
 
         var updated = Build(check, id);
-        return appointments.UpdateSlot(updated) ? Ok(updated) : Conflict("Slot is no longer available.");
+        if (!appointments.UpdateSlot(updated)) return Conflict("Slot is no longer available.");
+        var changes = ActivityChangeFormatter.Describe(
+            ("Title", existing.Title, updated.Title),
+            ("Category", existing.Category, updated.Category),
+            ("Start", existing.StartDateTime, updated.StartDateTime),
+            ("End", existing.EndDateTime, updated.EndDateTime),
+            ("Location", existing.Location, updated.Location),
+            ("Notes", existing.Notes, updated.Notes));
+        notificationService?.OnAppointmentUpdated(updated.Id, updated.Category, updated.Title, currentUser.UserId, changes);
+        return Ok(updated);
     }
 
     [HttpDelete("{id}")]
@@ -161,7 +170,9 @@ public sealed class SlotsController(
         if (existing is null || existing.ProviderId != provider!.Id) return NotFound();
         if (existing.Status != AppointmentStatus.Available) return Conflict("Only Available slots can be deleted.");
 
-        return appointments.SoftDeleteSlot(id) ? NoContent() : Conflict("Slot is no longer available.");
+        if (!appointments.SoftDeleteSlot(id)) return Conflict("Slot is no longer available.");
+        notificationService?.OnAppointmentCancelled(string.Empty, provider!.Id, existing.Id, existing.Category, existing.Title, string.Empty);
+        return NoContent();
     }
 
     // ---------- helpers ----------

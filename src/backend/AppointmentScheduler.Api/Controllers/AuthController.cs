@@ -1,5 +1,6 @@
 using AppointmentScheduler.Api.Models;
 using AppointmentScheduler.Api.Security;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ public sealed class AuthController : ControllerBase
     private readonly IProviderRequestStore _providerRequests;
     private readonly PasswordHasher _passwordHasher;
     private readonly JwtTokenService _tokens;
+    private readonly INotificationService? _notifications;
 
     /// <summary>
     /// Creates a controller that can read/write users, verify password hashes, and issue JWTs.
@@ -24,16 +26,19 @@ public sealed class AuthController : ControllerBase
     /// <param name="providerRequests">Provider request persistence boundary used to file approval requests.</param>
     /// <param name="passwordHasher">Password hashing service used to hash and verify credentials.</param>
     /// <param name="tokens">JWT token service used to create successful authentication responses.</param>
+    /// <param name="notifications">Optional notification service used to notify admins of account events.</param>
     public AuthController(
         IUserStore users,
         IProviderRequestStore providerRequests,
         PasswordHasher passwordHasher,
-        JwtTokenService tokens)
+        JwtTokenService tokens,
+        INotificationService? notifications = null)
     {
         _users = users;
         _providerRequests = providerRequests;
         _passwordHasher = passwordHasher;
         _tokens = tokens;
+        _notifications = notifications;
     }
 
     /// <summary>
@@ -87,6 +92,7 @@ public sealed class AuthController : ControllerBase
         {
             return Conflict("Username is already taken.");
         }
+        _notifications?.OnAccountCreated(created);
 
         var token = _tokens.CreateToken(created);
         var response = new RegisterResponse
@@ -137,9 +143,10 @@ public sealed class AuthController : ControllerBase
         {
             return Conflict("Username is already taken.");
         }
+        _notifications?.OnAccountCreated(created);
 
         // File an open provider request so admins can review and approve/reject it.
-        _providerRequests.Add(new ProviderRequest
+        var providerRequest = new ProviderRequest
         {
             UserId = created.Id,
             ProviderName = $"{created.FirstName} {created.LastName}".Trim(),
@@ -151,7 +158,9 @@ public sealed class AuthController : ControllerBase
             IsApproved = false,
             Notes = string.Empty,
             SubmittedAt = DateTimeOffset.UtcNow
-        });
+        };
+        _providerRequests.Add(providerRequest);
+        _notifications?.OnProviderRequestSubmitted(providerRequest);
 
         var response = new RegisterResponse
         {
@@ -234,7 +243,7 @@ public sealed class AuthController : ControllerBase
         _users.Update(user);
 
         // File a brand-new open request so admins review the updated application.
-        _providerRequests.Add(new ProviderRequest
+        var providerRequest = new ProviderRequest
         {
             UserId = user.Id,
             ProviderName = $"{user.FirstName} {user.LastName}".Trim(),
@@ -246,7 +255,9 @@ public sealed class AuthController : ControllerBase
             IsApproved = false,
             Notes = string.Empty,
             SubmittedAt = DateTimeOffset.UtcNow
-        });
+        };
+        _providerRequests.Add(providerRequest);
+        _notifications?.OnProviderRequestSubmitted(providerRequest);
 
         return Ok(new RegisterResponse
         {

@@ -82,7 +82,7 @@ export class NotificationsComponent implements OnInit {
 
   /** Shown when more than one unread notification exists and the banner hasn't been dismissed. */
   get showMissedBanner(): boolean {
-    return !this.missedBannerDismissed && this.unreadCount > 1;
+    return !this.isAdmin && !this.missedBannerDismissed && this.unreadCount > 1;
   }
 
   ngOnInit(): void {
@@ -96,6 +96,10 @@ export class NotificationsComponent implements OnInit {
 
   get unreadCount(): number {
     return this.history.filter((item) => !item.isRead).length;
+  }
+
+  get isAdmin(): boolean {
+    return this.currentUser?.isAdmin === true;
   }
 
   get canMarkAllRead(): boolean {
@@ -307,4 +311,3 @@ export class NotificationsComponent implements OnInit {
   }
 
 }
-

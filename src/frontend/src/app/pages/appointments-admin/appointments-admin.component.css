@@ -213,6 +213,7 @@ select {
 .summary-date {
   color: #52635f;
   font-size: 12px;
+  transform: translateX(-10px);
 }
 
 .expand-indicator {

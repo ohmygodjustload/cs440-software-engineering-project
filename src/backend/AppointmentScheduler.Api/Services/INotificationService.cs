@@ -20,6 +20,12 @@ public interface INotificationService
 
     /// <summary>An appointment or slot was cancelled with a reason.</summary>
     void OnAppointmentCancelled(string clientId, string providerId, string appointmentId, AppointmentCategory category, string title, string reason);
+    void OnAppointmentUpdated(string appointmentId, AppointmentCategory category, string title, string? actorUserId = null, string? changes = null);
+    void OnAccountCreated(User user);
+    void OnAccountUpdated(User user, string? actorUserId = null, string? changes = null);
+    void OnProviderRequestSubmitted(ProviderRequest request);
+    void OnProviderRequestDecision(ProviderRequest request, bool approved);
+    void OnNotificationSettingsUpdated(User user);
 
     int GetUnreadCount(string userId);
 }

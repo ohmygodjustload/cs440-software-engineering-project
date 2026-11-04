@@ -8,11 +8,13 @@ public sealed class NotificationService : INotificationService
 {
     private readonly INotificationStore _notifications;
     private readonly IUserStore _users;
+    private readonly IActivityStore? _activity;
 
-    public NotificationService(INotificationStore notifications, IUserStore users)
+    public NotificationService(INotificationStore notifications, IUserStore users, IActivityStore? activity = null)
     {
         _notifications = notifications;
         _users = users;
+        _activity = activity;
     }
 
     public void OnAppointmentCreated(string userId, string appointmentId, AppointmentCategory category, string title)
@@ -31,6 +33,7 @@ public sealed class NotificationService : INotificationService
                 IsRead = false,
                 CreatedAt = DateTimeOffset.UtcNow,
             });
+        NotifyAdmins("APPOINTMENT_CREATED", "Appointment created", title, appointmentId, category, userId);
     }
 
     public void OnSlotCreated(string providerId, string slotId, AppointmentCategory category, string title)
@@ -49,6 +52,7 @@ public sealed class NotificationService : INotificationService
                 IsRead = false,
                 CreatedAt = DateTimeOffset.UtcNow,
             });
+        NotifyAdmins("APPOINTMENT_CREATED", "Appointment slot created", title, slotId, category, providerId);
     }
 
     public void OnAppointmentBooked(string clientId, string providerId, string appointmentId, AppointmentCategory category, string title, string? clientName = null)
@@ -67,6 +71,7 @@ public sealed class NotificationService : INotificationService
                 IsRead = false,
                 CreatedAt = DateTimeOffset.UtcNow,
             });
+        NotifyAdmins("APPOINTMENT_BOOKED", "Appointment booked", title, appointmentId, category, clientId);
 
         Ensure(
             providerId,
@@ -83,6 +88,30 @@ public sealed class NotificationService : INotificationService
                 CreatedAt = DateTimeOffset.UtcNow,
             });
     }
+
+    public void OnAppointmentUpdated(
+        string appointmentId,
+        AppointmentCategory category,
+        string title,
+        string? actorUserId = null,
+        string? changes = null) =>
+        NotifyAdmins("APPOINTMENT_UPDATED", "Appointment updated", Detail(title, changes), appointmentId, category, actorUserId);
+
+    public void OnAccountCreated(User user) =>
+        NotifyAdmins("ACCOUNT_CREATED", "New account created", user.Username, user.Id, null, user.Id);
+
+    public void OnAccountUpdated(User user, string? actorUserId = null, string? changes = null) =>
+        NotifyAdmins("ACCOUNT_UPDATED", "Account updated", Detail(user.Username, changes), user.Id, null, actorUserId ?? user.Id);
+
+    public void OnProviderRequestSubmitted(ProviderRequest request) =>
+        NotifyAdmins("PROVIDER_REQUEST_SUBMITTED", "New approval request", request.ProviderName, request.Id, null, request.UserId);
+
+    public void OnProviderRequestDecision(ProviderRequest request, bool approved) =>
+        NotifyAdmins(approved ? "PROVIDER_APPROVED" : "PROVIDER_REJECTED",
+            approved ? "Provider approved" : "Provider denied", request.ProviderName, request.Id, null, request.UserId);
+
+    public void OnNotificationSettingsUpdated(User user) =>
+        NotifyAdmins("NOTIFICATION_SETTINGS_UPDATED", "Notification settings updated", user.Username, user.Id, null, user.Id);
 
     public void OnAppointmentCancelled(string clientId, string providerId, string appointmentId, AppointmentCategory category, string title, string reason)
     {
@@ -117,6 +146,8 @@ public sealed class NotificationService : INotificationService
                 IsRead = false,
                 CreatedAt = DateTimeOffset.UtcNow,
             });
+
+        NotifyAdmins("APPOINTMENT_CANCELLED", "Appointment cancelled", title, appointmentId, category, clientId);
     }
 
     public int GetUnreadCount(string userId) => _notifications.GetUnreadCount(userId);
@@ -127,6 +158,38 @@ public sealed class NotificationService : INotificationService
         if (user is null || !ShouldNotifyForCategory(user, category)) return;
         _notifications.Add(create());
     }
+
+    private void NotifyAdmins(
+        string eventKind,
+        string eventLabel,
+        string message,
+        string? entityId,
+        AppointmentCategory? category,
+        string? actorUserId)
+    {
+        foreach (var admin in _users.GetAll().Where(user => user.IsAdmin && user.IsActive))
+        {
+            _notifications.Add(new Notification
+            {
+                UserId = admin.Id,
+                Event = eventKind.ToLowerInvariant().Replace('_', '-'),
+                EventLabel = eventLabel,
+                Message = message,
+                AppointmentId = entityId,
+                Category = category,
+                IsRead = false,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
+        }
+
+        if (eventKind != "ACCOUNT_UPDATED" && eventKind != "APPOINTMENT_UPDATED")
+        {
+            _activity?.Add(eventKind, $"{eventLabel}: {message}", actorUserId, entityId);
+        }
+    }
+
+    private static string Detail(string subject, string? changes) =>
+        string.IsNullOrWhiteSpace(changes) ? $"{subject}; Changed: no tracked fields" : $"{subject}; Changed: {changes}";
 
     public static bool ShouldNotifyForCategory(User user, AppointmentCategory category)
     {

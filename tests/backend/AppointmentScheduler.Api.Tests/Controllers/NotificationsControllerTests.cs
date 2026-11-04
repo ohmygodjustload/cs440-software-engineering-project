@@ -31,18 +31,27 @@ public sealed class NotificationsControllerTests
             new FakeCurrentUser(SeedIds.ProviderUser), users, notifications).List(mine: true);
         var clientResult = new NotificationsController(
             new FakeCurrentUser(SeedIds.ClientUser), users, notifications).List(mine: true);
+        var adminResult = new NotificationsController(
+            new FakeCurrentUser(SeedIds.AdminUser), users, notifications).List(mine: true);
 
         var providerItems = Assert.IsType<OkObjectResult>(providerResult.Result).Value
             as IReadOnlyList<Notification>;
         var clientItems = Assert.IsType<OkObjectResult>(clientResult.Result).Value
             as IReadOnlyList<Notification>;
+        var adminItems = Assert.IsType<OkObjectResult>(adminResult.Result).Value
+            as IReadOnlyList<Notification>;
 
         Assert.NotNull(providerItems);
         Assert.NotNull(clientItems);
+        Assert.NotNull(adminItems);
         Assert.Contains(providerItems!, item =>
             item.Event == "appointment-booked" && item.Message == "Jane Porter booked your slot.");
         Assert.Contains(clientItems!, item =>
             item.Event == "appointment-booked" && item.Message == "Annual physical");
+        Assert.DoesNotContain(clientItems!, item => item.Event == "appointment-cancelled");
+        Assert.Contains(adminItems!, item =>
+            item.Event == "appointment-booked" && item.Message == "Annual physical");
+        Assert.DoesNotContain(adminItems!, item => item.Event == "appointment-cancelled");
     }
 
     [Fact]

@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace AppointmentScheduler.Api.Controllers;
 
 /// <summary>
-/// Account notifications for client and service provider accounts only (no admin paths).
+/// Account notifications for signed-in accounts. Admins can also review the complete
+/// notification stream received by every account.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -27,9 +28,9 @@ public sealed class NotificationsController(
         if (currentUser.UserId is null) return Unauthorized();
 
         var user = users.GetById(currentUser.UserId);
-        if (user is null || user.IsAdmin) return Forbid();
+        if (user is null) return Forbid();
 
-        return Ok(notifications.GetAll(currentUser.UserId));
+        return Ok(user.IsAdmin ? notifications.GetAll() : notifications.GetAll(currentUser.UserId));
     }
 
     [HttpPost("mark-all-read")]
@@ -41,7 +42,7 @@ public sealed class NotificationsController(
         if (currentUser.UserId is null) return Unauthorized();
 
         var user = users.GetById(currentUser.UserId);
-        if (user is null || user.IsAdmin) return Forbid();
+        if (user is null) return Forbid();
 
         var updated = notifications.MarkAllRead(currentUser.UserId);
         return Ok(new MarkAllReadResult { Updated = updated });

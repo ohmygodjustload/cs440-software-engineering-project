@@ -21,6 +21,12 @@ public sealed class MongoNotificationStore : INotificationStore
         _raw = context.Database.GetCollection<BsonDocument>(options.Value.NotificationsCollection);
     }
 
+    public IReadOnlyList<Notification> GetAll()
+    {
+        var filter = Builders<BsonDocument>.Filter.Eq("IsDeleted", false);
+        return _raw.Find(filter).ToList().Select(Map).OrderByDescending(n => n.CreatedAt).ToList();
+    }
+
     public IReadOnlyList<Notification> GetAll(string userId)
     {
         var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId) & Builders<BsonDocument>.Filter.Eq("IsDeleted", false);
@@ -166,4 +172,3 @@ public sealed class MongoNotificationStore : INotificationStore
         return doc.TryGetValue(key, out var value) && value is BsonBoolean b ? b.Value : fallback;
     }
 }
-

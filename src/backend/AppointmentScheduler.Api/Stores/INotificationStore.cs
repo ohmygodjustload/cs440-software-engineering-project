@@ -9,6 +9,7 @@ namespace AppointmentScheduler.Api.Stores;
 /// </summary>
 public interface INotificationStore
 {
+    IReadOnlyList<Notification> GetAll();
     IReadOnlyList<Notification> GetAll(string userId);
     Notification? GetById(string id);
     Notification Add(Notification notification);

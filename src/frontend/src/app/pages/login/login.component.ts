@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -23,6 +24,7 @@ export class LoginComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly settingsService = inject(UserSettingsService);
   private readonly notificationsService = inject(NotificationsService);
+  private readonly http = inject(HttpClient, { optional: true });
 
   errorMessage: string | null = null;
   loading = false;
@@ -83,8 +85,10 @@ export class LoginComponent implements OnInit {
             : response.user.isServiceProvider
               ? '/home-provider'
               : '/home';
-          this.greetAndReplayMissed();
-          void this.router.navigateByUrl(this.resolvePostLoginTarget(returnUrl, response.user, home));
+          const target = this.resolvePostLoginTarget(returnUrl, response.user, home);
+          this.greetAndReplayMissed(response.user, () => {
+            void this.router.navigateByUrl(target);
+          });
         },
         error: (error: unknown) => {
           this.errorMessage = this.authService.getErrorMessage(error);
@@ -98,35 +102,57 @@ export class LoginComponent implements OnInit {
    * Read state is left untouched — the user marks items read on the
    * Notifications page. Failures are silent: the greeting still shows.
    */
-  private greetAndReplayMissed(): void {
+  private greetAndReplayMissed(user: User, continueLogin: () => void): void {
     this.toastService.showLoggedIn();
     this.settingsService.getCurrentUser().subscribe({
-      next: (user) => {
+      next: () => {
         this.notificationsService.getPreferences(user.id).subscribe({
           next: (prefs) => {
             if (!prefs.inBrowserEnabled) {
+              continueLogin();
               return;
             }
             this.notificationsService.getNotifications(user.id).subscribe({
               next: (items) => {
-                const unreadCount = items.filter((item) => !item.isRead).length;
+                const unreadItems = items.filter((item) => !item.isRead);
+                const unreadCount = unreadItems.length;
+                const destination = user.isAdmin ? '/activity' : '/notifications';
                 if (unreadCount > 0) {
                   window.setTimeout(() => {
                     this.toastService.show({
                       title: 'Unread notifications',
-                      message: `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Notifications tab to read them.`,
-                      variant: 'info'
+                      message: user.isAdmin
+                        ? `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Activity Log to review them.`
+                        : `You have ${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}. Visit the Notifications tab to read them.`,
+                      variant: 'info',
+                      actionUrl: destination
                     });
                   }, 1200);
                 }
+                continueLogin();
               },
-              error: () => undefined
+              error: () => continueLogin()
             });
+            if (user.isAdmin) {
+              this.http?.get<unknown[]>('/api/provider-requests?status=pending').subscribe({
+                next: (requests) => {
+                  if (requests.length > 0) {
+                    this.toastService.show({
+                      title: 'Unreviewed approval requests',
+                      message: `You have ${requests.length} request${requests.length === 1 ? '' : 's'} to review.`,
+                      variant: 'info',
+                      actionUrl: '/requests'
+                    });
+                  }
+                },
+                error: () => undefined
+              });
+            }
           },
-          error: () => undefined
+          error: () => continueLogin()
         });
       },
-      error: () => undefined
+      error: () => continueLogin()
     });
   }
 

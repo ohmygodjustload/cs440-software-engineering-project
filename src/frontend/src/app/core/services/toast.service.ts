@@ -11,7 +11,8 @@
  *   toastService.showAppointmentBooked('Annual physical', '2026-10-20T09:00:00Z');
  */
 
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { Toast, ToastInput } from '../models/toast';
@@ -54,6 +55,8 @@ export class ToastService {
   /** Pending auto-dismiss / removal timers, keyed by toast id. */
   private readonly timers = new Map<string, number[]>();
 
+  private readonly router = inject(Router, { optional: true });
+
   /** Synchronous snapshot (handy for specs). */
   get toasts(): Toast[] {
     return this.toastsSubject.value;
@@ -68,7 +71,8 @@ export class ToastService {
       message: input.message ?? '',
       variant: input.variant ?? 'success',
       durationMs: input.durationMs && input.durationMs > 0 ? input.durationMs : DEFAULT_DURATION_MS,
-      leaving: false
+      leaving: false,
+      actionUrl: input.actionUrl
     };
 
     let next = [...this.toastsSubject.value, toast];
@@ -93,6 +97,7 @@ export class ToastService {
     if (!target || target.leaving) {
       return;
     }
+
     this.toastsSubject.next(current.map((item) => (item.id === id ? { ...item, leaving: true } : item)));
     this.trackTimer(
       id,
@@ -101,6 +106,10 @@ export class ToastService {
         this.clearTimers(id);
       }, LEAVE_MS)
     );
+  }
+
+  navigate(url: string): Promise<boolean> {
+    return this.router?.navigateByUrl(url) ?? Promise.resolve(false);
   }
 
   /** Remove every popup immediately (used on sign-out). */
@@ -137,9 +146,9 @@ export class ToastService {
   }
 
   /** One popup per missed/unread notification, queued after the greeting. */
-  showMissed(eventLabel: string, message: string): string {
+  showMissed(eventLabel: string, message: string, actionUrl = '/notifications'): string {
     const title = eventLabel?.trim() ? eventLabel.trim() : 'Missed notification';
-    return this.show({ title, message, variant: 'info' });
+    return this.show({ title, message, variant: 'info', actionUrl });
   }
 
   /** Appointment created / booked (client books a slot, provider publishes one). */
@@ -148,7 +157,8 @@ export class ToastService {
     return this.show({
       title: 'Appointment booked',
       message: [title?.trim() || 'Appointment', when].filter(Boolean).join(' · '),
-      variant: 'success'
+      variant: 'success',
+      actionUrl: '/appointments'
     });
   }
 
@@ -158,7 +168,8 @@ export class ToastService {
     return this.show({
       title: 'Appointment updated',
       message: [title?.trim() || 'Appointment', when].filter(Boolean).join(' · '),
-      variant: 'info'
+      variant: 'info',
+      actionUrl: '/appointments'
     });
   }
 
@@ -167,7 +178,8 @@ export class ToastService {
     return this.show({
       title: 'Appointment deleted',
       message: title?.trim() ?? '',
-      variant: 'info'
+      variant: 'info',
+      actionUrl: '/appointments'
     });
   }
 
@@ -177,7 +189,8 @@ export class ToastService {
     return this.show({
       title: 'Appointment cancelled',
       message: [title?.trim() || 'Appointment', when].filter(Boolean).join(' · '),
-      variant: 'info'
+      variant: 'info',
+      actionUrl: '/appointments'
     });
   }
 
@@ -186,7 +199,8 @@ export class ToastService {
     return this.show({
       title: 'Notification settings updated',
       message: detail?.trim() || 'Your notification preferences were saved.',
-      variant: 'success'
+      variant: 'success',
+      actionUrl: '/notifications'
     });
   }
 }

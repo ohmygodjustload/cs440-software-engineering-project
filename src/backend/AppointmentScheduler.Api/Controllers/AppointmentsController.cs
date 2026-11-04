@@ -196,6 +196,16 @@ public sealed class AppointmentsController(
             return NotFound();
         }
 
+        var originalTitle = existing.Title;
+        var originalCategory = existing.Category;
+        var originalStartDateTime = existing.StartDateTime;
+        var originalEndDateTime = existing.EndDateTime;
+        var originalProviderId = existing.ProviderId;
+        var originalProviderName = existing.ProviderName;
+        var originalLocation = existing.Location;
+        var originalNotes = existing.Notes;
+        var originalStatus = existing.Status;
+
         var startDateTime = dto.StartDateTime ?? existing.StartDateTime;
         var endDateTime = dto.EndDateTime ?? existing.EndDateTime;
         if (endDateTime <= startDateTime) {
@@ -254,7 +264,9 @@ public sealed class AppointmentsController(
             existing.Status = dto.Status.Value;
         }
 
-        if (dto.Status.HasValue && existing.Status == AppointmentStatus.Canceled) {
+        if (dto.Status.HasValue
+            && oldStatus != AppointmentStatus.Canceled
+            && existing.Status == AppointmentStatus.Canceled) {
             notificationService?.OnAppointmentCancelled(
                 existing.UserId, notifyingProviderId, existing.Id, existing.Category, existing.Title, existing.Notes ?? string.Empty);
         }
@@ -286,7 +298,19 @@ public sealed class AppointmentsController(
             return Conflict("The appointment was modified by another process. Please retry.");
         }
 
-        activity?.Add("APPOINTMENT_UPDATED", $"Appointment updated: {existing.Title}", currentUser?.UserId, existing.Id);
+        var changes = ActivityChangeFormatter.Describe(
+            ("Title", originalTitle, existing.Title),
+            ("Category", originalCategory, existing.Category),
+            ("Start", originalStartDateTime, existing.StartDateTime),
+            ("End", originalEndDateTime, existing.EndDateTime),
+            ("Provider", originalProviderId, existing.ProviderId),
+            ("Provider name", originalProviderName, existing.ProviderName),
+            ("Location", originalLocation, existing.Location),
+            ("Notes", originalNotes, existing.Notes),
+            ("Status", originalStatus, existing.Status));
+        var activityMessage = $"Appointment updated: {existing.Title}; {ActivityChangeFormatter.Summary(changes)}";
+        notificationService?.OnAppointmentUpdated(existing.Id, existing.Category, existing.Title, currentUser?.UserId, changes);
+        activity?.Add("APPOINTMENT_UPDATED", activityMessage, currentUser?.UserId, existing.Id);
         return Ok(existing);
     }
 

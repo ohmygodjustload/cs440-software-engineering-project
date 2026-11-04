@@ -79,6 +79,32 @@ describe('AppComponent', () => {
     ]);
   });
 
+  it('should omit notifications from the admin navigation', () => {
+    authService.getCurrentUser.and.returnValue({
+      id: 'admin-id',
+      firstName: 'Admin',
+      lastName: 'User',
+      username: 'admin',
+      isClient: false,
+      isServiceProvider: false,
+      isAdmin: true
+    });
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+
+    const links = Array.from(
+      fixture.nativeElement.querySelectorAll('.app-nav__link')
+    ) as HTMLAnchorElement[];
+
+    expect(links.map((link) => link.textContent?.trim())).toEqual([
+      'Home',
+      'Requests',
+      'Accounts',
+      'Appointments',
+      'Activity'
+    ]);
+  });
+
   it('should render the router outlet used by the routed pages', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();

@@ -4,7 +4,7 @@
   @if (showMissedBanner) {
     <div class="notifications-alert notifications-alert--info" role="status">
       <p>
-        You have {{ unreadCount }} unread notifications — visit the Notifications tab to see them all.
+        You have {{ unreadCount }} unread notifications — scroll down to see them all.
       </p>
       <button type="button" class="notifications-retry" (click)="dismissMissedBanner()">Dismiss</button>
     </div>
@@ -15,15 +15,17 @@
       <h1>Notifications</h1>
       <p>Manage delivery preferences and review reminder status.</p>
     </div>
-    <button
-      type="button"
-      class="notifications-mark"
-      (click)="markAllRead()"
-      [disabled]="!canMarkAllRead"
-      [attr.aria-disabled]="!canMarkAllRead"
-    >
-      {{ markAllReadSaving ? 'Marking…' : 'Mark all read' }}
-    </button>
+    @if (!isAdmin) {
+      <button
+        type="button"
+        class="notifications-mark"
+        (click)="markAllRead()"
+        [disabled]="!canMarkAllRead"
+        [attr.aria-disabled]="!canMarkAllRead"
+      >
+        {{ markAllReadSaving ? 'Marking…' : 'Mark all read' }}
+      </button>
+    }
   </header>
 
   @if (userState === 'error') {
@@ -125,40 +127,41 @@
     }
   </section>
 
-  <section class="notifications-section" aria-labelledby="recent-heading">
-    <h2 id="recent-heading">Recent notifications</h2>
-    @if (historyState === 'loading') {
-      <app-loading class="notifications-status" label="Loading notifications…"></app-loading>
-    } @else if (historyState === 'error') {
-      <div class="notifications-alert notifications-alert--error" role="alert">
-        <p>{{ historyError }}</p>
-        <button type="button" class="notifications-retry" (click)="retryHistory()">Try again</button>
-      </div>
-    } @else if (history.length === 0) {
-      <p class="notifications-empty" role="status">No New Notifications!</p>
-    } @else {
-      <ul class="notifications-history">
-        @for (item of history; track item.id) {
-          <li
-            class="notifications-history__row"
-            [class.notifications-history__row--unread]="!item.isRead"
-          >
-            <span class="notifications-history__event">
-              {{ eventLabel(item) }}
-              @if (!item.isRead) {
-                <span class="notifications-unread-dot" aria-label="Unread"></span>
-              }
-            </span>
-            <span class="notifications-history__message">
-              {{ item.message }} · {{ formatTimestamp(item.createdAt) }}
-              @if (!item.isRead) {
-                <span class="notifications-unread-tag">Unread</span>
-              }
-            </span>
-          </li>
-        }
-      </ul>
-    }
-  </section>
+  @if (!isAdmin) {
+    <section class="notifications-section" aria-labelledby="recent-heading">
+      <h2 id="recent-heading">Recent notifications</h2>
+      @if (historyState === 'loading') {
+        <app-loading class="notifications-status" label="Loading notifications…"></app-loading>
+      } @else if (historyState === 'error') {
+        <div class="notifications-alert notifications-alert--error" role="alert">
+          <p>{{ historyError }}</p>
+          <button type="button" class="notifications-retry" (click)="retryHistory()">Try again</button>
+        </div>
+      } @else if (history.length === 0) {
+        <p class="notifications-empty" role="status">No New Notifications!</p>
+      } @else {
+        <ul class="notifications-history">
+          @for (item of history; track item.id) {
+            <li
+              class="notifications-history__row"
+              [class.notifications-history__row--unread]="!item.isRead"
+            >
+              <span class="notifications-history__event">
+                {{ eventLabel(item) }}
+                @if (!item.isRead) {
+                  <span class="notifications-unread-dot" aria-label="Unread"></span>
+                }
+              </span>
+              <span class="notifications-history__message">
+                {{ item.message }} · {{ formatTimestamp(item.createdAt) }}
+                @if (!item.isRead) {
+                  <span class="notifications-unread-tag">Unread</span>
+                }
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
 </div>
-

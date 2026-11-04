@@ -4,13 +4,6 @@
       <h1>Activity Log</h1>
       <p>Global feed of account and appointment actions.</p>
     </div>
-    <button class="clear-activity" type="button" aria-label="Delete all activity log entries"
-      title="Delete all activity log entries" [disabled]="clearing || entries.length === 0"
-      [attr.aria-disabled]="clearing || entries.length === 0" (click)="clearActivity()">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M6 7h12M9 7V5h6v2m-8 0 1 13h6l1-13M10 10v7m4-7v7" />
-      </svg>
-    </button>
   </header>
 
   <form class="controls" role="search" [formGroup]="searchForm">
@@ -30,7 +23,7 @@
         <span>Date</span>
         <span>Notification received</span>
       </div>
-      @for (entry of filteredEntries; track entry.id) {
+      @for (entry of paginatedEntries; track entry.id) {
         <div class="activity-line">
           <time>{{ entry.timestamp | date:'medium' }}</time>
           <span><strong>{{ entry.action }}</strong> {{ entry.message }}</span>
@@ -41,5 +34,19 @@
         </div>
       }
     </section>
+
+    <nav class="activity-pagination" aria-label="Activity log pages">
+      @for (page of pageNumbers; track page) {
+        <button
+          type="button"
+          [class.activity-page--active]="page === currentPage"
+          [attr.aria-current]="page === currentPage ? 'page' : null"
+          [attr.aria-label]="'Show activity log page ' + page"
+          (click)="selectPage(page)"
+        >
+          {{ page }}
+        </button>
+      }
+    </nav>
   }
 </main>

@@ -11,6 +11,9 @@ public sealed class InMemoryNotificationStore : INotificationStore
     private readonly ConcurrentDictionary<string, Notification> _items = new();
     private readonly Lock _gate = new();
 
+    public IReadOnlyList<Notification> GetAll() =>
+        _items.Values.Where(n => !n.IsDeleted).OrderByDescending(n => n.CreatedAt).ToList();
+
     public IReadOnlyList<Notification> GetAll(string userId) =>
         _items.Values.Where(n => !n.IsDeleted && n.UserId == userId).OrderByDescending(n => n.CreatedAt).ToList();
 
