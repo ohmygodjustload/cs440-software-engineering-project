@@ -34,6 +34,24 @@
         aria-label="Search activity log"
       />
     </label>
+
+    <label class="date-field" [class.date-filter-empty]="$any(searchForm.controls.startDate).value">
+      <span>Date</span>
+      <input
+        type="date"
+        formControlName="startDate"
+        aria-label="Filter activity by date"
+      />
+      @if (!$any(searchForm.controls.startDate).value) {
+        <span class="date-placeholder" aria-hidden="true">All dates</span>
+      }
+    </label>
+
+    @if ($any(searchForm.controls.startDate).value) {
+      <button class="clear-date" type="button" (click)="clearDateFilter()">
+        Clear date
+      </button>
+    }
   </form>
 
   @if (loading) {

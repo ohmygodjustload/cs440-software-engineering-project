@@ -35,7 +35,8 @@ export class ActivityComponent implements OnInit {
   readonly pageSize = 10;
   currentPage = 1;
   readonly searchForm = new FormGroup({
-    search: new FormControl('', { nonNullable: true })
+    search: new FormControl('', { nonNullable: true }),
+    startDate: new FormControl('', { nonNullable: true })
   });
 
   ngOnInit(): void {
@@ -84,8 +85,13 @@ export class ActivityComponent implements OnInit {
 
   filterEntries(): void {
     const search = this.searchForm.controls.search.value.trim().toLowerCase();
-    this.filteredEntries = this.entries.filter((entry) =>
-      !search || `${entry.action} ${entry.message}`.toLowerCase().includes(search));
+    const selectedDate = this.searchForm.controls.startDate.value;
+    const selectedDateStr = selectedDate ? selectedDate.slice(0, 10) : null;
+    this.filteredEntries = this.entries.filter((entry) => {
+      const matchesSearch = !search || `${entry.action} ${entry.message}`.toLowerCase().includes(search);
+      const matchesDate = !selectedDateStr || entry.timestamp.slice(0, 10) === selectedDateStr;
+      return matchesSearch && matchesDate;
+    });
     this.currentPage = 1;
   }
 
@@ -106,5 +112,11 @@ export class ActivityComponent implements OnInit {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
     }
+  }
+
+  clearDateFilter(): void {
+    this.searchForm.controls.startDate.setValue('', { emitEvent: false });
+    this.filterEntries();
+    this.loadActivity();
   }
 }

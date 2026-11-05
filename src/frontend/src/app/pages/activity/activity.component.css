@@ -230,6 +230,8 @@ footer a {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
   width: 100%;
   padding: 14px 20px 14px 18px;
   border: 1px solid #d4ded6;
@@ -246,12 +248,12 @@ footer a {
 
 .search-field input {
   flex: 1;
+  min-width: 0;
   border: 0;
   outline: 0;
   background: transparent;
   color: #212c2a;
   font: inherit;
-  min-width: 0;
 }
 
 .search-field input::placeholder {
@@ -264,6 +266,86 @@ footer a {
   height: 18px;
   color: #6a7e7a;
   opacity: .7;
+}
+
+.date-field {
+  display: flex;
+  flex: 0 1 260px;
+  min-width: 200px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border: 1px solid #d4ded6;
+  border-radius: 999px;
+  background: #f0f5f2;
+  font-size: 14px;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.date-field span {
+  flex: 0 0 auto;
+  color: #52635f;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.date-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #212c2a;
+  font: inherit;
+  text-align: center;
+  height: 48px;
+  padding: 0 12px;
+}
+
+.date-field input::-webkit-calendar-picker-indicator {
+  opacity: .35;
+}
+
+.date-filter-empty input {
+  color: inherit;
+}
+
+.date-filter-empty input::-webkit-calendar-picker-indicator {
+  opacity: .5;
+}
+
+.date-placeholder {
+  flex: 1;
+  color: #52635f;
+  font: inherit;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.clear-date {
+  align-self: center;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #e0dcd1;
+  color: #344945;
+  font: inherit;
+  cursor: pointer;
+}
+
+.clear-date:hover {
+  background: #d4d0c6;
+}
+
+.clear-date:focus-visible {
+  outline: 2px solid #344945;
+  outline-offset: 3px;
+}
+
+.clear-date:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+  pointer-events: none;
 }
 
 .activity-list {
