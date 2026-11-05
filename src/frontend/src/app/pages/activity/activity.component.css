@@ -228,19 +228,42 @@ footer a {
 
 .search-field {
   display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
-  padding: 14px 20px;
+  padding: 14px 20px 14px 18px;
+  border: 1px solid #d4ded6;
   border-radius: 999px;
-  background: #d9e6ed;
+  background: #f0f5f2;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.search-field:focus-within {
+  border-color: #344945;
+  box-shadow: 0 0 0 3px rgba(52, 73, 69, .15);
+  background: #f7f9f7;
 }
 
 .search-field input {
-  width: 100%;
+  flex: 1;
   border: 0;
   outline: 0;
   background: transparent;
-  color: inherit;
+  color: #212c2a;
   font: inherit;
+  min-width: 0;
+}
+
+.search-field input::placeholder {
+  color: #7a8a82;
+}
+
+.search-field .search-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: #6a7e7a;
+  opacity: .7;
 }
 
 .activity-list {

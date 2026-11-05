@@ -17,7 +17,22 @@
   <form class="controls" role="search" [formGroup]="searchForm">
     <label class="search-field">
       <span class="visually-hidden">Search activity</span>
-      <input type="search" formControlName="search" placeholder="Search activity" />
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <input
+        type="search"
+        formControlName="search"
+        placeholder="Search activity"
+        aria-label="Search activity log"
+      />
     </label>
   </form>
 

@@ -37,7 +37,7 @@ public sealed class User
     public bool IsAdmin { get; set; }
 
     public bool IsActive { get; set; } = true;
-    /// <summary>Categories this account wants to receive notifications for.</summary>
+
     public bool NotifyMedical { get; set; } = true;
 
     public bool NotifyBeauty { get; set; } = true;
@@ -53,11 +53,6 @@ public sealed class User
 
     public ServiceCredential? FitnessCredentials { get; set; }
 
-    /// <summary>
-    /// Per-user notification preferences. Not persisted to the BAAAM.User
-    /// collection directly during local dev — governed by the in-memory or
-    /// Mongo user store below (see NotificationPreferencesStore).
-    /// </summary>
     [JsonIgnore]
     [BsonIgnore]
     public NotificationPreferences? NotificationPreferences { get; set; }
