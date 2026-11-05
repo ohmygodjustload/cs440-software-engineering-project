@@ -61,8 +61,33 @@ public sealed class MongoAppointmentStore : IAppointmentStore
     public Appointment Add(Appointment appointment) =>
         throw new NotSupportedException("BAAAM.Appointment is read-only from this API.");
 
-    public bool Update(Appointment appointment) =>
-        throw new NotSupportedException("BAAAM.Appointment is read-only from this API.");
+    public bool Update(Appointment appointment)
+    {
+        var id = ToObjectIdOrString(appointment.Id);
+        var updates = new List<UpdateDefinition<BsonDocument>>
+        {
+            Builders<BsonDocument>.Update.Set("StartTime", appointment.StartDateTime.UtcDateTime),
+            Builders<BsonDocument>.Update.Set("EndTime", appointment.EndDateTime.UtcDateTime),
+            Builders<BsonDocument>.Update.Set("Notes", appointment.Notes ?? string.Empty),
+            Builders<BsonDocument>.Update.Set("Title", appointment.Title),
+            Builders<BsonDocument>.Update.Set("ProviderId", appointment.ProviderId),
+            Builders<BsonDocument>.Update.Set("ProviderName", appointment.ProviderName ?? string.Empty),
+            Builders<BsonDocument>.Update.Set("Location", appointment.Location ?? string.Empty),
+        };
+
+        var statusId = FindStatusId(appointment.Status.ToString());
+        if (statusId is not null)
+        {
+            updates.Add(Builders<BsonDocument>.Update.Set("StatusId", statusId));
+        }
+
+        var result = _raw.UpdateOne(
+            Builders<BsonDocument>.Filter.And(
+                Builders<BsonDocument>.Filter.Eq("_id", id),
+                Builders<BsonDocument>.Filter.Ne("IsDeleted", true)),
+            Builders<BsonDocument>.Update.Combine(updates));
+        return result.MatchedCount == 1;
+    }
 
     public bool Remove(string id) =>
         throw new NotSupportedException("BAAAM.Appointment is read-only from this API.");
@@ -209,7 +234,9 @@ public sealed class MongoAppointmentStore : IAppointmentStore
 
         var customServiceName = typeDoc is null ? null : ReadString(typeDoc, "CustomServiceName");
         var categoryName = CategoryFromType(typeDoc);
-        var title = !string.IsNullOrWhiteSpace(customServiceName)
+        var title = !string.IsNullOrWhiteSpace(ReadString(d, "Title"))
+            ? ReadString(d, "Title")!
+            : !string.IsNullOrWhiteSpace(customServiceName)
             ? customServiceName
             : !string.IsNullOrWhiteSpace(categoryName)
                 ? $"{categoryName} appointment"
@@ -251,6 +278,7 @@ public sealed class MongoAppointmentStore : IAppointmentStore
                 ? ReadString(userDoc, "Username", "Email")
                 : full;
         }
+        providerName = ReadString(d, "ProviderName") ?? providerName;
 
         // Location: direct LocationId first, then via AppointmentType.
         string? location = null;
@@ -272,6 +300,7 @@ public sealed class MongoAppointmentStore : IAppointmentStore
                 break;
             }
         }
+        location = ReadString(d, "Location") ?? location;
 
         return new Appointment
         {

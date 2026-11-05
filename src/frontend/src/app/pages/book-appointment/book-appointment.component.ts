@@ -11,6 +11,13 @@ import { BookedAppointment, Slot } from '../../core/models/slot';
 import { SlotsService } from '../../core/services/slots.service';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
 
+interface ProviderOption {
+  id: string;
+  name: string;
+  categories: AppointmentCategory[];
+  openings: number;
+}
+
 /**
  * Client booking page: lists the open slots from `GET /api/slots`, lets the client pick one and add notes,
  * then books it with `POST /api/slots/{id}/book`. The API takes the client from the signed-in JWT.
@@ -23,6 +30,8 @@ import { LoadingComponent } from '../../core/components/loading/loading.componen
   styleUrl: './book-appointment.component.css'
 })
 export class BookAppointmentComponent implements OnInit {
+  // Week navigation should start at today; users should not browse past ranges.
+  private readonly minWeekStart = this.startOfDay(new Date());
   private readonly slotsService = inject(SlotsService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -30,6 +39,8 @@ export class BookAppointmentComponent implements OnInit {
 
   category: AppointmentCategory | '' = '';
   slots: Slot[] = [];
+  selectedProviderId = '';
+  weekStart = this.startOfDay(new Date());
   selectedId = '';
   notes = '';
   loading = false;
@@ -42,7 +53,64 @@ export class BookAppointmentComponent implements OnInit {
     return this.slots.find((slot) => slot.id === this.selectedId) ?? null;
   }
 
+  // Until there is a provider lookup endpoint for booking, derive provider choices from open slots.
+  get providers(): ProviderOption[] {
+    const providers = new Map<string, ProviderOption>();
+    for (const slot of this.slots) {
+      const provider: ProviderOption = providers.get(slot.providerId) ?? {
+        id: slot.providerId,
+        name: slot.providerName ?? 'Unknown provider',
+        categories: [],
+        openings: 0
+      };
+      provider.openings += 1;
+      if (!provider.categories.includes(slot.category)) {
+        provider.categories.push(slot.category);
+      }
+      providers.set(slot.providerId, provider);
+    }
+
+    return [...providers.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  get selectedProvider(): ProviderOption | null {
+    return this.providers.find((provider) => provider.id === this.selectedProviderId) ?? null;
+  }
+
+  get providerSlots(): Slot[] {
+    return this.selectedProviderId
+      ? this.slots.filter((slot) => slot.providerId === this.selectedProviderId)
+      : this.slots;
+  }
+
+  get visibleSlots(): Slot[] {
+    const weekEnd = this.addDays(this.weekStart, 7);
+    return this.providerSlots.filter((slot) => {
+      const start = new Date(slot.startDateTime);
+      return start >= this.weekStart && start < weekEnd;
+    });
+  }
+
+  get weekRangeLabel(): string {
+    return `${this.shortDate(this.weekStart)} - ${this.shortDate(this.addDays(this.weekStart, 6))}`;
+  }
+
+  get canGoPreviousWeek(): boolean {
+    return this.addDays(this.weekStart, -7) >= this.minWeekStart;
+  }
+
   ngOnInit(): void {
+    this.loadSlots();
+  }
+
+  selectCategory(category: AppointmentCategory | ''): void {
+    if (this.category === category || this.loading) {
+      return;
+    }
+
+    this.category = category;
+    this.selectedProviderId = '';
+    this.selectedId = '';
     this.loadSlots();
   }
 
@@ -57,16 +125,51 @@ export class BookAppointmentComponent implements OnInit {
       )
       .subscribe({
         next: (slots) => {
-          this.slots = slots;
+          this.slots = [...slots].sort((a, b) =>
+            new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
+          if (this.selectedProviderId && !this.providers.some((provider) => provider.id === this.selectedProviderId)) {
+            this.selectedProviderId = '';
+          }
           if (!slots.some((slot) => slot.id === this.selectedId)) this.selectedId = '';
+          this.alignWeekToSlots();
         },
         error: () => this.loadError = 'Open slots could not be loaded. Check the API and retry.'
       });
   }
 
+  chooseProvider(id: string): void {
+    this.selectedProviderId = id;
+    this.selectedId = '';
+    this.formError = '';
+    this.alignWeekToSlots();
+  }
+
+  chooseDifferentProvider(): void {
+    this.selectedProviderId = '';
+    this.selectedId = '';
+    this.formError = '';
+  }
+
   choose(id: string): void {
     this.selectedId = id;
     this.formError = '';
+  }
+
+  chooseDifferentDate(): void {
+    this.selectedId = '';
+    this.formError = '';
+  }
+
+  previousWeek(): void {
+    if (!this.canGoPreviousWeek) {
+      return;
+    }
+
+    this.moveWeek(-1);
+  }
+
+  nextWeek(): void {
+    this.moveWeek(1);
   }
 
   book(): void {
@@ -86,6 +189,7 @@ export class BookAppointmentComponent implements OnInit {
           this.booked = booked;
           this.notes = '';
           this.selectedId = '';
+          this.selectedProviderId = '';
         },
         error: (error: unknown) => {
           this.formError = this.errorMessage(error);
@@ -99,6 +203,7 @@ export class BookAppointmentComponent implements OnInit {
 
   bookAnother(): void {
     this.booked = null;
+    this.selectedProviderId = '';
     this.loadSlots();
   }
 
@@ -113,5 +218,31 @@ export class BookAppointmentComponent implements OnInit {
       case 400: return body || 'That slot has already started. Pick another time.';
       default: return 'The appointment could not be booked. Check the API and try again.';
     }
+  }
+
+  private moveWeek(offset: number): void {
+    this.weekStart = this.addDays(this.weekStart, offset * 7);
+    if (!this.visibleSlots.some((slot) => slot.id === this.selectedId)) {
+      this.selectedId = '';
+    }
+  }
+
+  private alignWeekToSlots(): void {
+    // Keep the current range anchored at today if data or navigation would otherwise move it into the past.
+    if (this.weekStart < this.minWeekStart) {
+      this.weekStart = this.minWeekStart;
+    }
+  }
+
+  private startOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private addDays(date: Date, days: number): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+  }
+
+  private shortDate(date: Date): string {
+    return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(date);
   }
 }

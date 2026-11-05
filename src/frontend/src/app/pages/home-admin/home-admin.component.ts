@@ -15,9 +15,9 @@ export interface AdminReviewItem {
 
 export function greetingFor(date: Date): string {
   const hour = date.getHours();
-  if (hour < 12) return 'Good morning, Admin';
-  if (hour < 17) return 'Good afternoon, Admin';
-  return 'Good evening, Admin';
+  if (hour < 12) return 'Good morning, Admin.';
+  if (hour < 17) return 'Good afternoon, Admin.';
+  return 'Good evening, Admin.';
 }
 
 @Component({

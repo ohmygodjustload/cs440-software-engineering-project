@@ -25,6 +25,20 @@ describe('BookAppointmentComponent', () => {
   const booking: BookedAppointment = {
     ...slot, status: 'Booked', userId: '6abc20bda313dfdf8ecc0286', notes: 'First visit'
   };
+  const nextWeekSlot: Slot = {
+    ...slot,
+    id: 's2',
+    startDateTime: '2027-01-08T10:00:00Z',
+    endDateTime: '2027-01-08T10:30:00Z'
+  };
+  const beautySlot: Slot = {
+    ...slot,
+    id: 's3',
+    title: 'Hair styling',
+    category: 'Beauty',
+    providerId: '6abc1939a313dfdf8ecc0999',
+    providerName: 'Jane Doe'
+  };
 
   let slots: jasmine.SpyObj<SlotsService>;
 
@@ -48,8 +62,8 @@ describe('BookAppointmentComponent', () => {
 
     expect(slots.getAvailable).toHaveBeenCalledWith({});
     expect(fixture.componentInstance.slots).toEqual([slot]);
-    expect(fixture.nativeElement.textContent).toContain('General checkup');
     expect(fixture.nativeElement.textContent).toContain('John Smith');
+    expect(fixture.nativeElement.textContent).toContain('Medical');
   });
 
   it('reloads the slots with the chosen category', () => {
@@ -59,6 +73,81 @@ describe('BookAppointmentComponent', () => {
     component.loadSlots();
 
     expect(slots.getAvailable).toHaveBeenCalledWith({ category: 'Beauty' });
+  });
+
+  it('selects a category from the filter chips', () => {
+    const component = create().componentInstance;
+
+    component.selectCategory('Fitness');
+
+    expect(component.category).toBe('Fitness');
+    expect(slots.getAvailable).toHaveBeenCalledWith({ category: 'Fitness' });
+  });
+
+  it('shows one week of slots at a time', () => {
+    slots.getAvailable.and.returnValue(of([slot, nextWeekSlot]));
+    const component = create().componentInstance;
+
+    component.weekStart = new Date(2027, 0, 1);
+
+    expect(component.weekRangeLabel).toContain('Jan 1');
+    expect(component.visibleSlots).toEqual([slot]);
+
+    component.nextWeek();
+
+    expect(component.weekRangeLabel).toContain('Jan 8');
+    expect(component.visibleSlots).toEqual([nextWeekSlot]);
+  });
+
+  it('groups available slots by provider', () => {
+    slots.getAvailable.and.returnValue(of([slot, nextWeekSlot, beautySlot]));
+    const component = create().componentInstance;
+
+    expect(component.providers.map((provider) => provider.name)).toEqual(['Jane Doe', 'John Smith']);
+    expect(component.providers.find((provider) => provider.name === 'John Smith')?.openings).toBe(2);
+  });
+
+  it('shows only the chosen provider slots', () => {
+    slots.getAvailable.and.returnValue(of([slot, beautySlot]));
+    const component = create().componentInstance;
+
+    component.weekStart = new Date(2027, 0, 1);
+    component.chooseProvider('6abc1939a313dfdf8ecc0999');
+
+    expect(component.selectedProvider?.name).toBe('Jane Doe');
+    expect(component.visibleSlots).toEqual([beautySlot]);
+  });
+
+  it('clears the selected slot when paging to another week', () => {
+    slots.getAvailable.and.returnValue(of([slot, nextWeekSlot]));
+    const component = create().componentInstance;
+
+    component.choose('s1');
+    component.nextWeek();
+
+    expect(component.selected).toBeNull();
+  });
+
+  it('does not page into a week before today', () => {
+    const component = create().componentInstance;
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    component.weekStart = today;
+    component.previousWeek();
+
+    expect(component.weekStart).toEqual(today);
+    expect(component.canGoPreviousWeek).toBeFalse();
+  });
+
+  it('returns to slot selection when choosing a different date', () => {
+    const component = create().componentInstance;
+
+    component.choose('s1');
+    expect(component.selected).toEqual(slot);
+
+    component.chooseDifferentDate();
+    expect(component.selected).toBeNull();
   });
 
   it('books the selected slot with the notes and shows the confirmation', () => {

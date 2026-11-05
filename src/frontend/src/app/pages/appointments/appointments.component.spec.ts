@@ -21,7 +21,7 @@ import { AppointmentsOverviewService } from '../../core/services/appointments-ov
 import { AppointmentsComponent } from './appointments.component';
 
 describe('Appointments overview', () => {
-  it('groups by local month and year, sorts starts, and excludes cancelled records', () => {
+  it('shows the soonest upcoming booked appointment', () => {
     TestBed.configureTestingModule({
       imports: [AppointmentsComponent],
       providers: [provideRouter([]), {
@@ -30,17 +30,26 @@ describe('Appointments overview', () => {
       }]
     });
     const component = TestBed.createComponent(AppointmentsComponent).componentInstance;
-    const booking = (year: number, month: number, status: Appointment['status'] = 'Booked'): Appointment => ({
-      id: `${year}-${month}-${status}`, title: 'Physical', category: 'Medical',
-      startDateTime: new Date(year, month, 16, 14).toISOString(),
-      endDateTime: new Date(year, month, 16, 15).toISOString(),
+    const future = new Date();
+    future.setDate(future.getDate() + 2);
+    const later = new Date();
+    later.setDate(later.getDate() + 5);
+    const past = new Date();
+    past.setDate(past.getDate() - 2);
+    const booking = (id: string, start: Date, status: Appointment['status'] = 'Booked'): Appointment => ({
+      id, title: 'Physical', category: 'Medical',
+      startDateTime: start.toISOString(),
+      endDateTime: new Date(start.getTime() + 60 * 60 * 1000).toISOString(),
       providerId: 'p-1', userId: 'demo-user', status
     });
-    component.appointments = [booking(2027, 9), booking(2026, 9), booking(2026, 8), booking(2026, 8, 'Canceled')];
+    component.appointments = [
+      booking('later', later),
+      booking('soonest', future),
+      booking('past', past),
+      booking('canceled', future, 'Canceled')
+    ];
 
-    expect(component.months.length).toBe(3);
-    expect(component.months[0].items.length).toBe(1);
-    expect(component.months[0].items[0].id).toBe('2026-8-Booked');
-    expect(component.months[2].label).toContain('2027');
+    expect(component.upcomingAppointments.map((item) => item.id)).toEqual(['soonest', 'later']);
+    expect(component.nextAppointment?.id).toBe('soonest');
   });
 });

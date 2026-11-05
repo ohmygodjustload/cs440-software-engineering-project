@@ -41,23 +41,8 @@ input {
   font-weight: 500;
 }
 
-.signup-back {
-  display: inline-block;
+.signup-card .app-breadcrumb {
   margin: 14px 0 0;
-  color: var(--signup-foreground);
-  font-size: 13px;
-  line-height: 18px;
-  text-decoration: none;
-}
-
-.signup-back:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.signup-back:focus-visible {
-  outline: 2px solid var(--signup-foreground);
-  outline-offset: 4px;
 }
 
 .signup-card__title {

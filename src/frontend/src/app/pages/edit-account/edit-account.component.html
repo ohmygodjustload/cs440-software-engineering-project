@@ -1,0 +1,43 @@
+<main class="account-page">
+  <h1>Edit account</h1>
+  @if (loading) {
+    <p>Loading account...</p>
+  } @else if (error && !account) {
+    <p role="alert">{{ error }}</p>
+    <a routerLink="/accounts">Back to accounts</a>
+  } @else {
+    <form class="settings-form" [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-grid">
+        <label>First name <input formControlName="firstName" />
+          @if (fieldError('firstName', 'First name')) {
+            <span class="field-error" role="alert">{{ fieldError('firstName', 'First name') }}</span>
+          }
+        </label>
+        <label>Last name <input formControlName="lastName" />
+          @if (fieldError('lastName', 'Last name')) {
+            <span class="field-error" role="alert">{{ fieldError('lastName', 'Last name') }}</span>
+          }
+        </label>
+        <label>Email @if (account?.isServiceProvider) { <span>(required for service providers)</span> }
+          <input type="email" formControlName="email" />
+          @if (fieldError('email', 'Email')) {
+            <span class="field-error" role="alert">{{ fieldError('email', 'Email') }}</span>
+          }
+        </label>
+        <label>Phone @if (account?.isServiceProvider) { <span>(required for service providers)</span> }
+          <input type="tel" formControlName="phone" />
+          @if (fieldError('phone', 'Phone number')) {
+            <span class="field-error" role="alert">{{ fieldError('phone', 'Phone number') }}</span>
+          }
+        </label>
+      </div>
+      @if (error) { <p role="alert">{{ error }}</p> }
+      @if (success) { <p role="status">{{ success }}</p> }
+      <div class="actions">
+        <button class="primary-action" type="submit" [disabled]="saving || form.pristine"
+          [attr.aria-disabled]="saving || form.pristine">Save changes</button>
+        <button class="secondary-action" type="button" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  }
+</main>
