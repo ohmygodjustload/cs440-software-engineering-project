@@ -4,12 +4,15 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
+import { AuthService } from '../../core/services/auth.service';
+import { NotificationsService } from '../../core/services/notifications.service';
 
 interface ActivityEntry {
   id: string;
   timestamp: string;
   action: string;
   message: string;
+  isRead: boolean;
 }
 
 @Component({
@@ -21,18 +24,47 @@ interface ActivityEntry {
 })
 export class ActivityComponent implements OnInit {
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+  private readonly notificationsService = inject(NotificationsService);
   entries: ActivityEntry[] = [];
   filteredEntries: ActivityEntry[] = [];
   loading = false;
-  clearing = false;
   error: string | null = null;
+  markAllReadError: string | null = null;
+  markAllReadSaving = false;
+  readonly pageSize = 10;
+  currentPage = 1;
   readonly searchForm = new FormGroup({
-    search: new FormControl('', { nonNullable: true })
+    search: new FormControl('', { nonNullable: true }),
+    startDate: new FormControl('', { nonNullable: true })
   });
 
   ngOnInit(): void {
     this.loadActivity();
     this.searchForm.valueChanges.subscribe(() => this.filterEntries());
+  }
+
+  get unreadCount(): number {
+    return this.entries.filter((entry) => !entry.isRead).length;
+  }
+
+  markAllRead(): void {
+    const user = this.authService.getCurrentUser();
+    if (!user?.isAdmin || this.markAllReadSaving || this.unreadCount === 0) return;
+
+    this.markAllReadSaving = true;
+    this.markAllReadError = null;
+    this.notificationsService.markAllRead(user.id).subscribe({
+      next: () => {
+        this.entries = this.entries.map((entry) => ({ ...entry, isRead: true }));
+        this.filterEntries();
+        this.markAllReadSaving = false;
+      },
+      error: () => {
+        this.markAllReadError = 'Failed to mark notifications as read.';
+        this.markAllReadSaving = false;
+      }
+    });
   }
 
   loadActivity(): void {
@@ -53,29 +85,38 @@ export class ActivityComponent implements OnInit {
 
   filterEntries(): void {
     const search = this.searchForm.controls.search.value.trim().toLowerCase();
-    this.filteredEntries = this.entries.filter((entry) =>
-      !search || `${entry.action} ${entry.message}`.toLowerCase().includes(search));
+    const selectedDate = this.searchForm.controls.startDate.value;
+    const selectedDateStr = selectedDate ? selectedDate.slice(0, 10) : null;
+    this.filteredEntries = this.entries.filter((entry) => {
+      const matchesSearch = !search || `${entry.action} ${entry.message}`.toLowerCase().includes(search);
+      const matchesDate = !selectedDateStr || entry.timestamp.slice(0, 10) === selectedDateStr;
+      return matchesSearch && matchesDate;
+    });
+    this.currentPage = 1;
   }
 
-  clearActivity(): void {
-    if (this.clearing || this.entries.length === 0) return;
-    const confirmed = window.confirm(
-      'Delete all activity log entries? This action cannot be undone.'
-    );
-    if (!confirmed) return;
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredEntries.length / this.pageSize));
+  }
 
-    this.clearing = true;
-    this.error = null;
-    this.http.delete('/api/admin/activity').subscribe({
-      next: () => {
-        this.entries = [];
-        this.filteredEntries = [];
-        this.clearing = false;
-      },
-      error: () => {
-        this.error = 'Failed to clear activity.';
-        this.clearing = false;
-      }
-    });
+  get pageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, index) => index + 1);
+  }
+
+  get paginatedEntries(): ActivityEntry[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredEntries.slice(start, start + this.pageSize);
+  }
+
+  selectPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  clearDateFilter(): void {
+    this.searchForm.controls.startDate.setValue('', { emitEvent: false });
+    this.filterEntries();
+    this.loadActivity();
   }
 }

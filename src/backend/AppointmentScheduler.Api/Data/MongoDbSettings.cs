@@ -32,6 +32,9 @@ public sealed class MongoDbSettings
     public string AppointmentTypesCollection { get; set; } = "AppointmentType";
 
     public string LocationsCollection { get; set; } = "Location";
+    /// <summary>New collection for the in-app notification feature (BAAAM.Notification).</summary>
+    public string NotificationsCollection { get; set; } = "Notification";
+
 
     public string StatusesCollection { get; set; } = "Status";
 

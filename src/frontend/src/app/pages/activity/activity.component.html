@@ -4,20 +4,54 @@
       <h1>Activity Log</h1>
       <p>Global feed of account and appointment actions.</p>
     </div>
-    <button class="clear-activity" type="button" aria-label="Delete all activity log entries"
-      title="Delete all activity log entries" [disabled]="clearing || entries.length === 0"
-      [attr.aria-disabled]="clearing || entries.length === 0" (click)="clearActivity()">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M6 7h12M9 7V5h6v2m-8 0 1 13h6l1-13M10 10v7m4-7v7" />
-      </svg>
+    <button
+      type="button"
+      class="activity-mark-read"
+      [disabled]="markAllReadSaving || unreadCount === 0"
+      (click)="markAllRead()"
+    >
+      {{ markAllReadSaving ? 'Marking…' : 'Mark all as read' }}
     </button>
   </header>
 
   <form class="controls" role="search" [formGroup]="searchForm">
     <label class="search-field">
       <span class="visually-hidden">Search activity</span>
-      <input type="search" formControlName="search" placeholder="Search activity" />
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <input
+        type="search"
+        formControlName="search"
+        placeholder="Search activity"
+        aria-label="Search activity log"
+      />
     </label>
+
+    <label class="date-field" [class.date-filter-empty]="$any(searchForm.controls.startDate).value">
+      <span>Date</span>
+      <input
+        type="date"
+        formControlName="startDate"
+        aria-label="Filter activity by date"
+      />
+      @if (!$any(searchForm.controls.startDate).value) {
+        <span class="date-placeholder" aria-hidden="true">All dates</span>
+      }
+    </label>
+
+    @if ($any(searchForm.controls.startDate).value) {
+      <button class="clear-date" type="button" (click)="clearDateFilter()">
+        Clear date
+      </button>
+    }
   </form>
 
   @if (loading) {
@@ -25,13 +59,16 @@
   } @else if (error) {
     <div role="alert"><p>{{ error }}</p><button (click)="loadActivity()">Try again</button></div>
   } @else {
+    @if (markAllReadError) {
+      <div class="activity-error" role="alert">{{ markAllReadError }}</div>
+    }
     <section class="activity-list" aria-label="Activity log">
       <div class="activity-header" aria-hidden="true">
         <span>Date</span>
         <span>Notification received</span>
       </div>
-      @for (entry of filteredEntries; track entry.id) {
-        <div class="activity-line">
+      @for (entry of paginatedEntries; track entry.id) {
+        <div class="activity-line" [class.activity-line--unread]="!entry.isRead">
           <time>{{ entry.timestamp | date:'medium' }}</time>
           <span><strong>{{ entry.action }}</strong> {{ entry.message }}</span>
         </div>
@@ -41,5 +78,19 @@
         </div>
       }
     </section>
+
+    <nav class="activity-pagination" aria-label="Activity log pages">
+      @for (page of pageNumbers; track page) {
+        <button
+          type="button"
+          [class.activity-page--active]="page === currentPage"
+          [attr.aria-current]="page === currentPage ? 'page' : null"
+          [attr.aria-label]="'Show activity log page ' + page"
+          (click)="selectPage(page)"
+        >
+          {{ page }}
+        </button>
+      }
+    </nav>
   }
 </main>

@@ -45,11 +45,16 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
   reminderHourBeforeEnabled: true
 };
 
-/** Machine-readable event kinds the history list can render. */
+/**
+ * Machine-readable event kinds the history list can render.
+ * Mirrors the C# `NotificationEvent` enum — keep in sync when adding new kinds.
+ */
 export type NotificationEventKind =
   | 'appointment-created'
-  | 'appointment-edited'
+  | 'appointment-booked'
   | 'appointment-cancelled'
+  | 'missed-notifications'
+  | 'appointment-edited'
   | 'reminder';
 
 /**
@@ -71,6 +76,10 @@ export interface AppNotification {
   message: string;
   /** Related appointment id when known (used for future deep-links only). */
   appointmentId?: string | null;
+  /** Category the notification is scoped to, when applicable. */
+  category?: string | null;
+  /** Cancellation reason, for cancelled notifications. */
+  reason?: string | null;
   /** When the backend recorded the notification (UTC ISO-8601). */
   createdAt: string;
   /** Read state as recorded by the backend. */
@@ -80,7 +89,9 @@ export interface AppNotification {
 /** Human-readable labels for event kinds (fallback when the API omits eventLabel). */
 export const NOTIFICATION_EVENT_LABELS: Record<NotificationEventKind, string> = {
   'appointment-created': 'Appointment created',
-  'appointment-edited': 'Appointment edited',
+  'appointment-booked': 'Appointment booked',
   'appointment-cancelled': 'Appointment cancelled',
+  'missed-notifications': 'Missed notifications',
+  'appointment-edited': 'Appointment edited',
   reminder: 'Reminder'
 };

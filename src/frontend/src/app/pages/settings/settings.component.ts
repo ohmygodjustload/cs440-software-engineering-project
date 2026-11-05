@@ -194,7 +194,10 @@ export class SettingsComponent implements OnInit {
       firstName: nameParts[0] ?? '',
       lastName: nameParts.slice(1).join(' '),
       email: this.form.value.email,
-      phone: this.form.value.phone
+      phone: this.form.value.phone,
+      notifyMedical: this.form.controls.notifyMedical.value,
+      notifyBeauty: this.form.controls.notifyBeauty.value,
+      notifyFitness: this.form.controls.notifyFitness.value
     };
 
     this.settingsService.saveSettings(user.id, patch).subscribe({
@@ -244,9 +247,9 @@ export class SettingsComponent implements OnInit {
       phone: user.phone ?? '',
       timeZone: this.resolveDefaultTimeZone(),
       defaultCalendarView: this.calendarViewService.getView(user.id),
-      notifyMedical: true,
-      notifyBeauty: true,
-      notifyFitness: true
+      notifyMedical: user.notifyMedical ?? true,
+      notifyBeauty: user.notifyBeauty ?? true,
+      notifyFitness: user.notifyFitness ?? true
     };
   }
 }

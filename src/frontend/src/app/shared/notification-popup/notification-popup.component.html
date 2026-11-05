@@ -8,6 +8,8 @@
       [class.toast--reminder]="toast.variant === 'reminder'"
       [class.toast--leaving]="toast.leaving"
       role="status"
+      [class.toast--clickable]="!!toast.actionUrl"
+      (click)="open(toast)"
     >
       <div class="toast__body">
         <p class="toast__title">{{ toast.title }}</p>
@@ -19,7 +21,7 @@
         type="button"
         class="toast__close"
         [attr.aria-label]="'Dismiss: ' + toast.title"
-        (click)="dismiss(toast.id)"
+        (click)="$event.stopPropagation(); dismiss(toast.id)"
       >&#10005;</button>
       <!-- Timer line: drains linearly over the toast lifetime, then the service dismisses. -->
       <span class="toast__timer" aria-hidden="true" [style.animation-duration.ms]="toast.durationMs"></span>

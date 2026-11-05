@@ -65,6 +65,9 @@ public sealed class MongoUserStore : IUserStore
             ["IsActive"] = user.IsActive,
             ["PasswordHash"] = user.PasswordHash,
             ["ServiceTypes"] = new BsonArray(user.ServiceTypes.Select(value => value.ToString())),
+            ["NotifyMedical"] = user.NotifyMedical,
+            ["NotifyBeauty"] = user.NotifyBeauty,
+            ["NotifyFitness"] = user.NotifyFitness,
         };
 
         AddCredential(doc, "MedicalCredentials", user.MedicalCredentials);
@@ -99,6 +102,9 @@ public sealed class MongoUserStore : IUserStore
                 ? ReadString(existing, "PasswordHash") ?? string.Empty
                 : user.PasswordHash,
             ["ServiceTypes"] = new BsonArray(user.ServiceTypes.Select(value => value.ToString())),
+            ["NotifyMedical"] = user.NotifyMedical,
+            ["NotifyBeauty"] = user.NotifyBeauty,
+            ["NotifyFitness"] = user.NotifyFitness,
         };
 
         AddCredential(replacement, "MedicalCredentials", user.MedicalCredentials);
@@ -140,6 +146,9 @@ public sealed class MongoUserStore : IUserStore
         MedicalCredentials = ReadCredential(d, "MedicalCredentials"),
         BeautyCredentials = ReadCredential(d, "BeautyCredentials"),
         FitnessCredentials = ReadCredential(d, "FitnessCredentials"),
+        NotifyMedical = ReadBool(d, "NotifyMedical", fallback: true),
+        NotifyBeauty = ReadBool(d, "NotifyBeauty", fallback: true),
+        NotifyFitness = ReadBool(d, "NotifyFitness", fallback: true),
         PasswordHash = ReadString(d, "PasswordHash") ?? string.Empty,
     };
 
