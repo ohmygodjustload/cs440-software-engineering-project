@@ -29,17 +29,21 @@ function formatWhen(iso: string | null | undefined): string {
   if (!iso) {
     return '';
   }
-  const time = Date.parse(iso);
-  if (Number.isNaN(time)) {
+
+  const timestamp = Date.parse(iso);
+
+  if (Number.isNaN(timestamp)) {
     return '';
   }
+
   try {
-    return new Intl.DateTimeFormat(undefined, {
+    return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
-      minute: '2-digit'
-    }).format(new Date(iso));
+      minute: '2-digit',
+      hour12: true
+    }).format(new Date(timestamp));
   } catch {
     return '';
   }

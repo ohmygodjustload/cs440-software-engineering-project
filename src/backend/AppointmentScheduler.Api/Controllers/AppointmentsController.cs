@@ -301,8 +301,8 @@ public sealed class AppointmentsController(
         var changes = ActivityChangeFormatter.Describe(
             ("Title", originalTitle, existing.Title),
             ("Category", originalCategory, existing.Category),
-            ("Start", originalStartDateTime, existing.StartDateTime),
-            ("End", originalEndDateTime, existing.EndDateTime),
+            ("Start", originalStartDateTime, dto.StartDateTimeLocal ?? (object)existing.StartDateTime),
+            ("End", originalEndDateTime, dto.EndDateTimeLocal ?? (object)existing.EndDateTime),
             ("Provider", originalProviderId, existing.ProviderId),
             ("Provider name", originalProviderName, existing.ProviderName),
             ("Location", originalLocation, existing.Location),

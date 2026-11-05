@@ -79,40 +79,101 @@ public sealed class AdminController(
     }
 
     [HttpPut("appointments/{id}")]
-    public ActionResult<Appointment> UpdateAppointment(string id, [FromBody] UpdateAppointmentDto request)
+    public ActionResult<Appointment> UpdateAppointment(
+        string id,
+        [FromBody] UpdateAppointmentDto request)
     {
         var appointment = appointments.GetById(id);
         if (appointment is null) return NotFound();
 
-        var changes = ActivityChangeFormatter.Describe(
-            ("Title", appointment.Title, request.Title?.Trim() ?? appointment.Title),
-            ("Category", appointment.Category, request.Category ?? appointment.Category),
-            ("Start", appointment.StartDateTime, request.StartDateTime ?? appointment.StartDateTime),
-            ("End", appointment.EndDateTime, request.EndDateTime ?? appointment.EndDateTime),
-            ("Provider", appointment.ProviderId, request.ProviderId?.Trim() ?? appointment.ProviderId),
-            ("Provider name", appointment.ProviderName, request.ProviderName?.Trim() ?? appointment.ProviderName),
-            ("Location", appointment.Location, request.Location?.Trim() ?? appointment.Location),
-            ("Notes", appointment.Notes, request.Notes ?? appointment.Notes),
-            ("Status", appointment.Status, request.Status ?? appointment.Status));
         var start = request.StartDateTime ?? appointment.StartDateTime;
         var end = request.EndDateTime ?? appointment.EndDateTime;
-        if (end <= start) return BadRequest("EndDateTime must be after StartDateTime.");
-        if (request.Title is not null && string.IsNullOrWhiteSpace(request.Title))
+
+        if (end <= start)
+            return BadRequest("EndDateTime must be after StartDateTime.");
+
+        if (request.Title is not null &&
+            string.IsNullOrWhiteSpace(request.Title))
+        {
             return BadRequest("Title cannot be empty.");
+        }
 
-        appointment.Title = request.Title?.Trim() ?? appointment.Title;
-        appointment.Category = request.Category ?? appointment.Category;
-        appointment.StartDateTime = start;
-        appointment.EndDateTime = end;
-        appointment.ProviderId = request.ProviderId?.Trim() ?? appointment.ProviderId;
-        appointment.ProviderName = request.ProviderName?.Trim() ?? appointment.ProviderName;
-        appointment.Location = request.Location?.Trim() ?? appointment.Location;
-        appointment.Notes = request.Notes ?? appointment.Notes;
-        appointment.Status = request.Status ?? appointment.Status;
+        TimeZoneInfo displayTimeZone;
 
-        if (!appointments.Update(appointment)) return Conflict("The appointment was modified. Please retry.");
-        notificationService?.OnAppointmentUpdated(appointment.Id, appointment.Category, appointment.Title, currentUser.UserId, changes);
-        activity.Add("APPOINTMENT_UPDATED", ActivityMessage("Appointment updated", appointment.Title, changes), currentUser.UserId, appointment.Id);
+        if (string.IsNullOrWhiteSpace(request.TimeZoneId))
+        {
+            // Compatibility for older clients.
+            // The formatter explicitly labels these values as UTC+00:00.
+            displayTimeZone = TimeZoneInfo.Utc;
+        }
+        else
+        {
+            try
+            {
+                displayTimeZone = TimeZoneInfo.FindSystemTimeZoneById(
+                    request.TimeZoneId.Trim());
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                return BadRequest(
+                    "TimeZoneId is not supported by this server.");
+            }
+            catch (InvalidTimeZoneException)
+            {
+                return BadRequest(
+                    "TimeZoneId is invalid on this server.");
+            }
+        }
+
+        var title = request.Title?.Trim() ?? appointment.Title;
+        var category = request.Category ?? appointment.Category;
+        var providerId = request.ProviderId?.Trim() ?? appointment.ProviderId;
+        var providerName =
+            request.ProviderName?.Trim() ?? appointment.ProviderName;
+        var location = request.Location?.Trim() ?? appointment.Location;
+        var notes = request.Notes ?? appointment.Notes;
+        var status = request.Status ?? appointment.Status;
+
+        // Compare the stored values against the effective new values.
+        // Format both sides in the same explicitly selected time zone.
+        var changes = ActivityChangeFormatter.DescribeInTimeZone(
+            displayTimeZone,
+            ("Title", appointment.Title, title),
+            ("Category", appointment.Category, category),
+            ("Start", appointment.StartDateTime, start),
+            ("End", appointment.EndDateTime, end),
+            ("Provider", appointment.ProviderId, providerId),
+            ("Provider name", appointment.ProviderName, providerName),
+            ("Location", appointment.Location, location),
+            ("Notes", appointment.Notes, notes),
+            ("Status", appointment.Status, status));
+
+        appointment.Title = title;
+        appointment.Category = category;
+        appointment.StartDateTime = start.ToUniversalTime();
+        appointment.EndDateTime = end.ToUniversalTime();
+        appointment.ProviderId = providerId;
+        appointment.ProviderName = providerName;
+        appointment.Location = location;
+        appointment.Notes = notes;
+        appointment.Status = status;
+
+        if (!appointments.Update(appointment))
+            return Conflict("The appointment was modified. Please retry.");
+
+        notificationService?.OnAppointmentUpdated(
+            appointment.Id,
+            appointment.Category,
+            appointment.Title,
+            currentUser.UserId,
+            changes);
+
+        activity.Add(
+            "APPOINTMENT_UPDATED",
+            ActivityMessage("Appointment updated", appointment.Title, changes),
+            currentUser.UserId,
+            appointment.Id);
+
         return Ok(appointment);
     }
 
