@@ -1,18 +1,18 @@
 # BAAAM design system (as implemented)
 
-Documented from the existing CSS for Document 3 (BAAAM-44 / BAAAM-97). Values are taken from the stylesheets; nothing here invents a new look.
+The design system the Angular frontend actually uses, documented from its CSS for Document 3 (BAAAM-44 / BAAAM-97). Nothing here is a proposal except the last section.
 
-**Sources**
+**Sources** (as of Nov 5, 2026)
 
-- Global: [`src/frontend/src/styles.css`](../src/frontend/src/styles.css)
-- Fonts link: [`src/frontend/src/index.html`](../src/frontend/src/index.html)
-- 21 component stylesheets under `src/frontend/src/app/**/*.css` (signup-provider reuses `signup.component.css`)
+- Global stylesheet: [`src/frontend/src/styles.css`](../src/frontend/src/styles.css)
+- Font loading: [`src/frontend/src/index.html`](../src/frontend/src/index.html)
+- 24 component stylesheets under `src/frontend/src/app/**/*.css`. The signup-provider page has no stylesheet of its own; it reuses `signup.component.css`.
 
-Counts below were produced by scanning those files (hex literals, media queries, font/spacing properties).
+All counts come from scanning those files. A "count" is the number of declarations (or hex literals) with that exact value.
 
-## Design tokens — defined, not yet adopted
+## Global design tokens: defined, not yet adopted
 
-[`styles.css`](../src/frontend/src/styles.css) defines these on `:root`:
+`styles.css` defines these tokens on `:root`:
 
 | Token | Value |
 | --- | --- |
@@ -25,261 +25,236 @@ Counts below were produced by scanning those files (hex literals, media queries,
 | `--radius` | `8px` |
 | `--display` | `block` |
 
-**Adoption status: defined, not yet adopted.**
+Status: **defined, not yet adopted.** Only the `body` rule in `styles.css` uses them (`--color-ink` and `--color-surface-muted`). No component stylesheet references any `--color-*` token or `--radius`. Components hard-code their colors instead: **380 hex literals across the 24 component files** (386 including the six in `styles.css`).
 
-- Only `body` in `styles.css` references `var(--color-ink)` and `var(--color-surface-muted)`.
-- No component CSS file uses `var(--color-*)` or `var(--radius)`.
-- Component styles hard-code colors instead: **288** hex literals across the 21 app CSS files (**294** including the six token values in `styles.css`).
-
-### Hex literals per file
-
-| File | Hex count |
+| Component stylesheet | Hex literals |
 | --- | ---: |
-| `pages/notifications/notifications.component.css` | 33 |
-| `pages/settings/settings.component.css` | 32 |
-| `pages/book-appointment/book-appointment.component.css` | 32 |
-| `app.component.css` | 23 |
-| `pages/requests/requests.component.css` | 19 |
-| `pages/calendar/calendar.component.css` | 16 |
-| `pages/statistics/statistics.component.css` | 15 |
-| `pages/home-provider/home-provider.component.css` | 15 |
-| `pages/create-slots/create-slots.component.css` | 14 |
-| `pages/confirmation/confirmation.component.css` | 14 |
-| `pages/home-admin/home-admin.component.css` | 12 |
-| `shared/notification-popup/notification-popup.component.css` | 12 |
-| `pages/appointments/appointments.component.css` | 10 |
-| `pages/home/home.component.css` | 10 |
-| `pages/review-request/review-request.component.css` | 9 |
-| `pages/signup/signup.component.css` | 7 |
-| `styles.css` | 6 |
-| `pages/login/login.component.css` | 5 |
-| `core/components/loading/loading.component.css` | 3 |
-| `pages/signup-selection/signup-selection.component.css` | 3 |
-| `pages/appointments-admin/appointments-admin.component.css` | 2 |
-| `pages/accounts/accounts.component.css` | 2 |
+| `pages/book-appointment` | 34 |
+| `pages/notifications` | 33 |
+| `pages/settings` | 32 |
+| `pages/appointments-admin` | 26 |
+| `pages/activity` | 24 |
+| `pages/edit-account` | 23 |
+| `app.component.css` (shell) | 23 |
+| `pages/requests` | 19 |
+| `pages/accounts` | 16 |
+| `pages/calendar` | 16 |
+| `pages/statistics` | 15 |
+| `pages/home-provider` | 15 |
+| `pages/create-slots` | 14 |
+| `pages/confirmation` | 14 |
+| `shared/notification-popup` | 12 |
+| `pages/home-admin` | 12 |
+| `pages/edit-appointment-admin` | 11 |
+| `pages/home` | 10 |
+| `pages/review-request` | 9 |
+| `pages/signup` | 7 |
+| `pages/login` | 5 |
+| `pages/appointments` | 4 |
+| `pages/signup-selection` | 3 |
+| `core/components/loading` | 3 |
 
-## Local token sets (page-scoped)
+## Page-scoped tokens
 
-Several pages define their own CSS variables instead of using the global tokens. These repeat a second, warm palette that differs from the blue-gray `:root` set.
+Six stylesheets define their own variables instead of using the global ones. Five of them repeat the same three warm values (`#f7f5f1`, `#344945`, `#e0dcd1`) under different names.
 
-### Login — `login.component.css`
-
-| Token | Value |
+| Stylesheet | Tokens |
 | --- | --- |
-| `--login-background` | `#f7f5f1` |
-| `--login-foreground` | `#344945` |
-| `--login-border` | `#e0dcd1` |
-| `--login-font` | `"Inter", sans-serif` |
-| `--login-input-radius` | `14px` |
-| `--login-panel-radius` | `24px` |
-| `--login-button-radius` | `999px` |
-
-### Signup / signup-selection — `signup.component.css`, `signup-selection.component.css`
-
-| Token | Value |
-| --- | --- |
-| `--signup-background` | `#f7f5f1` |
-| `--signup-foreground` | `#344945` |
-| `--signup-border` | `#e0dcd1` |
-| `--signup-font` | `"Inter", sans-serif` |
-
-Signup-provider reuses `signup.component.css` (no separate stylesheet).
-
-### Book appointment — `book-appointment.component.css`
-
-| Token | Value |
-| --- | --- |
-| `--booking-ink` | `#344945` |
-| `--booking-paper` | `#f7f5f1` |
-| `--booking-soft` | `#e0dcd1` |
-| `--booking-active` | `#d5e3e8` |
-
-### Review request — `review-request.component.css`
-
-| Token | Value |
-| --- | --- |
-| `--paper` | `#f7f5f1` |
-| `--ink` | `#344945` |
-| `--blue` | `#d5e3e8` |
-| `--fitness` | `#e4e3bc` |
-| `--soft` | `#e0dcd1` |
-
-### Toasts — `notification-popup.component.css`
-
-| Token | Default / variants |
-| --- | --- |
-| `--toast-accent` | `#4c8a5c` (default / success); `#1f6feb` (info); `#b7791f` (reminder) |
+| `login` | `--login-background #f7f5f1`, `--login-foreground #344945`, `--login-border #e0dcd1`, `--login-font "Inter"`, `--login-input-radius 14px`, `--login-panel-radius 24px`, `--login-button-radius 999px` |
+| `signup`, `signup-selection` (identical) | `--signup-background #f7f5f1`, `--signup-foreground #344945`, `--signup-border #e0dcd1`, `--signup-font "Inter"` |
+| `appointments` | `--appointments-paper #f7f5f1`, `--appointments-ink #344945`, `--appointments-soft #e0dcd1` |
+| `review-request` | `--paper #f7f5f1`, `--ink #344945`, `--blue #d5e3e8`, `--fitness #e4e3bc`, `--soft #e0dcd1` |
+| `notification-popup` | `--toast-accent`: `#4c8a5c` (default and success), `#1f6feb` (info), `#b7791f` (reminder) |
 
 ## Color palette in use
 
-Most frequent hex literals across all CSS (exact occurrence counts):
+The app's real palette is a warm "paper and ink" set, not the blue-gray global tokens. Most-used values across all CSS:
 
-| Hex | Count | Typical role |
+| Hex | Count | Where it's used |
 | --- | ---: | --- |
-| `#344945` | 42 | Primary text / ink (warm palette) |
-| `#f7f5f1` | 29 | Paper / page background |
-| `#344b48` | 25 | Text / chrome (shell, toasts) |
-| `#e0dcd1` | 22 | Soft border |
-| `#d5e3e8` | 16 | Active / accent wash (blue-gray) |
-| `#526460` | 13 | Muted text |
-| `#e4e3bc` | 12 | Category / fitness wash |
-| `#344f4b` | 11 | Dark accent / spinner |
-| `#fff` / `#ffffff` | 9+ | Surfaces |
-| `#1f6feb` | 7 | Brand blue (token + toast info) |
-| `#fbeceb` | 7 | Soft error / reject wash |
-| `#faf9f6` | 7 | Header background |
-| `#dedbd2` | 5 | Nav / chrome border |
-| `#4c8a5c` | 4 | Success |
-| `#8a3636` / `#9a3412` / `#7a2222` | several | Error / danger text |
+| `#344945` | 69 | Ink: text color in 14 stylesheets, fill for primary buttons (19 backgrounds), and the value behind `--*-foreground` / `--ink` |
+| `#f7f5f1` | 49 | Paper: page and panel backgrounds, text on dark buttons, the nav pill |
+| `#e0dcd1` | 43 | Soft: borders and secondary button fill |
+| `#344b48` | 24 | Shell text (brand, nav links) and toast text |
+| `#d5e3e8` | 15 | Pale blue accent (`--blue` in review-request) |
+| `#526460` | 13 | Muted text (loading label, toast message, notifications status) |
+| `#344f4b` | 11 | Dark control color (loading spinner, settings Save, notification toggle) |
+| `#e4e3bc` | 10 | Fitness category tint (`--fitness`) |
+| `#faf9f6` | 6 | Header background |
+| `#dce9ed` | 4 | Active nav link |
+| `#1f6feb` | 7 | Global brand token, info toast accent, focus outlines on notifications |
 
-**Two palettes coexist:** the unused global blue-gray tokens (`#1f6feb`, `#1f2933`, `#f4f7fb`, …) and the widely used warm paper palette (`#f7f5f1`, `#344945`, `#e0dcd1`, `#d5e3e8`).
+Status colors:
+
+| Purpose | Values |
+| --- | --- |
+| Error text | `#9a3412` (signup and login), `#7a2222` (alerts), `#9c2b2b` (settings and notifications field errors) |
+| Error background and border | `#fdecec` with border `#c04949` (alerts), `#fbeaea` (create-slots and edit-appointment-admin error box) |
+| Success | Background `#e7f3ea`, border `#4c8a5c`, text `#234d2e` (alerts); `#4c8a5c` success toast |
+| Reminder | `#b7791f` reminder toast accent |
 
 ## Typography
 
-### Font families
+**Font families**
 
-| Context | Stack |
+| Font stack | Used by |
 | --- | --- |
-| Global `body` (`styles.css`) | `"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif` |
-| Inter (Google Fonts in `index.html`, weights **400** and **500** only) | Used by login, signup, signup-selection (`var(--*-font)`), review-request, and confirmation |
+| `"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif` | Global default (`body` in `styles.css`), so every page that doesn't set its own |
+| `Inter` (loaded from Google Fonts at weights **400 and 500 only**) | login, signup, signup-selection, signup-provider, review-request, confirmation |
+| `system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif` | accounts, activity, appointments-admin (set on `:host`) |
+| `"Inter:Medium", Inter, Arial, sans-serif` | One dark pill button each in activity and appointments-admin. `"Inter:Medium"` is not a real font name (it looks copied from a design tool), so browsers skip it and use `Inter`. |
 
-### Font sizes in use (declaration counts)
+**Font sizes** (declaration counts)
 
-| Size | Count | Size | Count |
-| --- | ---: | --- | ---: |
-| 14px | 53 | 13px | 50 |
-| 12px | 20 | 15px | 15 |
-| 32px | 14 | 11px | 10 |
-| 20px | 7 | 26px | 6 |
-| 18px | 5 | 30px | 4 |
-| Others (9–48px) | sparse | | |
-
-Body / UI copy clusters around **13–15px**. Display headings commonly use **26–32px** (some 38–48px on auth / hero-like blocks).
-
-### Font weights in use
-
-| Weight | Count |
-| --- | ---: |
-| 500 | 46 |
-| 400 | 15 |
-| 600 | 4 |
-| 700 | 1 |
-
-Inter is loaded only at 400/500; heavier weights fall back to the next available face.
-
-## Spacing and radii
-
-### Common spacing
-
-| Pattern | Approx. count | Notes |
+| Size | Count | Examples |
 | --- | ---: | --- |
-| `gap: 12px` / `16px` / `24px` | 18 / 17 / 12 | Dominant flex/grid gaps |
-| `gap: 4px` / `8px` | 10 each | Tight clusters |
-| `padding: 24px` / `20px` | 10 / 9 | Page and card padding |
-| `padding: 12px 16px` / `14px 24px` | several | Buttons and controls |
+| 14px | 60 | `.primary` buttons, settings inputs, toast titles |
+| 13px | 55 | Nav links, account chip, loading label, toast messages |
+| 12px | 26 | Settings hints and field errors |
+| 15px | 14 | |
+| 32px | 15 | Page titles: mostly `h1`, plus the login, signup, and signup-selection titles |
+| 20px | 8 | Brand name in the header |
+| 26px, 28px, 30px | 5, 4, 3 | |
+| 38px to 48px | 8 in total | |
+| 10px, 11px | 4, 5 | |
 
-There is no shared spacing scale token; values are hard-coded per component.
+There is no type scale: 21 different sizes appear, from 10px to 48px. Body copy sits at 13px to 15px.
 
-### Border radii in use
+**Font weights:** 500 (62 declarations), 400 (18), 600 (5), 700 (1). Inter is only loaded at 400 and 500, so a 600 or 700 rule on an Inter page is faked by the browser.
 
-| Value | Count | Role |
+## Spacing and corner radius
+
+Spacing mostly follows a 4px grid. There are no spacing tokens.
+
+| Property | Most common values (count) |
+| --- | --- |
+| `gap` | 12px (27), 16px (24), 24px (19), 8px (18), 4px (16), 10px (12), 20px (9) |
+| `padding` | 20px (10), 24px (9), 14px 20px (8), 24px 18px (7), 12px 16px (6); buttons use 14px 24px or 12px 24px |
+
+Off-grid values also appear (10px, 14px, 18px, 5px).
+
+| `border-radius` | Count | Used for |
 | --- | ---: | --- |
-| `999px` | 37 | Pills (nav, many buttons) |
-| `24px` | 23 | Large panels / cards |
-| `16px` | 12 | Cards / sections |
-| `12px` | 8 | Toasts, smaller cards |
-| `14px` | 4 | Login inputs (also `--login-input-radius`) |
-| `50%` | 4 | Avatars / spinner |
-| Global `--radius: 8px` | — | Defined but almost unused (1 hard-coded `8px` elsewhere) |
+| 999px | 54 | Pill shape: buttons, nav, toggles |
+| 24px | 28 | Large panels and auth cards |
+| 16px | 12 | Cards |
+| 12px | 10 | Toasts, notification panels, error boxes |
+| 28px, 18px, 20px | 9, 7, 4 | Other card and panel variants |
+| 50% | 5 | Circles: spinner, today marker, toggle knob, unread dot, icon buttons |
+| 8px (the `--radius` token value) | 1 | Only one hard-coded use; the token itself is never used |
 
 ## Shared UI pieces
 
-There is no single shared component library for buttons or cards. Patterns are copied (and slightly varied) per page.
+There is no shared button, form, or card component. Each page styles its own copies, which mostly agree on colors but differ in class names and sizes.
 
-### App shell — `app.component.css`
+### App shell (`app.component.css`)
 
-- Header (`.app-header`, provider variant `.app-header--provider`), brand (`.app-brand`), centered pill nav (`.app-nav`, `.app-nav__list`, `.app-nav__link`, `--active`), account chip and sign-out.
-- Warm chrome colors (`#faf9f6`, `#f7f5f1`, `#344b48`, `#dedbd2`, `#dce9ed`).
-- Breakpoints at **1150px** and **650px**; respects `prefers-reduced-motion`.
+- Header with the brand name (`.app-brand`, 20px), a centered pill nav (`.app-nav__list`, `#f7f5f1` with `#dedbd2` border), pill links (`.app-nav__link`, 13px; hover `#f0efea`; active `#dce9ed`), an account chip, and Sign out.
+- A provider variant (`.app-header--provider`).
+- Hidden on login and the signup pages, which use a full-page layout.
 
 ### Buttons
 
-| Class | Where defined | Notes |
+| Style | Class names | Pages |
 | --- | --- | --- |
-| `.primary` | home, home-admin, home-provider, appointments, requests, review-request, create-slots | Pill / filled CTA; colors differ slightly per page |
-| `.secondary` | create-slots | Outline / quiet action next to `.primary` |
-| `.primary-button` / `.secondary-button` | book-appointment | Separate naming; rules appear more than once in that file |
-| `.action-button` | review-request | Used with return / dialog actions |
-| `.danger-button` | book-appointment | Destructive variant in the booking flow |
+| Primary: ink fill `#344945`, paper text `#f7f5f1`, pill | `.primary` | home, home-admin, requests, review-request, home-provider, create-slots, edit-appointment-admin, appointments (uses `--appointments-ink`) |
+| Primary (different name) | `.primary-button` (min-height 44px) | book-appointment |
+| Primary (different name) | `.primary-action` | edit-account |
+| Primary (different name) | `.confirmation-prompt__button--confirm` | confirmation |
+| Secondary: `#e0dcd1` fill or `#e0dcd1` border | `.secondary`, `.secondary-button`, `.secondary-action`, `.confirmation-prompt__button--back` | create-slots, edit-appointment-admin, book-appointment, edit-account, confirmation |
+| Outline / destructive | `.danger` (transparent with ink border), `.confirmation-prompt__button--reject` | appointments, confirmation |
+| Review actions | `.action-button` with `.approve` (filled) | review-request |
+| Text link button | `.text-button` | book-appointment |
+| Dark save button | `.settings-save` (`#344f4b` fill, white text) | settings |
+| Dark pill in the page header | Unnamed rule with `#344945` fill and the `"Inter:Medium"` font | activity, appointments-admin |
+
+The Edit links on accounts and appointments-admin have `class="primary"` in the HTML, but those stylesheets have no `.primary` rule. They are styled by `.account-card a` and `.appointment-card a` instead.
 
 ### Form fields
 
-- Auth pages (login, signup, signup-selection / provider): shared warm panel look, Inter, rounded inputs (`14px` on login).
-- create-slots: `.form-grid`, paired `.primary` / `.secondary`.
-- book-appointment: `.form-actions`, `.form-error`, and booking-local tokens.
-- No global form control class; validation and spacing are local.
+| Pattern | Pages |
+| --- | --- |
+| `.login-field__input`, `.login-password__input` (14px radius via `--login-input-radius`) | login |
+| `.signup-field__input` with `__label`, `__hint`, `__error`; invalid fields get a `#9a3412` border | signup, signup-provider |
+| `.field` with `.field-error` (settings also has `.field-hint`; its inputs use 12px 14px padding, a `#d5d1c6` border, and a white fill) | settings, edit-account |
+| `.form-grid` (edit-account and edit-appointment-admin collapse it to one column at 650px) | create-slots, edit-account, edit-appointment-admin |
+| `.search-field`, `.type-field`, `.time-field`, `.date-field` (filter bars) | accounts, activity, appointments-admin |
 
-### Cards / panels
+### Cards and panels
 
-- Page “card” layouts appear as local classes (e.g. `.card-heading`, `.card-content`, `.card-actions` on appointments / book-appointment).
-- Auth pages use large rounded panels (`24px` / `--login-panel-radius`).
-- Home / admin / provider / requests use section panels with paper backgrounds and soft borders rather than a shared `Card` component.
+| Pattern | Pages |
+| --- | --- |
+| `.signup-card`, `.login-panel` (large rounded auth panels) | signup, signup-selection, login |
+| `.stat-card` (dashboard numbers) | home, home-admin |
+| `.appointment-card` | home, home-provider, appointments-admin, activity |
+| `.request-card`, `.review-card`, `.comments-card` | requests, home-admin, review-request |
+| `.account-card` | accounts |
+| `.upcoming-card` | appointments |
+| `.provider-panel`, `.slots-panel`, `.review-panel`, `.slot-card`, `.confirmation-card` | book-appointment |
+| `.notifications-panel` (white, `#e3ded2` border, 12px radius) | notifications |
 
-### Toasts — `shared/notification-popup`
+### Toasts (`shared/notification-popup`)
 
-- Fixed top-right stack (`.toast-stack`, `.toast`, variants `--success` / `--info` / `--reminder`, leave animation `.toast--leaving`).
-- Accent via `--toast-accent`; body text `#344b48` / `#526460`.
-- Mobile tweak at **480px**; `prefers-reduced-motion` supported.
+- A fixed stack in the top-right corner (`.toast-stack`, up to 360px wide).
+- Each toast is a white card with a 4px colored left border from `--toast-accent`: success `#4c8a5c`, info `#1f6feb`, reminder `#b7791f`.
+- It has a close button, a timer bar, and slide-in / slide-out animations (`.toast--leaving`, 350ms).
+- Adjusts at 480px and turns off motion when the user prefers reduced motion.
 
-### Loading — `core/components/loading`
+### Loading indicator (`core/components/loading`)
 
-- Inline spinner (`.loading__spinner`): 15px ring, `#c7d3d1` / `#344f4b`, muted label `#526460`.
-- Pages may override host spacing/color; `prefers-reduced-motion` disables spin.
+- An inline 15px ring spinner (`#c7d3d1` track, `#344f4b` moving segment) with a 13px muted label (`#526460`).
+- Stops spinning when the user prefers reduced motion.
 
-### Confirmation dialog — `confirmation.component.css`
+### Inline alerts
 
-- Standalone route exists, but the component is also embedded from review-request.
-- Uses Inter; no width media queries (not responsive).
+- Error and success banners with a 3px left border: `.settings-alert--error/--success` and `.notifications-alert--error/--success`.
+- Colors are listed under Status colors above.
+
+### Confirmation dialog (`pages/confirmation`)
+
+- A dialog with confirm, reject, and back buttons, used inside review-request.
+- It uses Inter and has no width media queries.
 
 ## Responsive breakpoints
 
-**11 distinct widths** appear in `@media` rules: **380, 480, 600, 620, 650, 700, 760, 800, 900/901, 1050, 1150px**. **760px is the most common** (8 queries).
+All breakpoints are `max-width` except one range on login. Thirteen distinct widths are in use: 380, 480, 560, 600, 620, 650, 700, 760, 800, 860, 900 (with 901 as the start of a range), 980, and 1150px. **650px and 760px are the most common, with 6 queries each.**
 
-| File | Breakpoint(s) |
+| Stylesheet | Breakpoints |
 | --- | --- |
-| `app.component.css` | max 1150px, max 650px |
-| `login.component.css` | 901–1150px, max 900px, max 380px |
-| `book-appointment.component.css` | max 1050px, max 760px (twice) |
-| `notifications.component.css` | max 800px |
-| `settings.component.css` | max 800px |
-| `home.component.css` | max 760px |
-| `home-admin.component.css` | max 760px |
-| `appointments.component.css` | max 760px |
-| `requests.component.css` | max 760px |
-| `review-request.component.css` | max 760px |
-| `statistics.component.css` | max 760px |
-| `home-provider.component.css` | max 700px |
-| `create-slots.component.css` | max 650px |
-| `signup.component.css` | max 620px |
-| `signup-selection.component.css` | max 620px |
-| `calendar.component.css` | max 600px |
-| `notification-popup.component.css` | max 480px |
+| `app.component.css` (shell) | 1150px, 650px |
+| `login` | 901px to 1150px, 900px, 380px |
+| `book-appointment` | 980px, 860px, 700px, 560px |
+| `notifications` | 800px |
+| `settings` | 800px |
+| `home` | 760px |
+| `home-admin` | 760px |
+| `appointments` | 760px |
+| `requests` | 760px |
+| `review-request` | 760px |
+| `statistics` | 760px |
+| `home-provider` | 700px |
+| `activity` | 700px |
+| `create-slots` | 650px |
+| `edit-account` | 650px |
+| `edit-appointment-admin` | 650px |
+| `accounts` | 650px |
+| `appointments-admin` | 650px |
+| `signup` (and signup-provider) | 620px |
+| `signup-selection` | 620px |
+| `calendar` | 600px |
+| `notification-popup` | 480px |
 
-### Pages with no media queries (not responsive)
+**Not responsive:** the confirmation page (`confirmation.component.css`) has no width media queries. The loading component has none either, but it is a small inline element.
 
-- `accounts.component.css`
-- `appointments-admin.component.css`
-- `confirmation.component.css`
+Earlier versions of the app also had no media queries on accounts and appointments-admin. Both got a 650px breakpoint with BAAAM-148.
 
-### Reduced motion
-
-Also honored in: `styles.css` (view transitions), `app.component.css`, `login.component.css`, `signup.component.css`, `signup-selection.component.css`, `settings.component.css`, `notification-popup.component.css`, `loading.component.css`.
+**Reduced motion:** `styles.css` (page transitions), `app.component.css`, `login`, `signup`, `signup-selection`, `settings`, `notification-popup`, and `loading` turn off animations when the user's OS asks for reduced motion.
 
 ## Gaps and recommendations
 
-1. **Adopt the `:root` tokens** (or replace them with the warm palette actually used) so components stop hard-coding ~288 hex values.
-2. **Pick one palette** — either the global blue-gray tokens or the warm paper set (`#f7f5f1` / `#344945` / `#e0dcd1`) — and delete the unused set.
-3. **Standardize breakpoints** to 2–3 widths (for example 760px + 1150px) instead of 11 ad-hoc widths.
-4. **Extract shared button / form / card classes** (or Angular shared components) so `.primary` and `.primary-button` do not diverge page by page.
-5. **Add media queries** for accounts, appointments-admin, and confirmation, or document them as desktop-only intentionally.
-6. **Align typography:** Inter is loaded at 400/500 while many rules use weight 500/600; either load 600 or stay at 500.
+1. **Adopt one set of tokens.** Either point the `:root` tokens at the warm palette the app really uses (`#344945`, `#f7f5f1`, `#e0dcd1`) or drop them, then replace the 380 hard-coded hex literals with `var()` references.
+2. **Merge the duplicate page-scoped tokens.** `--login-*`, `--signup-*`, `--appointments-*`, and review-request's `--paper` / `--ink` / `--soft` define the same three colors five times over.
+3. **Standardize breakpoints** on two or three widths (for example 650px and 1150px, plus 760px if needed) instead of thirteen.
+4. **Share button, form, and card styles.** One `.primary` / `.secondary` style (or shared Angular components) would replace `.primary-button`, `.primary-action`, and the confirmation button classes.
+5. **Make the confirmation dialog responsive.**
+6. **Fix the font setup.** Load Inter at 600 if it's needed, settle on one font stack (three are in use), and replace `"Inter:Medium"` with `Inter` plus `font-weight: 500`.
