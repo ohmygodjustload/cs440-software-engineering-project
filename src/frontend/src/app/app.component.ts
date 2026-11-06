@@ -43,7 +43,8 @@ const ADMIN_NAV: readonly NavLink[] = [
   { label: 'Home', path: '/home-admin' },
   { label: 'Requests', path: '/requests' },
   { label: 'Accounts', path: '/accounts' },
-  { label: 'Appointments', path: '/appointments-admin' }
+  { label: 'Appointments', path: '/appointments-admin' },
+  { label: 'Activity', path: '/activity' }
 ];
 const PROVIDER_NAV: readonly NavLink[] = [
   { label: 'Home', path: '/home-provider' },
