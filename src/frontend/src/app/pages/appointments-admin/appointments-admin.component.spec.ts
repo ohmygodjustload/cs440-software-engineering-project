@@ -48,5 +48,12 @@ describe('AppointmentsAdminComponent', () => {
     expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1']);
     component.searchForm.patchValue({ search: '', appointmentType: 'Fitness' });
     expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['2']);
+    // Filter by status
+    component.searchForm.patchValue({ appointmentType: 'Booked' });
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1']);
+    component.searchForm.patchValue({ appointmentType: 'Available' });
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['2']);
+    component.searchForm.patchValue({ appointmentType: 'all' });
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1', '2']);
   });
 });

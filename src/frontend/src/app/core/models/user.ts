@@ -40,4 +40,10 @@ export interface User {
   isActive?: boolean;
   /** Provider service categories, when applicable. */
   serviceTypes?: string[] | null;
+  /** Whether the user wants Medical-category notifications. */
+  notifyMedical?: boolean;
+  /** Whether the user wants Beauty-category notifications. */
+  notifyBeauty?: boolean;
+  /** Whether the user wants Fitness-category notifications. */
+  notifyFitness?: boolean;
 }

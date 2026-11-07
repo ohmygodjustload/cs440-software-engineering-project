@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Appointment, AppointmentCategory } from '../../core/models/appointment';
+import { Appointment, AppointmentCategory, AppointmentStatus } from '../../core/models/appointment';
 import { User } from '../../core/models/user';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
 
@@ -23,6 +23,8 @@ export class AppointmentsAdminComponent implements OnInit {
   error: string | null = null;
   readonly expandedAppointments = new Set<string>();
   readonly categories: readonly AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
+  /** Statuses that the admin can filter the appointment list by. */
+  readonly statuses: readonly AppointmentStatus[] = ['Booked', 'Available'];
   readonly searchForm = new FormGroup({
     search: new FormControl('', { nonNullable: true }),
     appointmentType: new FormControl('all', { nonNullable: true }),
@@ -67,8 +69,13 @@ export class AppointmentsAdminComponent implements OnInit {
       const text = `${appointment.title} ${appointment.providerName ?? ''} ${appointment.location ?? ''} ${this.clientName(appointment)}`.toLowerCase();
       const selectedDate = this.searchForm.controls.startDate.value;
       const appointmentDate = appointment.startDateTime.slice(0, 10);
+      const categoryMatch =
+        category === 'all' ||
+        category === 'Booked' && appointment.status === 'Booked' ||
+        category === 'Available' && appointment.status === 'Available' ||
+        appointment.category === category;
       return (!search || text.includes(search)) &&
-        (category === 'all' || appointment.category === category) &&
+        categoryMatch &&
         (!selectedDate || appointmentDate === selectedDate);
     });
   }

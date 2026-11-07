@@ -77,6 +77,14 @@ export class NotificationsComponent implements OnInit {
   markAllReadError: string | null = null;
   markAllReadDone = false;
 
+  /** When true, a banner tells the user to visit the Notifications tab for missed notifications. */
+  missedBannerDismissed = false;
+
+  /** Shown when more than one unread notification exists and the banner hasn't been dismissed. */
+  get showMissedBanner(): boolean {
+    return !this.isAdmin && !this.missedBannerDismissed && this.unreadCount > 1;
+  }
+
   ngOnInit(): void {
     this.loadAll();
   }
@@ -90,12 +98,21 @@ export class NotificationsComponent implements OnInit {
     return this.history.filter((item) => !item.isRead).length;
   }
 
+  get isAdmin(): boolean {
+    return this.currentUser?.isAdmin === true;
+  }
+
   get canMarkAllRead(): boolean {
     return (
       this.historyState === 'loaded' &&
       this.unreadCount > 0 &&
       !this.markAllReadSaving
     );
+  }
+
+  /** Dismisses the missed-notifications banner. */
+  dismissMissedBanner(): void {
+    this.missedBannerDismissed = true;
   }
 
   retryUser(): void {
@@ -293,7 +310,4 @@ export class NotificationsComponent implements OnInit {
     });
   }
 
-
 }
-
-

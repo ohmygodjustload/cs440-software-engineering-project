@@ -8,7 +8,13 @@
 
 import { Routes } from '@angular/router';
 
-import { adminGuard, authGuard, guestGuard, providerGuard } from './core/guards/auth.guard';
+import {
+  adminGuard,
+  authGuard,
+  guestGuard,
+  nonAdminGuard,
+  providerGuard
+} from './core/guards/auth.guard';
 
 /**
  * Application routes. Each page is loaded lazily so the initial bundle only contains the shell
@@ -132,7 +138,7 @@ export const routes: Routes = [
   {
     path: 'notifications',
     title: 'Notifications · BAAAM Scheduling System',
-    canActivate: [authGuard],
+    canActivate: [authGuard, nonAdminGuard],
     loadComponent: () =>
       import('./pages/notifications/notifications.component')
         .then(m => m.NotificationsComponent)
