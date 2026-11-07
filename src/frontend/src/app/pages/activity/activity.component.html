@@ -80,6 +80,17 @@
     </section>
 
     <nav class="activity-pagination" aria-label="Activity log pages">
+      @if (showPrevious) {
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          aria-label="Previous activity log page group"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+      }
+       
       @for (page of pageNumbers; track page) {
         <button
           type="button"
@@ -89,6 +100,17 @@
           (click)="selectPage(page)"
         >
           {{ page }}
+        </button>
+      }
+       
+      @if (showNext) {
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage >= totalPages"
+          aria-label="Next activity log page group"
+        >
+          <span aria-hidden="true">→</span>
         </button>
       }
     </nav>

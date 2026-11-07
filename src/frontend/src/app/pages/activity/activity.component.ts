@@ -100,7 +100,50 @@ export class ActivityComponent implements OnInit {
   }
 
   get pageNumbers(): number[] {
-    return Array.from({ length: this.totalPages }, (_, index) => index + 1);
+    if (this.totalPages <= 10) {
+      return Array.from({ length: this.totalPages }, (_, index) => index + 1);
+    }
+
+    // Calculate the page group window (10 pages at a time)
+    const pageGroupSize = 10;
+    const currentGroup = Math.ceil(this.currentPage / pageGroupSize);
+    const startPage = (currentGroup - 1) * pageGroupSize + 1;
+    const endPage = Math.min(startPage + pageGroupSize - 1, this.totalPages);
+
+    return Array.from({ length: endPage - startPage + 1 }, (_, index) => startPage + index);
+  }
+
+  get showPrevious(): boolean {
+    if (this.totalPages <= 10) return false;
+    const pageGroupSize = 10;
+    const currentGroup = Math.ceil(this.currentPage / pageGroupSize);
+    return currentGroup > 1;
+  }
+
+  get showNext(): boolean {
+    if (this.totalPages <= 10) return false;
+    const pageGroupSize = 10;
+    const currentGroup = Math.ceil(this.currentPage / pageGroupSize);
+    const startPage = (currentGroup - 1) * pageGroupSize + 1;
+    return startPage + pageGroupSize < this.totalPages;
+  }
+
+  previousPage(): void {
+    if (this.showPrevious) {
+      const pageGroupSize = 10;
+      const currentGroup = Math.ceil(this.currentPage / pageGroupSize);
+      const newGroup = currentGroup - 1;
+      this.currentPage = Math.max((newGroup - 1) * pageGroupSize + 1, 1);
+    }
+  }
+
+  nextPage(): void {
+    if (this.showNext) {
+      const pageGroupSize = 10;
+      const currentGroup = Math.ceil(this.currentPage / pageGroupSize);
+      const newGroup = currentGroup + 1;
+      this.currentPage = Math.min((newGroup - 1) * pageGroupSize + 1, this.totalPages);
+    }
   }
 
   get paginatedEntries(): ActivityEntry[] {
