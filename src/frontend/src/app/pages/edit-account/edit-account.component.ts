@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { User } from '../../core/models/user';
+import { ToastService } from '../../core/services/toast.service';
 import { fieldErrorMessage } from '../../core/validation/field-error';
 
 @Component({
@@ -28,7 +29,8 @@ export class EditAccountComponent implements OnInit {
   loading = true;
   saving = false;
   error: string | null = null;
-  success = '';
+
+  private readonly toastService = inject(ToastService);
 
   ngOnInit(): void {
     const id = this.route.snapshot.queryParamMap.get('id');
@@ -64,9 +66,14 @@ export class EditAccountComponent implements OnInit {
     this.http.put<User>(`/api/admin/accounts/${encodeURIComponent(this.account.id)}`, this.form.getRawValue()).subscribe({
       next: (account) => {
         this.account = account;
-        this.success = 'Account Information has been Sucessfully Updated!';
         this.saving = false;
         this.form.markAsPristine();
+        this.toastService.show({
+          title: 'Account updated',
+          message: 'Account Information has been Successfully Updated!',
+          variant: 'success',
+          actionUrl: '/accounts'
+        });
       },
       error: () => { this.error = 'Could not save this account.'; this.saving = false; }
     });

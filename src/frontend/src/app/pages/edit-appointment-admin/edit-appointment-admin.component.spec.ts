@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
+import { ToastService } from '../../core/services/toast.service';
 import { Appointment } from '../../core/models/appointment';
 import { EditAppointmentAdminComponent } from './edit-appointment-admin.component';
 
@@ -14,6 +15,7 @@ describe('EditAppointmentAdminComponent', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['show']) },
         { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: new Map([['id', 'a1']]) } } }
       ]
     });
@@ -93,5 +95,23 @@ describe('EditAppointmentAdminComponent', () => {
     expect(buttons.length).toBe(18);
     expect(labels[labels.length - 1]).toBe('5:30 PM');
     expect(labels).toContain('12:00 PM');
+  });
+
+  it('shows a toast notification after saving the appointment', () => {
+    const component = create().componentInstance;
+    const toastService = TestBed.inject(ToastService) as any;
+    component.appointment!.title = 'Updated appointment';
+    component.save();
+
+    const request = TestBed.inject(HttpTestingController).expectOne('/api/admin/appointments/a1');
+    expect(request.request.method).toBe('PUT');
+    request.flush({ ...component.appointment, title: 'Updated appointment' });
+
+    expect(toastService.show).toHaveBeenCalledWith({
+      title: 'Appointment updated',
+      message: 'Appointment saved.',
+      variant: 'success',
+      actionUrl: '/appointments-admin'
+    });
   });
 });

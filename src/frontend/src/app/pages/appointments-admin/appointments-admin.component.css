@@ -41,50 +41,84 @@ h1 {
 
 .search-field {
   display: flex;
-  height: 48px;
   align-items: center;
-  gap: 10px;
-  background: #d9e6ed;
-  border: none;
-  padding: 14px 20px;
-  border-radius: 999px;
+  gap: 12px;
+  height: 48px;
   flex: 1;
-  min-width: 180px;
+  min-width: 0;
+  padding: 14px 20px 14px 18px;
+  border: 1px solid #d4ded6;
+  border-radius: 999px;
+  background: #f0f5f2;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
-.search-field img {
-  opacity: 0.6;
+.search-field:focus-within {
+  border-color: #344945;
+  box-shadow: 0 0 0 3px rgba(52, 73, 69, .15);
+  background: #f7f9f7;
 }
 
 .search-field input {
-  border: none;
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
   background: transparent;
-  outline: none;
-  color: inherit;
+  color: #212c2a;
   font: inherit;
-  width: 100%;
 }
 
 .search-field input::placeholder {
+  color: #7a8a82;
+}
+
+.search-field .search-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
   color: #6a7e7a;
+  opacity: .7;
 }
 
 .type-field {
   display: flex;
   flex: 0 1 240px;
-  min-width: 170px;
+  min-width: 160px;
   height: 48px;
   align-items: center;
   padding: 0;
   border-radius: 999px;
-  background: #d9e6ed;
+  background: #f0f5f2;
+  border: 1px solid #d4ded6;
+  text-align: center;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.type-field:focus-within {
+  border-color: #344945;
+  box-shadow: 0 0 0 3px rgba(52, 73, 69, .15);
+  background: #f7f9f7;
+}
+
+select {
+  color: inherit;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  padding: 0 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  outline: 0;
+  background: transparent;
+  font: inherit;
   text-align: center;
 }
 
 .time-field {
   display: flex;
-  flex: 0 1 240px; 
-  min-width: 240px; 
+  flex: 0 1 240px;
+  min-width: 240px;
   position: relative;
   align-items: center;
   justify-content: center;
@@ -96,11 +130,11 @@ h1 {
   font: inherit;
   width: 100%;
   height: 100%;
-  border: none;
-  padding: 14px 20px;
+  border: 0;
+  padding: 0 20px;
   border-radius: 999px;
   cursor: pointer;
-  background: #e2e8d4;
+  background: #f0f5f2;
   appearance: none;
   -webkit-appearance: none;
   background-repeat: no-repeat;
@@ -119,18 +153,90 @@ h1 {
   cursor: pointer;
 }
 
-select {
-  color: inherit;
-  width: 100%;
-  min-height: 48px;
-  border: none;
-  padding: 14px 20px;
+.date-field {
+  display: flex;
+  flex: 0 1 240px;
+  min-width: 180px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  border: 1px solid #d4ded6;
   border-radius: 999px;
-  cursor: pointer;
-  outline: none;
+  background: #f0f5f2;
+  font-size: 14px;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.date-field:focus-within {
+  border-color: #344945;
+  box-shadow: 0 0 0 3px rgba(52, 73, 69, .15);
+  background: #f7f9f7;
+}
+
+.date-field span {
+  flex: 0 0 auto;
+  color: #52635f;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.date-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
   background: transparent;
+  color: #212c2a;
   font: inherit;
   text-align: center;
+  height: 48px;
+  padding: 0 12px;
+}
+
+.date-field input::-webkit-calendar-picker-indicator {
+  opacity: .35;
+}
+
+.date-filter-empty input {
+  color: inherit;
+}
+
+.date-filter-empty input::-webkit-calendar-picker-indicator {
+  opacity: .5;
+}
+
+.date-placeholder {
+  flex: 1;
+  color: #52635f;
+  font: inherit;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.clear-date {
+  align-self: center;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #e0dcd1;
+  color: #344945;
+  font: inherit;
+  cursor: pointer;
+}
+
+.clear-date:hover {
+  background: #d4d0c6;
+}
+
+.clear-date:focus-visible {
+  outline: 2px solid #344945;
+  outline-offset: 3px;
+}
+
+.clear-date:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+  pointer-events: none;
 }
 
 /* Appointments Stack Layout */
@@ -213,6 +319,7 @@ select {
 .summary-date {
   color: #52635f;
   font-size: 12px;
+  transform: translateX(-10px);
 }
 
 .expand-indicator {
@@ -246,16 +353,16 @@ select {
 
 .date-field {
   display: flex;
-  flex: 0 1 240px;
-  min-width: 180px;
-  height: 48px;
+  flex: 0 1 260px;
+  min-width: 200px;
   align-items: center;
-  justify-content: flex-start;
   gap: 12px;
   padding: 0 20px;
+  border: 1px solid #d4ded6;
   border-radius: 999px;
-  background: #e2e8d4;
+  background: #f0f5f2;
   font-size: 14px;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 
 .date-field span {

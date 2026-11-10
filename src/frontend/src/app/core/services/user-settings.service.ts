@@ -85,5 +85,8 @@ export interface UserSettingsPatch {
   lastName?: string;
   email?: string;
   phone?: string;
+  notifyMedical?: boolean;
+  notifyBeauty?: boolean;
+  notifyFitness?: boolean;
 }
 

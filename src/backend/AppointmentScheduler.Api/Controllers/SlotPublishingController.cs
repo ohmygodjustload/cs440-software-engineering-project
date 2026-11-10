@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using AppointmentScheduler.Api.Data;
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,8 @@ namespace AppointmentScheduler.Api.Controllers;
 public sealed class SlotPublishingController(
     IUserStore users, IProviderStore providers, IAppointmentStore appointments,
     IServiceProvider services, IOptions<MongoDbSettings> options,
-    ILogger<SlotPublishingController> logger) : ControllerBase
+    ILogger<SlotPublishingController> logger,
+    INotificationService? notificationService = null) : ControllerBase
 {
     private static readonly SemaphoreSlim MemoryGate = new(1, 1);
 
@@ -120,7 +122,13 @@ public sealed class SlotPublishingController(
                     Phone = user.Phone
                 });
             }
-            return planned.Select(appointments.AddSlot).ToList();
+            foreach (var slot in planned)
+            {
+                appointments.AddSlot(slot);
+                notificationService?.OnSlotCreated(user.Id, slot.Id, slot.Category, slot.Title);
+            }
+
+            return planned;
         }
         finally { MemoryGate.Release(); }
     }
@@ -221,6 +229,7 @@ public sealed class SlotPublishingController(
                 { "Notes", dto.Notes?.Trim() ?? "" }, { "IsDeleted", false }, { "DeletedAt", BsonNull.Value }
             }, cancellationToken: ct);
                 slot.Id = slotKey.ToString();
+                notificationService?.OnSlotCreated(user.Id, slot.Id, slot.Category, slot.Title);
                 published.Add(slot);
             }
             return published;

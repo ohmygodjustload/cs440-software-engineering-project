@@ -21,8 +21,8 @@ describe('ActivityComponent', () => {
 
   it('loads and filters activity entries', () => {
     http.expectOne('/api/admin/activity').flush([
-      { id: '1', timestamp: '2026-10-30T10:00:00Z', action: 'Updated', message: 'Jane Porter' },
-      { id: '2', timestamp: '2026-10-30T11:00:00Z', action: 'Booked', message: 'Medical appointment' }
+      { id: '1', timestamp: '2026-10-30T10:00:00Z', action: 'Updated', message: 'Jane Porter', isRead: false },
+      { id: '2', timestamp: '2026-10-30T11:00:00Z', action: 'Booked', message: 'Medical appointment', isRead: true }
     ]);
     const component = fixture.componentInstance;
 
@@ -35,18 +35,45 @@ describe('ActivityComponent', () => {
     expect(component.filteredEntries[0].id).toBe('1');
   });
 
-  it('clears activity after confirmation', () => {
-    http.expectOne('/api/admin/activity').flush([
-      { id: '1', timestamp: '2026-10-30T10:00:00Z', action: 'Updated', message: 'Jane Porter' }
-    ]);
-    spyOn(window, 'confirm').and.returnValue(true);
+  it('paginates activity entries in groups of ten', () => {
+    const entries = Array.from({ length: 21 }, (_, index) => ({
+      id: `${index + 1}`,
+      timestamp: '2026-10-30T10:00:00Z',
+      action: 'Updated',
+      message: `Account ${index + 1}`,
+      isRead: true
+    }));
+    http.expectOne('/api/admin/activity').flush(entries);
+    const component = fixture.componentInstance;
 
-    fixture.componentInstance.clearActivity();
+    expect(component.totalPages).toBe(3);
+    expect(component.paginatedEntries.length).toBe(10);
+    expect(component.paginatedEntries[0].id).toBe('1');
 
-    const request = http.expectOne('/api/admin/activity');
-    expect(request.request.method).toBe('DELETE');
-    request.flush(null);
-    expect(fixture.componentInstance.entries).toEqual([]);
-    expect(fixture.componentInstance.filteredEntries).toEqual([]);
+    component.selectPage(2);
+    expect(component.paginatedEntries[0].id).toBe('11');
+    expect(component.paginatedEntries.length).toBe(10);
+
+    component.selectPage(3);
+    expect(component.paginatedEntries[0].id).toBe('21');
+    expect(component.paginatedEntries.length).toBe(1);
+  });
+
+  it('resets pagination when filtering activity', () => {
+    const entries = Array.from({ length: 11 }, (_, index) => ({
+      id: `${index + 1}`,
+      timestamp: '2026-10-30T10:00:00Z',
+      action: 'Updated',
+      message: index === 10 ? 'Jane Porter' : `Account ${index + 1}`,
+      isRead: true
+    }));
+    http.expectOne('/api/admin/activity').flush(entries);
+    const component = fixture.componentInstance;
+    component.selectPage(2);
+
+    component.searchForm.controls.search.setValue('porter');
+
+    expect(component.currentPage).toBe(1);
+    expect(component.paginatedEntries.length).toBe(1);
   });
 });

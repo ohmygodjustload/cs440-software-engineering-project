@@ -17,18 +17,14 @@ public sealed class Appointment {
 
     public AppointmentCategory Category { get; set; }
 
-    /// <summary>Stored as BSON date (UTC) by the driver's DateTimeOffsetSerializer.</summary>
     public DateTimeOffset StartDateTime { get; set; }
 
-    /// <summary>Stored as BSON date (UTC) by the driver's DateTimeOffsetSerializer.</summary>
     public DateTimeOffset EndDateTime { get; set; }
 
-    /// <summary>Service provider (doctor, stylist, trainer, ...). Free-form id for now.</summary>
     public string ProviderId { get; set; } = string.Empty;
 
     public string? ProviderName { get; set; }
 
-    /// <summary>Owner of the appointment. Used later for per-user filtering + auth.</summary>
     public string? UserId { get; set; }
 
     public string? AppointmentTypeId { get; set; }
