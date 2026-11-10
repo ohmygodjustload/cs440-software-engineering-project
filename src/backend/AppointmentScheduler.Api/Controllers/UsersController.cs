@@ -1,4 +1,5 @@
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using AppointmentScheduler.Api.Stores;
 
@@ -12,12 +13,18 @@ public sealed class UsersController : ControllerBase
     private readonly IUserStore _store;
     private readonly INotificationPreferencesStore _preferences;
     private readonly IActivityStore _activity;
+    private readonly INotificationService? _notifications;
 
-    public UsersController(IUserStore store, INotificationPreferencesStore preferences, IActivityStore activity)
+    public UsersController(
+        IUserStore store,
+        INotificationPreferencesStore preferences,
+        IActivityStore activity,
+        INotificationService? notifications = null)
     {
         _store = store;
         _preferences = preferences;
         _activity = activity;
+        _notifications = notifications;
     }
 
     /// <summary>
@@ -59,8 +66,13 @@ public sealed class UsersController : ControllerBase
             return NotFound();
         }
 
-        user.FirstName = request.FirstName ?? user.FirstName;
-        user.LastName = request.LastName ?? user.LastName;
+        var changes = ActivityChangeFormatter.Describe(
+            ("First name", user.FirstName, request.FirstName?.Trim() ?? user.FirstName),
+            ("Last name", user.LastName, request.LastName?.Trim() ?? user.LastName),
+            ("Email", user.Email, NormalizeOptional(request.Email) ?? user.Email),
+            ("Phone", user.Phone, NormalizeOptional(request.Phone) ?? user.Phone));
+        user.FirstName = request.FirstName?.Trim() ?? user.FirstName;
+        user.LastName = request.LastName?.Trim() ?? user.LastName;
         user.Email = NormalizeOptional(request.Email) ?? user.Email;
         user.Phone = NormalizeOptional(request.Phone) ?? user.Phone;
 
@@ -69,7 +81,9 @@ public sealed class UsersController : ControllerBase
             return Conflict("The account was modified by another process. Please retry.");
         }
 
-        _activity.Add("ACCOUNT_UPDATED", $"Account updated: {user.Username}", user.Id, user.Id);
+        var message = $"Account updated: {user.Username}; {ActivityChangeFormatter.Summary(changes)}";
+        _activity.Add("ACCOUNT_UPDATED", message, user.Id, user.Id);
+        _notifications?.OnAccountUpdated(user, user.Id, changes);
         return Ok(user);
     }
 
@@ -117,6 +131,7 @@ public sealed class UsersController : ControllerBase
 
         _preferences.UpsertByUserId(id, prefs);
         _activity.Add("NOTIFICATION_SETTINGS_UPDATED", $"Notification settings updated for {user.Username}", id, id);
+        _notifications?.OnNotificationSettingsUpdated(user);
         return Ok(prefs);
     }
 

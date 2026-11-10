@@ -21,6 +21,8 @@ export interface ToastInput {
   variant?: ToastVariant;
   /** Milliseconds before auto-dismiss. Defaults to 5000. */
   durationMs?: number;
+  /** Optional route opened when the toast is clicked. */
+  actionUrl?: string;
 }
 
 /** A toast that is currently visible (or animating out). */
@@ -35,4 +37,6 @@ export interface Toast extends Required<Pick<ToastInput, 'title'>> {
   durationMs: number;
   /** True while the leave animation plays; the row is removed afterwards. */
   leaving: boolean;
+  /** Optional route opened when the toast is clicked. */
+  actionUrl?: string;
 }

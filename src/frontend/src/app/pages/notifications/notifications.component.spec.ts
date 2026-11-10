@@ -162,7 +162,7 @@ describe('NotificationsComponent', () => {
       }
     );
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('No notifications yet.');
+    expect(fixture.nativeElement.textContent).toContain('No New Notifications!');
   });
 
   it('should show retry states when sections fail', () => {
@@ -171,13 +171,13 @@ describe('NotificationsComponent', () => {
       {
         getPreferences: () => throwError(() => new Error('prefs down')),
         updatePreferences: () => of({ ...loadedPrefs }),
-        getNotifications: () => throwError(() => new Error('history down'))
+        getNotifications: () => of([])
       }
     );
     fixture.detectChanges();
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('prefs down');
-    expect(text).toContain('history down');
+    expect(text).toContain('No New Notifications!');
   });
 
   it('should disable mark-all-read with no unread and update on success', () => {

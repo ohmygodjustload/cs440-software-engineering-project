@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
+import { ToastService } from '../../core/services/toast.service';
 import { User } from '../../core/models/user';
 import { EditAccountComponent } from './edit-account.component';
 
@@ -26,6 +27,7 @@ describe('EditAccountComponent', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
+        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['show']) },
         { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: new Map([['id', 'user-1']]) } } }
       ]
     });
@@ -67,9 +69,15 @@ describe('EditAccountComponent', () => {
     });
     request.flush({ ...account, lastName: 'Updated' });
 
-    expect(component.success).toBe('Account Information has been Sucessfully Updated!');
     expect(component.saving).toBeFalse();
     expect(component.form.pristine).toBeTrue();
+    const toastService = TestBed.inject(ToastService) as any;
+    expect(toastService.show).toHaveBeenCalledWith({
+      title: 'Account updated',
+      message: 'Account Information has been Successfully Updated!',
+      variant: 'success',
+      actionUrl: '/accounts'
+    });
   });
 
   it('rejects invalid account details without saving', () => {

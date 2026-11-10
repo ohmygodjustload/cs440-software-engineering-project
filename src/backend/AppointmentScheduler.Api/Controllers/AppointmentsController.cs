@@ -1,5 +1,6 @@
 using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,7 @@ public sealed class AppointmentsController(
     IProviderStore? providerStore = null,
     ICurrentUser? currentUser = null,
     IUserStore? users = null,
+    INotificationService? notificationService = null,
     IActivityStore? activity = null) : ControllerBase {
     /// <summary>
     /// List appointments with optional filtering and paging.
@@ -137,6 +139,31 @@ public sealed class AppointmentsController(
         };
 
         var created = store.Add(appointment);
+
+        // A provider can be represented by a scheduler Provider id, while notifications
+        // belong to the authenticated User account. Prefer the authenticated provider when
+        // available so appointments created from scratch reach that account's history.
+        var notifyingProviderId = currentUser?.UserId is { } currentProviderId
+            && users?.GetById(currentProviderId) is { IsServiceProvider: true }
+            ? currentProviderId
+            : appointment.ProviderId;
+        if (!string.IsNullOrWhiteSpace(notifyingProviderId))
+        {
+            notificationService?.OnAppointmentCreated(notifyingProviderId, created.Id, appointment.Category, appointment.Title);
+        }
+
+        // If there's a real client (not demo-user), notify both parties about the booking
+        if (!string.IsNullOrWhiteSpace(appointment.UserId) && appointment.UserId != "demo-user")
+        {
+            notificationService?.OnAppointmentBooked(
+                appointment.UserId,
+                notifyingProviderId,
+                created.Id,
+                appointment.Category,
+                appointment.Title,
+                null);
+        }
+
         activity?.Add("APPOINTMENT_CREATED", $"Appointment created: {created.Title}", currentUser?.UserId, created.Id);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
@@ -168,6 +195,16 @@ public sealed class AppointmentsController(
         if (existing is null) {
             return NotFound();
         }
+
+        var originalTitle = existing.Title;
+        var originalCategory = existing.Category;
+        var originalStartDateTime = existing.StartDateTime;
+        var originalEndDateTime = existing.EndDateTime;
+        var originalProviderId = existing.ProviderId;
+        var originalProviderName = existing.ProviderName;
+        var originalLocation = existing.Location;
+        var originalNotes = existing.Notes;
+        var originalStatus = existing.Status;
 
         var startDateTime = dto.StartDateTime ?? existing.StartDateTime;
         var endDateTime = dto.EndDateTime ?? existing.EndDateTime;
@@ -217,15 +254,63 @@ public sealed class AppointmentsController(
             existing.Notes = string.IsNullOrWhiteSpace(dto.Notes) ? null : dto.Notes;
         }
 
+        var oldStatus = existing.Status;
+        var notifyingProviderId = currentUser?.UserId is { } currentProviderId
+            && users?.GetById(currentProviderId) is { IsServiceProvider: true }
+            ? currentProviderId
+            : existing.ProviderId;
+
         if (dto.Status.HasValue) {
             existing.Status = dto.Status.Value;
+        }
+
+        if (dto.Status.HasValue
+            && oldStatus != AppointmentStatus.Canceled
+            && existing.Status == AppointmentStatus.Canceled) {
+            notificationService?.OnAppointmentCancelled(
+                existing.UserId, notifyingProviderId, existing.Id, existing.Category, existing.Title, existing.Notes ?? string.Empty);
+        }
+
+        // NEW: Create notification when appointment status changes to Booked (first creation or booking)
+        var statusChangedToBooked = dto.Status.HasValue && oldStatus != AppointmentStatus.Booked && dto.Status.Value == AppointmentStatus.Booked;
+        if (statusChangedToBooked) {
+            // Provider who owns the appointment - notification about appointment created
+            if (!string.IsNullOrWhiteSpace(existing.ProviderId)) {
+                notificationService?.OnAppointmentCreated(
+                    notifyingProviderId,
+                    existing.Id,
+                    existing.Category,
+                    existing.Title);
+            }
+            // Client who booked - notification about appointment booked
+            if (!string.IsNullOrWhiteSpace(existing.UserId)) {
+                notificationService?.OnAppointmentBooked(
+                    existing.UserId,
+                    notifyingProviderId,
+                    existing.Id,
+                    existing.Category,
+                    existing.Title,
+                    null);
+            }
         }
 
         if (!store.Update(existing)) {
             return Conflict("The appointment was modified by another process. Please retry.");
         }
 
-        activity?.Add("APPOINTMENT_UPDATED", $"Appointment updated: {existing.Title}", currentUser?.UserId, existing.Id);
+        var changes = ActivityChangeFormatter.Describe(
+            ("Title", originalTitle, existing.Title),
+            ("Category", originalCategory, existing.Category),
+            ("Start", originalStartDateTime, dto.StartDateTimeLocal ?? (object)existing.StartDateTime),
+            ("End", originalEndDateTime, dto.EndDateTimeLocal ?? (object)existing.EndDateTime),
+            ("Provider", originalProviderId, existing.ProviderId),
+            ("Provider name", originalProviderName, existing.ProviderName),
+            ("Location", originalLocation, existing.Location),
+            ("Notes", originalNotes, existing.Notes),
+            ("Status", originalStatus, existing.Status));
+        var activityMessage = $"Appointment updated: {existing.Title}; {ActivityChangeFormatter.Summary(changes)}";
+        notificationService?.OnAppointmentUpdated(existing.Id, existing.Category, existing.Title, currentUser?.UserId, changes);
+        activity?.Add("APPOINTMENT_UPDATED", activityMessage, currentUser?.UserId, existing.Id);
         return Ok(existing);
     }
 
@@ -250,6 +335,9 @@ public sealed class AppointmentsController(
         if (existing.Status == AppointmentStatus.Canceled) return NoContent();
         existing.Status = AppointmentStatus.Canceled;
         store.Update(existing);
+
+        notificationService?.OnAppointmentCancelled(
+            existing.UserId, existing.ProviderId, existing.Id, existing.Category, existing.Title, existing.Notes ?? string.Empty);
 
         return NoContent();
     }

@@ -12,6 +12,7 @@ public sealed class ActivityEntry
     public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
     public string Action { get; set; } = string.Empty;
     public string Message { get; set; } = string.Empty;
+    public bool IsRead { get; set; } = true;
     public string? ActorUserId { get; set; }
     public string? EntityId { get; set; }
 }

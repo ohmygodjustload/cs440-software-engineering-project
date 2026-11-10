@@ -19,6 +19,9 @@
         @for (option of categories; track option) {
           <option [value]="option">{{ option }}</option>
         }
+        @for (option of statuses; track option) {
+          <option [value]="option">{{ option }}</option>
+        }
       </select>
     </label>
 

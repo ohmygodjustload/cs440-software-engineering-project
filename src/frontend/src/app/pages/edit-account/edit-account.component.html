@@ -32,7 +32,6 @@
         </label>
       </div>
       @if (error) { <p role="alert">{{ error }}</p> }
-      @if (success) { <p role="status">{{ success }}</p> }
       <div class="actions">
         <button class="primary-action" type="submit" [disabled]="saving || form.pristine"
           [attr.aria-disabled]="saving || form.pristine">Save changes</button>
