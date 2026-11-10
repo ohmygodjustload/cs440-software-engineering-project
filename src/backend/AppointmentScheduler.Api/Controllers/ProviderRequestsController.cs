@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,12 +17,20 @@ public sealed class ProviderRequestsController : ControllerBase
 {
     private readonly IProviderRequestStore _requests;
     private readonly IUserStore _users;
+    private readonly IActivityStore? _activity;
+    private readonly INotificationService? _notifications;
     private readonly AccountModeWorkflow? _accountModes;
 
-    public ProviderRequestsController(IProviderRequestStore requests, IUserStore users, AccountModeWorkflow? accountModes = null)
+    public ProviderRequestsController(
+        IProviderRequestStore requests,
+        IUserStore users, AccountModeWorkflow? accountModes = null,
+        IActivityStore? activity = null,
+        INotificationService? notifications = null)
     {
         _requests = requests;
         _users = users;
+        _activity = activity;
+        _notifications = notifications;
         _accountModes = accountModes;
     }
 
@@ -134,6 +143,10 @@ public sealed class ProviderRequestsController : ControllerBase
             }
         }
 
+        _activity?.Add(approved ? "PROVIDER_APPROVED" : "PROVIDER_REJECTED",
+            $"{(approved ? "Approved" : "Rejected")} provider request for {request.ProviderName}",
+            null, request.Id);
+        _notifications?.OnProviderRequestDecision(request, approved);
         return Ok(request);
     }
 }

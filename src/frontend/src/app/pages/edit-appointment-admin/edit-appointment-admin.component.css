@@ -1,0 +1,108 @@
+:host {
+  display: block;
+  color: #344945;
+}
+
+* { box-sizing: border-box; }
+
+.slot-page {
+  max-width: 980px;
+  margin: 24px auto;
+  padding: 36px 48px;
+  border-radius: 28px;
+  background: #f7f5f1;
+}
+
+h1 { margin: 0 0 10px; font-size: 28px; font-weight: 500; }
+header p { margin-bottom: 30px; }
+h2, label { font-size: 14px; font-weight: 400; }
+h2 { margin: 0 0 14px; }
+label { display: block; margin-bottom: 10px; }
+fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 40px;
+}
+
+.full-width { grid-column: 1 / -1; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d4d0c6;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+textarea { min-height: 100px; resize: vertical; }
+
+.date-options {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 14px;
+}
+
+.date-option, .time-options button {
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.date-option {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 2px;
+}
+
+.date-option span { font-size: 10px; text-transform: uppercase; }
+
+.time-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 6px;
+}
+
+.time-options button { min-height: 42px; }
+.date-options .selected, .time-options .selected {
+  color: #f7f5f1;
+  background: #344945;
+}
+
+.hint { font-size: 12px; line-height: 1.5; }
+.rule {
+  margin: 28px 0;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: #e0dcd1;
+  font-size: 13px;
+}
+
+.actions { display: flex; justify-content: flex-end; gap: 12px; }
+.primary, .secondary {
+  padding: 12px 24px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+.primary { background: #344945; color: #f7f5f1; }
+.secondary { background: #e0dcd1; color: #344945; }
+.error, [role="alert"] { padding: 14px; border-radius: 12px; background: #fbeaea; }
+button:disabled, select:disabled { opacity: .45; cursor: not-allowed; }
+
+button:disabled { pointer-events: none; }
+
+@media (max-width: 650px) {
+  .slot-page { margin: 12px; padding: 24px 18px; }
+  .form-grid { grid-template-columns: 1fr; gap: 24px; }
+  .full-width { grid-column: auto; }
+  .actions { flex-wrap: wrap; }
+}

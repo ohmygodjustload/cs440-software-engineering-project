@@ -25,4 +25,11 @@ export class NotificationPopupComponent {
   dismiss(id: string): void {
     this.toastService.dismiss(id);
   }
+
+  open(toast: { id: string; actionUrl?: string }): void {
+    this.toastService.dismiss(toast.id);
+    if (toast.actionUrl) {
+      void this.toastService.navigate(toast.actionUrl);
+    }
+  }
 }

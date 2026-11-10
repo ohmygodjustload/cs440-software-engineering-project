@@ -1,0 +1,118 @@
+<main class="activity-terminal">
+  <header>
+    <div>
+      <h1>Activity Log</h1>
+      <p>Global feed of account and appointment actions.</p>
+    </div>
+    <button
+      type="button"
+      class="activity-mark-read"
+      [disabled]="markAllReadSaving || unreadCount === 0"
+      (click)="markAllRead()"
+    >
+      {{ markAllReadSaving ? 'Marking…' : 'Mark all as read' }}
+    </button>
+  </header>
+
+  <form class="controls" role="search" [formGroup]="searchForm">
+    <label class="search-field">
+      <span class="visually-hidden">Search activity</span>
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path
+          d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <input
+        type="search"
+        formControlName="search"
+        placeholder="Search activity"
+        aria-label="Search activity log"
+      />
+    </label>
+
+    <label class="date-field" [class.date-filter-empty]="$any(searchForm.controls.startDate).value">
+      <span>Date</span>
+      <input
+        type="date"
+        formControlName="startDate"
+        aria-label="Filter activity by date"
+      />
+      @if (!$any(searchForm.controls.startDate).value) {
+        <span class="date-placeholder" aria-hidden="true">All dates</span>
+      }
+    </label>
+
+    @if ($any(searchForm.controls.startDate).value) {
+      <button class="clear-date" type="button" (click)="clearDateFilter()">
+        Clear date
+      </button>
+    }
+  </form>
+
+  @if (loading) {
+    <app-loading label="Loading activity…"></app-loading>
+  } @else if (error) {
+    <div role="alert"><p>{{ error }}</p><button (click)="loadActivity()">Try again</button></div>
+  } @else {
+    @if (markAllReadError) {
+      <div class="activity-error" role="alert">{{ markAllReadError }}</div>
+    }
+    <section class="activity-list" aria-label="Activity log">
+      <div class="activity-header" aria-hidden="true">
+        <span>Date</span>
+        <span>Notification received</span>
+      </div>
+      @for (entry of paginatedEntries; track entry.id) {
+        <div class="activity-line" [class.activity-line--unread]="!entry.isRead">
+          <time>{{ entry.timestamp | date:'medium' }}</time>
+          <span><strong>{{ entry.action }}</strong> {{ entry.message }}</span>
+        </div>
+      } @empty {
+        <div class="activity-line">
+          <span>No activity found.</span>
+        </div>
+      }
+    </section>
+
+    <nav class="activity-pagination" aria-label="Activity log pages">
+      @if (showPrevious) {
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          aria-label="Previous activity log page group"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
+      }
+       
+      @for (page of pageNumbers; track page) {
+        <button
+          type="button"
+          [class.activity-page--active]="page === currentPage"
+          [attr.aria-current]="page === currentPage ? 'page' : null"
+          [attr.aria-label]="'Show activity log page ' + page"
+          (click)="selectPage(page)"
+        >
+          {{ page }}
+        </button>
+      }
+       
+      @if (showNext) {
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage >= totalPages"
+          aria-label="Next activity log page group"
+        >
+          <span aria-hidden="true">→</span>
+        </button>
+      }
+    </nav>
+  }
+</main>
