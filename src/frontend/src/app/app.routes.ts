@@ -9,7 +9,7 @@
 import { Routes } from '@angular/router';
 import { accountHomeGuard } from './core/guards/account-home.guard';
 
-import { adminGuard, authGuard, guestGuard, providerGuard, homeGuard, enhancedGuard } from './core/guards/auth.guard';
+import { adminGuard, authGuard, guestGuard, providerGuard, homeGuard, enhancedGuard, nonAdminGuard } from './core/guards/auth.guard';
 
 /**
  * Application routes. Each page is loaded lazily so the initial bundle only contains the shell
