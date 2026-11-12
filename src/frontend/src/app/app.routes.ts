@@ -8,7 +8,13 @@
 
 import { Routes } from '@angular/router';
 
-import { adminGuard, authGuard, guestGuard, providerGuard } from './core/guards/auth.guard';
+import {
+  adminGuard,
+  authGuard,
+  guestGuard,
+  nonAdminGuard,
+  providerGuard
+} from './core/guards/auth.guard';
 
 /**
  * Application routes. Each page is loaded lazily so the initial bundle only contains the shell
@@ -101,6 +107,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/accounts/accounts.component').then((m) => m.AccountsComponent)
   },
+    {
+    path: 'edit-account',
+    title: 'Edit Account · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/edit-account/edit-account.component').then((m) => m.EditAccountComponent)
+  },
   {
     path: 'appointments-admin',
     title: 'Appointments · BAAAM Scheduling System',
@@ -109,9 +122,23 @@ export const routes: Routes = [
       import('./pages/appointments-admin/appointments-admin.component').then((m) => m.AppointmentsAdminComponent)
   },
   {
+    path: 'edit-appointment-admin',
+    title: 'Edit Appointment · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/edit-appointment-admin/edit-appointment-admin.component').then((m) => m.EditAppointmentAdminComponent)
+  },
+  {
+    path: 'activity',
+    title: 'Activity · BAAAM Scheduling System',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/activity/activity.component').then((m) => m.ActivityComponent)
+  },
+  {
     path: 'notifications',
     title: 'Notifications · BAAAM Scheduling System',
-    canActivate: [authGuard],
+    canActivate: [authGuard, nonAdminGuard],
     loadComponent: () =>
       import('./pages/notifications/notifications.component')
         .then(m => m.NotificationsComponent)

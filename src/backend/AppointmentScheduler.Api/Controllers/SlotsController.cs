@@ -1,5 +1,6 @@
 using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,8 @@ public sealed class SlotsController(
     IUserStore users,
     IAppointmentTypeStore types,
     ILocationStore locations,
-    ICurrentUser currentUser) : ControllerBase {
+    ICurrentUser currentUser,
+    INotificationService? notificationService = null) : ControllerBase {
     [HttpPost]
     public ActionResult<Appointment> Create([FromBody] CreateSlotDto dto) {
         var check = Validate(dto.AppointmentTypeId!, dto.StartTime!.Value, ignoreSlotId: null);
@@ -21,6 +23,7 @@ public sealed class SlotsController(
 
         var slot = Build(check, id: null);
         var created = appointments.AddSlot(slot);
+        notificationService?.OnSlotCreated(currentUser.UserId!, created.Id, created.Category, created.Title);
         return CreatedAtAction(nameof(GetMine), new { }, created);
     }
 
@@ -121,6 +124,14 @@ public sealed class SlotsController(
         if (!appointments.BookSlot(slot.Id, client.Id, notes)) return Conflict("Slot is no longer available.");
 
         var booked = appointments.GetById(slot.Id);
+        if (booked is not null)
+        {
+            var clientUser = users.GetById(client.Id);
+            notificationService?.OnAppointmentBooked(
+                client.Id, ownerId, booked.Id, booked.Category, booked.Title,
+                clientUser is null ? null : $"{clientUser.FirstName} {clientUser.LastName}");
+        }
+
         return booked is null ? Conflict("Slot is no longer available.") : Ok(Describe(booked, type, provider));
     }
 
@@ -138,7 +149,16 @@ public sealed class SlotsController(
         if (check.Error is not null) return check.Error;
 
         var updated = Build(check, id);
-        return appointments.UpdateSlot(updated) ? Ok(updated) : Conflict("Slot is no longer available.");
+        if (!appointments.UpdateSlot(updated)) return Conflict("Slot is no longer available.");
+        var changes = ActivityChangeFormatter.Describe(
+            ("Title", existing.Title, updated.Title),
+            ("Category", existing.Category, updated.Category),
+            ("Start", existing.StartDateTime, updated.StartDateTime),
+            ("End", existing.EndDateTime, updated.EndDateTime),
+            ("Location", existing.Location, updated.Location),
+            ("Notes", existing.Notes, updated.Notes));
+        notificationService?.OnAppointmentUpdated(updated.Id, updated.Category, updated.Title, currentUser.UserId, changes);
+        return Ok(updated);
     }
 
     [HttpDelete("{id}")]
@@ -150,7 +170,9 @@ public sealed class SlotsController(
         if (existing is null || existing.ProviderId != provider!.Id) return NotFound();
         if (existing.Status != AppointmentStatus.Available) return Conflict("Only Available slots can be deleted.");
 
-        return appointments.SoftDeleteSlot(id) ? NoContent() : Conflict("Slot is no longer available.");
+        if (!appointments.SoftDeleteSlot(id)) return Conflict("Slot is no longer available.");
+        notificationService?.OnAppointmentCancelled(string.Empty, provider!.Id, existing.Id, existing.Category, existing.Title, string.Empty);
+        return NoContent();
     }
 
     // ---------- helpers ----------

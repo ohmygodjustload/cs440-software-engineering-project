@@ -1,9 +1,11 @@
+using System;
 using System.ComponentModel.DataAnnotations;
-using AppointmentScheduler.Api.Models;
 
 namespace AppointmentScheduler.Api.Models;
 
-/// <summary>Body for <c>PUT /api/appointments/{id}</c>. All fields are optional except validation of dates.</summary>
+/// <summary>
+/// Body for appointment updates. Omitted fields retain their existing values.
+/// </summary>
 public sealed class UpdateAppointmentDto
 {
     [MinLength(1), MaxLength(200)]
@@ -14,6 +16,25 @@ public sealed class UpdateAppointmentDto
     public DateTimeOffset? StartDateTime { get; set; }
 
     public DateTimeOffset? EndDateTime { get; set; }
+
+    /// <summary>
+    /// Browser/editor time zone, for example "America/Chicago".
+    /// Used to format appointment times in activity messages.
+    /// </summary>
+    [MaxLength(100)]
+    public string? TimeZoneId { get; set; }
+
+    /// <summary>
+    /// Legacy display field. Not used to construct activity messages.
+    /// </summary>
+    [MaxLength(50)]
+    public string? StartDateTimeLocal { get; set; }
+
+    /// <summary>
+    /// Legacy display field. Not used to construct activity messages.
+    /// </summary>
+    [MaxLength(50)]
+    public string? EndDateTimeLocal { get; set; }
 
     [MaxLength(100)]
     public string? ProviderId { get; set; }

@@ -36,8 +36,9 @@ describe('StatisticsComponent', () => {
   beforeEach(() => {
     jasmine.clock().install();
     jasmine.clock().mockDate(now);
-    service = jasmine.createSpyObj<StatisticsService>('StatisticsService', ['loadAppointments']);
+    service = jasmine.createSpyObj<StatisticsService>('StatisticsService', ['loadAppointments', 'availableRoles']);
     service.loadAppointments.and.returnValue(of([]));
+    service.availableRoles.and.returnValue(['client']);
   });
   afterEach(() => jasmine.clock().uninstall());
 
@@ -90,5 +91,22 @@ describe('StatisticsComponent', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.error).toBe('');
     expect(fixture.nativeElement.textContent).toContain('No completed appointments');
+  });
+  it('defaults a provider account to provider statistics', () => {
+    service.availableRoles.and.returnValue(['provider']);
+    const fixture = create();
+    expect(fixture.componentInstance.role).toBe('provider');
+    expect(service.loadAppointments).toHaveBeenCalledWith('provider');
+    expect(fixture.nativeElement.textContent).toContain('Appointments clients have booked with you.');
+  });
+  it ('lets enhanced accounts switch to their client statistics', () => {
+    service.availableRoles.and.returnValue(['provider', 'client']);
+    const fixture = create();
+    expect(fixture.nativeElement.querySelector('#statistics-role')).not.toBeNull();
+    fixture.componentInstance.role = 'client';
+    fixture.componentInstance.load();
+    fixture.detectChanges();
+    expect(service.loadAppointments).toHaveBeenCalledWith('client');
+    expect(fixture.nativeElement.textContent).toContain('Appointments you have booked with service providers.');
   });
 });

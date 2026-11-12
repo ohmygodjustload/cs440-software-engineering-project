@@ -10,9 +10,16 @@
   <header>
     <div>
       <h1 id="statistics-title">Scheduling statistics</h1>
-      <p>Understand appointment patterns by category, day, and time.</p>
+      <p>{{ role === 'provider' ? 'Appointments clients have booked with you.' : 'Appointments you have booked with service providers.' }}</p>
     </div>
     <div class="controls">
+      @if (roles.length > 1) {
+        <label for="statistics-role">View</label>
+        <select id="statistics-role" [(ngModel)]="role" (ngModelChange)="load()" [disabled]="loading">
+          <option value="provider">As a service provider</option>
+          <option value="client">As a client</option>
+        </select>
+      }
       <label for="range">Date range</label>
       <select id="range" [(ngModel)]="rangeDays" [disabled]="loading">
         <option [ngValue]="30">Last 30 days</option>

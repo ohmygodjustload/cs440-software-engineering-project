@@ -37,6 +37,22 @@ export const adminGuard: CanActivateFn = () => {
     : router.createUrlTree([authService.getCurrentUser()?.isServiceProvider ? '/home-provider' : '/home']);
 };
 
+/** Keeps the notification settings page available to clients and providers, not admins. */
+export const nonAdminGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isAuthenticated()) {
+    return router.createUrlTree(['/login'], {
+      queryParams: { reason: 'auth' }
+    });
+  }
+
+  return authService.getCurrentUser()?.isAdmin
+    ? router.createUrlTree(['/home-admin'])
+    : true;
+};
+
 export const guestGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
