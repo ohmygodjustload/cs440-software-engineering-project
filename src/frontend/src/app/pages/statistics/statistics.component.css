@@ -220,3 +220,8 @@ h3, .time-grid p {
     padding: 22px 0;
   }
 }
+
+/* Keep role/date controls within the header when both account roles are available. */
+header { flex-wrap: wrap; }
+.controls { justify-content: flex-end; }
+@media (max-width: 760px) { .controls { justify-content: flex-start; } }
