@@ -16,10 +16,8 @@
         <nav class="actions" [attr.aria-label]="summary.heading + ' actions'">
           @if (summary.role === 'client') {
             <a class="primary" routerLink="/book-appointment">+ Book an appointment</a>
-            <a class="secondary" routerLink="/appointments">My appointments</a>
           } @else {
             <a class="primary" routerLink="/create-slots">+ Create appointment slots</a>
-            <a class="secondary" routerLink="/provider-schedule">Provider dashboard</a>
           }
         </nav>
         @if (summary.loading) {

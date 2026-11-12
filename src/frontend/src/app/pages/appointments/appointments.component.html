@@ -1,17 +1,57 @@
-<!--
-  appointments.component.html — the AppointmentsComponent template (the screen at "/appointments").
-
-  Purpose: a one-line placeholder so the top bar, routing, build, and tests can all be verified
-  before any real UI exists. Replace this markup when the appointment scheduler ticket is picked up.
-
--->
 <section class="overview" aria-labelledby="appointments-title">
   <header class="page-header">
     <h1 id="appointments-title">Appointments</h1>
     <a class="primary" routerLink="/book-appointment">+ New appointment</a>
   </header>
 
-  @if (loading) {
+  @if (isEnhanced) {
+    @for (role of ['client', 'provider']; track role) {
+      <section class="role-appointments" [attr.aria-labelledby]="role + '-appointments-title'">
+        <h2 [id]="role + '-appointments-title'">{{ role === 'client' ? 'As a client' : 'As a service provider' }}</h2>
+        @if (role === 'client' ? loading : providerLoading) {
+          <app-loading label="Loading appointments…"></app-loading>
+        } @else if (role === 'client' ? error : providerError) {
+          <div class="error" role="alert">
+            <p>{{ role === 'client' ? error : providerError }}</p>
+            <button type="button" (click)="role === 'client' ? load() : loadProviderAppointments()">Try again</button>
+          </div>
+        } @else {
+          @for (appointment of (role === 'client' ? bookedAppointments : providerAppointments); track appointment.id) {
+            <article class="upcoming-card">
+              <div>
+                <h3>{{ appointment.title }}</h3>
+                <p class="meta">{{ appointment.category }} · {{ appointment.startDateTime | date:'EEEE, MMM d, h:mm a' }}</p>
+                <p class="provider">
+                  @if (role === 'client') {
+                    {{ appointment.providerName || appointment.providerId }}
+                  } @else {
+                    Client ID: {{ appointment.userId }}
+                  }
+                  @if (appointment.location) { <span> · {{ appointment.location }}</span> }
+                </p>
+              </div>
+              <button type="button" class="secondary"
+                [attr.aria-expanded]="selectedId === role + ':' + appointment.id"
+                (click)="toggleDetails(role + ':' + appointment.id)">
+                {{ selectedId === role + ':' + appointment.id ? 'Hide details' : 'View details' }}
+              </button>
+              @if (selectedId === role + ':' + appointment.id) {
+                <dl class="details">
+                  <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
+                  <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
+                  <dt>Status</dt><dd>{{ appointment.status }}</dd>
+                  <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
+                  <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
+                </dl>
+              }
+            </article>
+          } @empty {
+            <p>{{ role === 'client' ? 'You have no booked appointments.' : 'No clients have booked appointments with you.' }}</p>
+          }
+        }
+      </section>
+    }
+  } @else if (loading) {
     <app-loading label="Loading appointments…"></app-loading>
   } @else if (error) {
     <div class="error" role="alert">

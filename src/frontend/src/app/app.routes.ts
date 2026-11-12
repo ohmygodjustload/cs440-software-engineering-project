@@ -9,7 +9,7 @@
 import { Routes } from '@angular/router';
 import { accountHomeGuard } from './core/guards/account-home.guard';
 
-import { adminGuard, authGuard, guestGuard, providerGuard, homeGuard, enhancedGuard, nonAdminGuard } from './core/guards/auth.guard';
+import { adminGuard, authGuard, guestGuard, providerGuard, enhancedGuard, nonAdminGuard } from './core/guards/auth.guard';
 
 /**
  * Application routes. Each page is loaded lazily so the initial bundle only contains the shell
@@ -56,7 +56,7 @@ export const routes: Routes = [
   {
     path: 'home',
     title: 'Home · BAAAM Scheduling System',
-    canActivate: [authGuard, homeGuard],
+    canActivate: [authGuard, accountHomeGuard],
     loadComponent: () =>
       import('./pages/home/home.component').then((m) => m.HomeComponent)
   },
@@ -170,15 +170,13 @@ export const routes: Routes = [
   },
   {
     path: 'provider-schedule',
-    title: 'Provider schedule · BAAAM',
-    canActivate: [authGuard, providerGuard],
-    loadComponent: () => import('./pages/home-provider/home-provider.component')
-      .then(m => m.ProviderHomeComponent)
+    redirectTo: 'home-provider',
+    pathMatch: 'full'
   },
   {
     path: 'home-provider',
     title: 'Service provider home · BAAAM',
-    canActivate: [authGuard, providerGuard],
+    canActivate: [authGuard, accountHomeGuard, providerGuard],
     loadComponent: () =>
       import('./pages/home-provider/home-provider.component')
         .then(m => m.ProviderHomeComponent)

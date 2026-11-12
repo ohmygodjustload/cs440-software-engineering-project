@@ -200,3 +200,15 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+.role-appointments {
+  margin-top: 28px;
+}
+
+.role-appointments .upcoming-card {
+  margin-top: 12px;
+}
+
+.role-appointments h3 {
+  margin: 0 0 8px;
+}

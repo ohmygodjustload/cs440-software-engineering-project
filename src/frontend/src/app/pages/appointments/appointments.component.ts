@@ -1,17 +1,11 @@
-/**
- * appointments.component.ts — AppointmentsComponent, the page served at "/appointments".
- *
- * Purpose: placeholder screen for the appointment scheduler (create, update, and delete an
- * appointment's category, date/time, provider, user, and location). It renders only
- * "<h1>Appointments Here!</h1>" until that ticket is picked up.
- *
- */
-
 import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
+import { isEnhancedUser } from '../../core/routing/home-route';
+import { AuthService } from '../../core/services/auth.service';
+import { ProviderHomeService } from '../../core/services/home-provider.service';
 import { Appointment } from '../../core/models/appointment';
 import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
@@ -27,7 +21,17 @@ export class AppointmentsComponent implements OnInit {
   private readonly service = inject(AppointmentsOverviewService);
   private readonly destroyRef = inject(DestroyRef);
 
+  private readonly auth = inject(AuthService);
+  private readonly providerHome = inject(ProviderHomeService);
+
   appointments: Appointment[] = [];
+  providerAppointments: Appointment[] = [];
+  providerLoading = false;
+  providerError = '';
+
+  get isEnhanced(): boolean {
+    return isEnhancedUser(this.auth.getCurrentUser());
+  }
   loading = false;
   error = '';
   selectedId = '';
@@ -49,6 +53,7 @@ export class AppointmentsComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    if (this.isEnhanced) this.loadProviderAppointments();
   }
 
   load(): void {
@@ -67,6 +72,26 @@ export class AppointmentsComponent implements OnInit {
         error: () => {
           this.error = 'Appointments could not be loaded. Check the API and try again.';
           this.loading = false;
+        }
+      });
+  }
+
+  loadProviderAppointments(): void {
+    if (!this.isEnhanced || this.providerLoading) return;
+    this.providerLoading = true;
+    this.providerError = '';
+    this.providerHome.bookings()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          this.providerAppointments = items
+            .filter((item) => item.status === 'Booked' && !!item.userId)
+            .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
+          this.providerLoading = false;
+        },
+        error: () => {
+          this.providerError = 'Provider appointments could not be loaded.';
+          this.providerLoading = false;
         }
       });
   }
