@@ -49,50 +49,63 @@ describe('CreateSlotsComponent', () => {
     });
   });
 
-  it('exposes 18 start times from 9:00 AM through 5:30 PM, including noon', () => {
+  it('exposes nine hourly blocks from 9:00 AM through 5:00 PM', () => {
     const component = create().componentInstance;
 
-    expect(component.startTimes.length).toBe(18);
+    expect(component.startTimes.length).toBe(9);
     expect(component.startTimes[0]).toBe('09:00');
-    expect(component.startTimes[component.startTimes.length - 1]).toBe('17:30');
+    expect(component.startTimes[component.startTimes.length - 1]).toBe('17:00');
     expect(component.startTimes).toContain('12:00');
-    expect(component.startTimes).toContain('12:30');
+    expect(component.startTimes).not.toContain('12:30');
   });
 
-  it('selects 3:30 PM on a future date and sets the end 60 minutes later', () => {
+  it('selects 3:00–4:00 PM on a future date', () => {
     const component = create().componentInstance;
     const date = futureDate();
 
     component.chooseDate(date);
-    component.chooseTime('15:30');
+    component.chooseTime('15:00');
 
-    expect(component.draft.start).toBe(`${date}T15:30`);
+    expect(component.draft.start).toBe(`${date}T15:00`);
     const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
     expect(minutes).toBe(60);
   });
 
-  it('selects 5:30 PM on a future date and sets the end 60 minutes later', () => {
+  it('selects the final 5:00–6:00 PM block', () => {
     const component = create().componentInstance;
     const date = futureDate();
 
     component.chooseDate(date);
-    component.chooseTime('17:30');
+    component.chooseTime('17:00');
 
-    expect(component.draft.start).toBe(`${date}T17:30`);
+    expect(component.draft.start).toBe(`${date}T17:00`);
+    expect(component.draft.end).toBe(`${date}T18:00`);
     const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
     expect(minutes).toBe(60);
   });
 
-  it('renders 18 start-time buttons with 5:30 PM last and 12:00 PM present', () => {
+  it('renders nine one-hour ranges from 9:00–10:00 AM through 5:00–6:00 PM', () => {
     const fixture = create();
     const buttons: HTMLButtonElement[] = Array.from(
       fixture.nativeElement.querySelectorAll('.time-options button')
     );
     const labels = buttons.map((button) => button.textContent?.trim());
 
-    expect(buttons.length).toBe(18);
-    expect(labels[labels.length - 1]).toBe('5:30 PM');
-    expect(labels).toContain('12:00 PM');
+    expect(buttons.length).toBe(9);
+    expect(labels[0]).toBe('9:00 AM – 10:00 AM');
+    expect(labels[labels.length - 1]).toBe('5:00 PM – 6:00 PM');
+    expect(labels).toContain('12:00 PM – 1:00 PM');
+  });
+
+  it('does not highlight an empty required field before publishing is attempted', () => {
+    const fixture = create();
+    const titleInput: HTMLInputElement = fixture.nativeElement.querySelector('#service');
+
+    titleInput.dispatchEvent(new Event('blur'));
+    fixture.detectChanges();
+
+    expect(titleInput.classList).not.toContain('field-invalid');
+    expect(fixture.nativeElement.querySelector('.field-invalid-label')).toBeNull();
   });
 
   it('highlights invalid fields after submitting missing required values', () => {
@@ -110,7 +123,7 @@ describe('CreateSlotsComponent', () => {
     expect(text).toContain('Highlighted fields are required.');
   });
 
-  it('marks overlapping start times unavailable for existing 60-minute slots', () => {
+  it('marks only the overlapping one-hour block unavailable', () => {
     const component = create().componentInstance;
     const date = futureDate();
     component.chooseDate(date);
@@ -129,8 +142,8 @@ describe('CreateSlotsComponent', () => {
       status: 'Available'
     } satisfies Slot];
 
+    expect(component.isTimeUnavailable('13:00')).toBeFalse();
     expect(component.isTimeUnavailable('14:00')).toBeTrue();
-    expect(component.isTimeUnavailable('14:30')).toBeTrue();
     expect(component.isTimeUnavailable('15:00')).toBeFalse();
   });
 });

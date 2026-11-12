@@ -56,11 +56,8 @@ export class CreateSlotsComponent implements OnInit {
   isPastTime(time: string): boolean {
     return new Date(`${this.selectedDate}T${time}`).getTime() <= Date.now();
   }
-  // Half-hour start times from 9:00 AM through 5:30 PM, inclusive (18 options).
-  // Slots are 60 minutes, so the last slot ends at 6:30 PM. 18 options fill the
-  // 3-column picker in six even rows. Generated from a range so gaps (like the
-  // earlier missing noon hour) cannot sneak back in.
-  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17.5, 30);
+  // Nine fixed one-hour blocks: 9:00–10:00 AM through 5:00–6:00 PM.
+  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17, 60);
 
   private buildStartTimes(startHour: number, endHour: number, stepMinutes: number): string[] {
     const pad = (n: number) => String(n).padStart(2, '0');
@@ -114,7 +111,8 @@ export class CreateSlotsComponent implements OnInit {
 
   chooseDate(date: string): void {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < this.today) return;
-    this.setStart(date, this.selectedTime || '10:30');
+    const time = this.startTimes.includes(this.selectedTime) ? this.selectedTime : '10:00';
+    this.setStart(date, time);
   }
 
   chooseTime(time: string): void {
@@ -127,12 +125,12 @@ export class CreateSlotsComponent implements OnInit {
   }
 
   fieldInvalid(control: NgModel | null): boolean {
-    return fieldErrorMessage(control?.control ?? null, 'Field', this.validationAttempted) !== null;
+    return this.validationAttempted &&
+      fieldErrorMessage(control?.control ?? null, 'Field', true) !== null;
   }
 
   requiredTextInvalid(control: NgModel | null, value: string): boolean {
-    const shouldShow = control?.control.touched || this.validationAttempted;
-    return (shouldShow && !value.trim()) || this.fieldInvalid(control);
+    return this.validationAttempted && (!value.trim() || this.fieldInvalid(control));
   }
 
   timeInvalid(form: NgForm): boolean {
@@ -142,6 +140,13 @@ export class CreateSlotsComponent implements OnInit {
   timeLabel(time: string): string {
     const [hour, minute] = time.split(':').map(Number);
     return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`;
+  }
+
+  timeRangeLabel(time: string): string {
+    const [hour, minute] = time.split(':').map(Number);
+    const endMinutes = hour * 60 + minute + this.durationMinutes;
+    const end = `${String(Math.floor(endMinutes / 60)).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}`;
+    return `${this.timeLabel(time)} – ${this.timeLabel(end)}`;
   }
 
   private setStart(date: string, time: string): void {

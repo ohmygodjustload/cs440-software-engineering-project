@@ -11,36 +11,52 @@
       }
 
       <div class="form-grid">
-        <div>
-          <label for="category">Category</label>
-          <select id="category" name="category" required [(ngModel)]="draft.category"
-            #categoryModel="ngModel" [class.field-invalid]="fieldInvalid(categoryModel)"
-            [attr.aria-invalid]="fieldInvalid(categoryModel) || null"
-            (ngModelChange)="categoryChanged()" [disabled]="categories.length === 0">
-            @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
-          </select>
-          @if (categories.length === 0) {
-            <p class="hint">Categories come from your signed-in provider account.</p>
-          }
-        </div>
-        <div>
-          <label for="service">Service / appointment title</label>
-          <input
-            id="service"
-            type="text"
-            name="title"
-            required
-            maxlength="200"
-            [(ngModel)]="draft.title"
-            #titleModel="ngModel"
-            [class.field-invalid]="requiredTextInvalid(titleModel, draft.title)"
-            [attr.aria-invalid]="requiredTextInvalid(titleModel, draft.title) || null"
-            placeholder="Enter your service name"
-          />
-        </div>
+        <section class="form-card">
+          <div class="section-heading">
+            <div>
+              <h2>Service details</h2>
+              <p>Tell clients what kind of appointment you are offering.</p>
+            </div>
+          </div>
+          <div class="field-pair">
+            <div>
+              <label for="category">Category</label>
+              <select id="category" name="category" required [(ngModel)]="draft.category"
+                #categoryModel="ngModel" [class.field-invalid]="fieldInvalid(categoryModel)"
+                [attr.aria-invalid]="fieldInvalid(categoryModel) || null"
+                (ngModelChange)="categoryChanged()" [disabled]="categories.length === 0">
+                @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
+              </select>
+              @if (categories.length === 0) {
+                <p class="hint">Categories come from your signed-in provider account.</p>
+              }
+            </div>
+            <div>
+              <label for="service">Service / appointment title</label>
+              <input
+                id="service"
+                type="text"
+                name="title"
+                required
+                maxlength="200"
+                [(ngModel)]="draft.title"
+                #titleModel="ngModel"
+                [class.field-invalid]="requiredTextInvalid(titleModel, draft.title)"
+                [attr.aria-invalid]="requiredTextInvalid(titleModel, draft.title) || null"
+                placeholder="For example, general checkup"
+              />
+            </div>
+          </div>
+        </section>
 
         <section class="date-section">
-          <label for="date">Select date · {{ dateLabel }}</label>
+          <div class="section-heading">
+            <div>
+              <h2>Choose a date</h2>
+              <p>Select a day from the week below or use the calendar.</p>
+            </div>
+          </div>
+          <label for="date">Calendar date · {{ dateLabel }}</label>
           <input id="date" type="date" name="date" required [min]="today"
             [ngModel]="selectedDate" #dateModel="ngModel" [class.field-invalid]="fieldInvalid(dateModel)"
             [attr.aria-invalid]="fieldInvalid(dateModel) || null" (ngModelChange)="chooseDate($event)">
@@ -54,32 +70,51 @@
             }
           </div>
         </section>
-        <section>
-          <h2 [class.field-invalid-label]="timeInvalid(slotForm)">Start time · 60-minute duration</h2>
-          <div class="time-options" aria-label="Slot start times">
+        <section class="time-section">
+          <div class="section-heading">
+            <div>
+              <h2 [class.field-invalid-label]="timeInvalid(slotForm)">Choose an available time</h2>
+              <p>Each appointment block is one hour.</p>
+            </div>
+            @if (draft.start) {
+              <span class="selection-summary">{{ draft.start | date:'h:mm a' }} – {{ draft.end | date:'h:mm a' }}</span>
+            }
+          </div>
+          <div class="time-options" aria-label="Available one-hour time blocks">
             @for (time of startTimes; track time) {
               <button type="button" [class.selected]="selectedTime === time"
                 [attr.aria-pressed]="selectedTime === time" [disabled]="isTimeUnavailable(time)"
-                (click)="chooseTime(time)">{{ timeLabel(time) }}</button>
+                (click)="chooseTime(time)">
+                <span>{{ timeRangeLabel(time) }}</span>
+              </button>
             }
           </div>
-          @if (draft.start) { <p class="hint">Ends at {{ draft.end | date:'h:mm a' }}</p> }
         </section>
 
-        <div>
-          <label for="location">Location</label>
-          <input id="location" name="location" required maxlength="300" [(ngModel)]="draft.location" #locationModel="ngModel"
-            [class.field-invalid]="requiredTextInvalid(locationModel, draft.location)"
-            [attr.aria-invalid]="requiredTextInvalid(locationModel, draft.location) || null" placeholder="Studio or clinic location">
-        </div>
-        <div>
-          <label for="notes">Access instructions (optional)</label>
-          <textarea id="notes" name="notes" maxlength="2000" [(ngModel)]="draft.notes" #notesModel="ngModel"
-            [class.field-invalid]="fieldInvalid(notesModel)" [attr.aria-invalid]="fieldInvalid(notesModel) || null"
-            placeholder="For example: use the main entrance."></textarea>
-        </div>
+        <section class="form-card">
+          <div class="section-heading">
+            <div>
+              <h2>Location and arrival</h2>
+              <p>Help clients find their appointment without confusion.</p>
+            </div>
+          </div>
+          <div class="field-pair">
+            <div>
+              <label for="location">Location</label>
+              <input id="location" name="location" required maxlength="300" [(ngModel)]="draft.location" #locationModel="ngModel"
+                [class.field-invalid]="requiredTextInvalid(locationModel, draft.location)"
+                [attr.aria-invalid]="requiredTextInvalid(locationModel, draft.location) || null" placeholder="Studio, clinic, or street address">
+            </div>
+            <div>
+              <label for="notes">Access instructions (optional)</label>
+              <textarea id="notes" name="notes" maxlength="2000" [(ngModel)]="draft.notes" #notesModel="ngModel"
+                [class.field-invalid]="fieldInvalid(notesModel)" [attr.aria-invalid]="fieldInvalid(notesModel) || null"
+                placeholder="Entrance, parking, room number, or check-in details"></textarea>
+            </div>
+          </div>
+        </section>
       </div>
-      <p class="rule">Slots last 60 minutes. Greyed out times are in the past or overlap a slot you already published.</p>
+      <p class="rule">Each option is a one-hour block. Greyed out blocks are in the past or overlap a slot you already published.</p>
       @if (success) {
         <p role="status">{{ success }}</p>
       }
