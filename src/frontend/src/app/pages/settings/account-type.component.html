@@ -1,7 +1,6 @@
 <section aria-labelledby="account-type-title">
   <h2 id="account-type-title">Account type</h2>
   <p>Book services, offer services, or do both with the same account.</p>
-  @if (loading) { <app-loading label="Loading your account type…"></app-loading> }
   @if (error) { <p class="error" role="alert">{{ error }}</p> }
   @if (message) { <p class="success" role="status">{{ message }}</p> }
   @if (!loading && status; as account) {
@@ -10,7 +9,6 @@
         <span class="badge">Client + Service provider</span>
         <h3>You can do both</h3>
         <p>Book appointments for yourself and publish availability for your clients.</p>
-        <button type="button" (click)="openEnhanced()" [disabled]="saving">{{ saving ? 'Opening…' : 'Open Enhanced Home' }}</button>
       </div>
     } @else if (account.user.isServiceProvider) {
       <div class="account-card">
@@ -26,9 +24,11 @@
         @if (account.application?.status === 'pending') {
           <p role="status">Your provider application is awaiting admin approval. Your client account stays active.</p>
         } @else {
-          @if (account.application?.status === 'rejected') {
+          @if (account.application && account.application.status === 'rejected') {
             <p>Your previous provider application was not approved.</p>
-            @if (account.application?.notes) { <p>Admin feedback: {{ account.application?.notes }}</p> }
+            @if (account.application.notes; as notes) {
+              <p>Admin feedback: {{ notes }}</p>
+            }
           }
           <p>Select the services you want to offer. Provider access starts after admin approval.</p>
           <form [formGroup]="form" (ngSubmit)="apply()">
@@ -56,5 +56,9 @@
       </div>
     }
   }
-  <button type="button" class="secondary" (click)="load()" [disabled]="loading || saving">Refresh account status</button>
+  @if (!(status && status.user.isClient && status.user.isServiceProvider)) {
+            <button type="button" class="secondary" (click)="load()" [disabled]="loading || saving">
+      Refresh account status
+    </button>
+  }
 </section>

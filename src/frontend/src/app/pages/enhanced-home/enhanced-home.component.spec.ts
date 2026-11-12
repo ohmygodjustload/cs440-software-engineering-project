@@ -95,10 +95,17 @@ describe('EnhancedHomeComponent', () => {
   it('renders the appointment title and location in details', () => {
     service.providerAppointments.and.returnValue(of([item('booking', 'Booked')]));
     const fixture = create();
-    const component = fixture.componentInstance;
-    component.showDetails(component.provider.items[0], component.provider);
+    const card = fixture.nativeElement.querySelector('.provider .appointment-card');
+    const button = card.querySelector('button');
+    button.click();
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.details').textContent).toContain('Annual physical');
-    expect(fixture.nativeElement.querySelector('.details').textContent).toContain('Hospital');
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(button.textContent).toContain('Hide details');
+    expect(card.querySelector('.details').textContent).toContain('Annual physical');
+    expect(card.querySelector('.details').textContent).toContain('Hospital');
+    button.click();
+    fixture.detectChanges();
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+    expect(card.querySelector('.details')).toBeNull();
   });
 });

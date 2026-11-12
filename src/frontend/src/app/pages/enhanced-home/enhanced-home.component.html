@@ -47,7 +47,13 @@
                       <h4>{{ slot.title || 'Appointment name not provided' }}</h4>
                       <p>{{ slot.startDateTime | date:'EEE, MMM d, h:mm a' }}–{{ slot.endDateTime | date:'h:mm a' }}</p>
                       <p>{{ slot.location || 'Location not provided' }}</p>
-                      <button type="button" (click)="showDetails(slot, summary)">View details</button>
+                      <button type="button" [attr.aria-expanded]="detailsAreOpen(slot, summary)" (click)="showDetails(slot, summary)">
+                        {{ detailsAreOpen(slot, summary) ? 'Hide details' : 'View details' }}
+                        <span aria-hidden="true">{{ detailsAreOpen(slot, summary) ? '▴' : '▾' }}</span>
+                      </button>
+                      @if (detailsAreOpen(slot, summary)) {
+                        <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
+                      }
                     </article>
                   } @empty { <p>No future open slots. Create a slot to add availability.</p> }
                 </div>
@@ -62,34 +68,47 @@
               @if (summary.role === 'client') { <p>{{ item.providerName || 'Provider ID: ' + item.providerId }}</p> }
               @else { <p>Client ID: {{ item.userId || 'Not provided' }}</p> }
               <p>{{ item.location || 'Location not provided' }}</p>
-              <button type="button" class="primary" (click)="showDetails(item, summary)">View details</button>
+              <button type="button" class="primary" [attr.aria-expanded]="detailsAreOpen(item, summary)" (click)="showDetails(item, summary)">
+                {{ detailsAreOpen(item, summary) ? 'Hide details' : 'View details' }}
+                <span aria-hidden="true">{{ detailsAreOpen(item, summary) ? '▴' : '▾' }}</span>
+              </button>
+              @if (detailsAreOpen(item, summary)) {
+                <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
+              }
             </article>
           } @else { <p>No upcoming booked appointments.</p> }
           <h3>{{ summary.role === 'client' ? 'Recent bookings' : 'Recent appointments' }}</h3>
           @for (item of recent(summary); track item.id) {
             <div class="recent">
               <span>{{ item.startDateTime | date:'MMM d' }}</span><span>{{ item.title }}</span>
-              <span>{{ item.status }}</span><button type="button" (click)="showDetails(item, summary)">Details</button>
+              <span>{{ item.status }}</span><button type="button" [attr.aria-expanded]="detailsAreOpen(item, summary)" (click)="showDetails(item, summary)">
+                {{ detailsAreOpen(item, summary) ? 'Hide details' : 'View details' }}
+                <span aria-hidden="true">{{ detailsAreOpen(item, summary) ? '▴' : '▾' }}</span>
+              </button>
+              @if (detailsAreOpen(item, summary)) {
+                <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
+              }
             </div>
           } @empty { <p>No recent appointments.</p> }
         }
       </section>
     }
   </div>
-  @if (selectedAppointment; as item) {
-    <section class="details" aria-labelledby="details-title" aria-live="polite">
-      <p>{{ selectedRole === 'client' ? 'Your booking' : 'Provider schedule' }}</p>
-      <h2 id="details-title">{{ item.title }}</h2>
-      <dl>
-        <dt>Start</dt><dd>{{ item.startDateTime | date:'medium' }}</dd>
-        <dt>End</dt><dd>{{ item.endDateTime | date:'medium' }}</dd>
-        @if (selectedRole === 'client') { <dt>Provider</dt><dd>{{ item.providerName || item.providerId }}</dd> }
-        @else if (item.userId) { <dt>Client ID</dt><dd>{{ item.userId }}</dd> }
-        <dt>Status</dt><dd>{{ item.status }}</dd>
-        <dt>Location</dt><dd>{{ item.location || 'Not provided' }}</dd>
-        <dt>Notes</dt><dd>{{ item.notes || 'No notes' }}</dd>
-      </dl>
-      <button type="button" (click)="selectedAppointment = null">Close details</button>
-    </section>
-  }
+  <ng-template #appointmentDetails>
+    @if (selectedAppointment; as item) {
+      <section class="details" aria-label="Appointment details">
+        <p>{{ selectedRole === 'client' ? 'Your booking' : 'Provider schedule' }}</p>
+        <h3>{{ item.title }}</h3>
+        <dl>
+          <dt>Start</dt><dd>{{ item.startDateTime | date:'medium' }}</dd>
+          <dt>End</dt><dd>{{ item.endDateTime | date:'medium' }}</dd>
+          @if (selectedRole === 'client') { <dt>Provider</dt><dd>{{ item.providerName || item.providerId }}</dd> }
+          @else if (item.userId) { <dt>Client ID</dt><dd>{{ item.userId }}</dd> }
+          <dt>Status</dt><dd>{{ item.status }}</dd>
+          <dt>Location</dt><dd>{{ item.location || 'Not provided' }}</dd>
+          <dt>Notes</dt><dd>{{ item.notes || 'No notes' }}</dd>
+        </dl>
+      </section>
+    }
+  </ng-template>
 </section>

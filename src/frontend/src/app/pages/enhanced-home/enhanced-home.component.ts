@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -19,7 +19,7 @@ interface RoleSummary {
 @Component({
   selector: 'app-enhanced-home',
   standalone: true,
-  imports: [DatePipe, RouterLink, LoadingComponent],
+  imports: [DatePipe, RouterLink, LoadingComponent, NgTemplateOutlet],
   templateUrl: './enhanced-home.component.html',
   styleUrl: './enhanced-home.component.css'
 })
@@ -102,8 +102,12 @@ export class EnhancedHomeComponent implements OnInit {
       .sort((a, b) => Date.parse(b.startDateTime) - Date.parse(a.startDateTime)).slice(0, 3);
   }
 
+  detailsAreOpen(item: Appointment, summary: RoleSummary): boolean {
+    return this.selectedRole === summary.role && this.selectedAppointment?.id === item.id;
+  }
+
   showDetails(item: Appointment, summary: RoleSummary): void {
-    this.selectedAppointment = item;
+    this.selectedAppointment = this.detailsAreOpen(item, summary) ? null : item;
     this.selectedRole = summary.role;
   }
 }

@@ -1,25 +1,22 @@
 import { Component, DestroyRef, EventEmitter, OnInit, Output, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AppointmentCategory } from '../../core/models/appointment';
 import { User } from '../../core/models/user';
 import { AccountModesService, AccountModeStatus } from '../../core/services/account-modes.service';
 import { AuthService } from '../../core/services/auth.service';
-import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 @Component({
   selector: 'app-account-type',
   standalone: true,
-  imports: [ReactiveFormsModule, LoadingComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './account-type.component.html',
   styleUrl: './account-type.component.css'
 })
 export class AccountTypeComponent implements OnInit {
   private readonly service = inject(AccountModesService);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   @Output() readonly userChanged = new EventEmitter<User>();
@@ -80,13 +77,5 @@ export class AccountTypeComponent implements OnInit {
       this.saving = false;
       this.load();
     }, error: error => this.error = this.auth.getErrorMessage(error) });
-  }
-
-  openEnhanced(): void {
-    if (this.saving || this.loading || !this.status?.user.isClient || !this.status.user.isServiceProvider) return;
-    this.saving = true; this.error = '';
-    this.service.refreshSession().pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving = false))
-      .subscribe({ next: () => void this.router.navigateByUrl('/enhanced-home'),
-        error: error => this.error = this.auth.getErrorMessage(error) });
   }
 }

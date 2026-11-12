@@ -132,10 +132,10 @@ button, .primary, .secondary {
 }
 
 .details {
-  padding: 24px;
-  margin-top: 24px;
-  border-radius: 20px;
-  background: #e0dcd1;
+  grid-column: 1 / -1;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(52 73 69 / 30%);
 }
 
 dl {
@@ -192,6 +192,10 @@ h1, h2, h3, h4, .recent {
   padding: 18px;
   border-radius: 18px;
   background: #e4e3bc;
+}
+
+#enhanced-open-slots {
+  margin-top: 8px;
 }
 
 .open-slot {

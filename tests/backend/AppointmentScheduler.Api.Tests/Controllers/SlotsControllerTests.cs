@@ -306,6 +306,25 @@ public class SlotsControllerTests
     }
 
     [Fact]
+    public void GetAvailable_HidesOwnSlotsForEnhancedAccount()
+    {
+        var users = UsersWith(new User
+        {
+            Id = DualRoleUser,
+            Username = "DeeDual",
+            IsClient = true,
+            IsServiceProvider = true,
+            IsActive = true,
+        });
+        var (c, appts) = Make(DualRoleUser, users);
+        Seed(appts, 24, providerId: DualRoleUser, typeId: null);
+        var otherSlot = Seed(appts, 25);
+
+        Assert.Equal(new[] { otherSlot.Id }, Ids(c.GetAvailable()));
+        Assert.Empty(Ids(c.GetAvailable(providerId: DualRoleUser)));
+    }
+
+    [Fact]
     public void Book_OwnSlot_403()
     {
         var users = UsersWith(new User

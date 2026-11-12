@@ -57,6 +57,10 @@ public sealed class SlotsController(
         var now = DateTimeOffset.UtcNow;
         var typeCache = new Dictionary<string, AppointmentType?>(StringComparer.OrdinalIgnoreCase);
         var providerCache = new Dictionary<string, User?>(StringComparer.OrdinalIgnoreCase);
+        var ownProviderId = currentUser.UserId is { } userId
+            && Cached(providerCache, userId, users.GetById) is { IsClient: true, IsServiceProvider: true }
+            ? userId
+            : null;
         var open = new List<Appointment>();
 
         foreach (var a in appointments.GetAll())
@@ -66,6 +70,7 @@ public sealed class SlotsController(
 
             var type = a.AppointmentTypeId is null ? null : Cached(typeCache, a.AppointmentTypeId, types.GetById);
             var ownerId = type?.ProviderId ?? a.ProviderId;
+            if (string.Equals(ownerId, ownProviderId, StringComparison.OrdinalIgnoreCase)) continue;
             if (!string.IsNullOrWhiteSpace(providerId)
                 && !string.Equals(ownerId, providerId.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
 

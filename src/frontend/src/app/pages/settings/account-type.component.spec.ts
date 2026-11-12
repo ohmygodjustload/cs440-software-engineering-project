@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { User } from '../../core/models/user';
 import { AccountModesService } from '../../core/services/account-modes.service';
@@ -10,7 +10,7 @@ describe('AccountTypeComponent', () => {
   const user: User = { id: 'one-account', firstName: 'Jane', lastName: 'Doe', username: 'jane', isClient: true, isServiceProvider: false, isAdmin: false };
   let service: jasmine.SpyObj<AccountModesService>;
   beforeEach(() => {
-    service = jasmine.createSpyObj<AccountModesService>('AccountModesService', ['status', 'apply', 'enableClient', 'refreshSession']);
+    service = jasmine.createSpyObj<AccountModesService>('AccountModesService', ['status', 'apply', 'enableClient']);
     service.status.and.returnValue(of({ user, application: null }));
     TestBed.configureTestingModule({ imports: [AccountTypeComponent], providers: [provideRouter([]),
       { provide: AccountModesService, useValue: service }, { provide: AuthService, useValue: { getErrorMessage: () => 'Request failed.' } }] });
@@ -34,16 +34,9 @@ describe('AccountTypeComponent', () => {
     service.status.and.returnValue(of({ user: { ...user, isClient: false, isServiceProvider: true }, application: null }));
     service.enableClient.and.returnValue(of({ token: 'new', expiresAt: '2099-01-01T00:00:00Z', user: { ...user, isServiceProvider: true } }));
     const fixture = create(); fixture.componentInstance.enableClient(); fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Open Enhanced Home');
+    expect(fixture.nativeElement.textContent).toContain('Client + Service provider');
+    expect(fixture.nativeElement.textContent).not.toContain('Open Enhanced Home');
+    expect(fixture.nativeElement.textContent).not.toContain('Refresh account status');
     expect(service.enableClient).toHaveBeenCalledTimes(1);
-  });
-  it('refreshes approved capabilities from the API before opening Enhanced Home', () => {
-    const both = { ...user, isServiceProvider: true };
-    service.status.and.returnValue(of({ user: both, application: null }));
-    service.refreshSession.and.returnValue(of({ token: 'new', expiresAt: '2099-01-01T00:00:00Z', user: both }));
-    const router = TestBed.inject(Router); spyOn(router, 'navigateByUrl').and.resolveTo(true);
-    create().componentInstance.openEnhanced();
-    expect(service.refreshSession).toHaveBeenCalledTimes(1);
-    expect(router.navigateByUrl).toHaveBeenCalledWith('/enhanced-home');
   });
 });
