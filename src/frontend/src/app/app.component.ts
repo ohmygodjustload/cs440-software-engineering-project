@@ -52,10 +52,10 @@ const ADMIN_NAV: readonly NavLink[] = [
 const PROVIDER_NAV: readonly NavLink[] = [
   { label: 'Home', path: '/home-provider' },
   { label: 'Calendar', path: '/calendar' },
-  { label: 'Create appointments', path: '/create-slots' },
-  { label: 'Notification', path: '/notifications' },
-  { label: 'Settings', path: '/settings' },
-  { label: 'Stats', path: '/statistics' }
+  { label: 'Appointments', path: '/create-slots' },
+  { label: 'Notifications', path: '/notifications' },
+  { label: 'Statistics', path: '/statistics' },
+  { label: 'Settings', path: '/settings' }
 ];
 
 @Component({

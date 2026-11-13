@@ -42,9 +42,7 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     const reason = this.route.snapshot.queryParamMap.get('reason');
 
-    if (reason === 'auth') {
-      this.errorMessage = 'Please sign in first.';
-    } else if (reason === 'registered') {
+    if (reason === 'registered') {
       this.successMessage = 'Account created. Sign in with your new credentials.';
     } else if (reason === 'provider-pending') {
       this.successMessage =
