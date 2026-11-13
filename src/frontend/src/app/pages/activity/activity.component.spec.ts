@@ -35,6 +35,31 @@ describe('ActivityComponent', () => {
     expect(component.filteredEntries[0].id).toBe('1');
   });
 
+  it('loads the appointment audit tab', () => {
+    http.expectOne('/api/admin/activity').flush([]);
+    const component = fixture.componentInstance;
+
+    component.selectTab('audit');
+    const request = http.expectOne((r) => r.url === '/api/admin/appointment-audit');
+    request.flush([
+      {
+        id: '1',
+        appointmentId: 'a1',
+        appointmentTitle: 'Checkup',
+        changedByUserId: 'u1',
+        changedByName: 'Jane Porter',
+        timestamp: '2026-10-30T10:00:00Z',
+        action: 'CANCELLED',
+        oldStatus: 'Booked',
+        newStatus: 'Available'
+      }
+    ]);
+
+    expect(component.activeTab).toBe('audit');
+    expect(component.auditEntries.length).toBe(1);
+    expect(component.statusLabel('Booked', 'Available')).toBe('Booked → Available');
+  });
+
   it('paginates activity entries in groups of ten', () => {
     const entries = Array.from({ length: 21 }, (_, index) => ({
       id: `${index + 1}`,

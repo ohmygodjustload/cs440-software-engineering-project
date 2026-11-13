@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
-import { Appointment, UpdateAppointmentDto } from '../models/appointment';
+import { Appointment } from '../models/appointment';
 import { ToastService } from './toast.service';
 
 @Injectable({ providedIn: 'root' })
@@ -15,17 +15,17 @@ export class AppointmentsOverviewService {
     return this.http.get<Appointment[]>('/api/appointments/mine');
   }
 
-  /** Updates one appointment (reschedule/modify) and pops a confirmation. */
-  updateAppointment(id: string, dto: UpdateAppointmentDto): Observable<Appointment> {
-    return this.http.put<Appointment>(`/api/appointments/${encodeURIComponent(id)}`, dto).pipe(
-      tap((updated) => this.toast.showAppointmentModified(updated.title, updated.startDateTime))
-    );
+  /** Client updates only the notes on their own booking. */
+  updateNotes(id: string, notes: string): Observable<Appointment> {
+    return this.http
+      .patch<Appointment>(`/api/appointments/${encodeURIComponent(id)}/notes`, { notes })
+      .pipe(tap((updated) => this.toast.showAppointmentModified(updated.title, updated.startDateTime)));
   }
 
-  /** Cancels one appointment (status -> Canceled) and pops a confirmation. */
-  cancelAppointment(id: string, title?: string | null): Observable<void> {
-    return this.http.delete<void>(`/api/appointments/${encodeURIComponent(id)}`).pipe(
-      tap(() => this.toast.showAppointmentCancelled(title ?? 'Appointment'))
-    );
+  /** Client cancels their booking; the slot returns to Available. */
+  cancelBooking(id: string, title?: string | null): Observable<Appointment> {
+    return this.http
+      .post<Appointment>(`/api/appointments/${encodeURIComponent(id)}/cancel`, {})
+      .pipe(tap(() => this.toast.showAppointmentCancelled(title ?? 'Appointment')));
   }
 }

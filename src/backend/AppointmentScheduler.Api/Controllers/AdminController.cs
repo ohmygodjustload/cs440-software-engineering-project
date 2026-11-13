@@ -16,7 +16,8 @@ public sealed class AdminController(
     IActivityStore activity,
     ICurrentUser currentUser,
     INotificationService? notificationService = null,
-    INotificationStore? notificationStore = null) : ControllerBase
+    INotificationStore? notificationStore = null,
+    IAppointmentAuditStore? audit = null) : ControllerBase
 {
     [HttpGet("accounts")]
     public ActionResult<IReadOnlyList<User>> Accounts([FromQuery] string? search = null)
@@ -133,6 +134,9 @@ public sealed class AdminController(
         var location = request.Location?.Trim() ?? appointment.Location;
         var notes = request.Notes ?? appointment.Notes;
         var status = request.Status ?? appointment.Status;
+        var originalStart = appointment.StartDateTime;
+        var originalEnd = appointment.EndDateTime;
+        var originalStatus = appointment.Status;
 
         // Compare the stored values against the effective new values.
         // Format both sides in the same explicitly selected time zone.
@@ -161,6 +165,8 @@ public sealed class AdminController(
         if (!appointments.Update(appointment))
             return Conflict("The appointment was modified. Please retry.");
 
+        WriteAdminAudit(appointment, originalStart, originalEnd, originalStatus);
+
         notificationService?.OnAppointmentUpdated(
             appointment.Id,
             appointment.Category,
@@ -175,6 +181,42 @@ public sealed class AdminController(
             appointment.Id);
 
         return Ok(appointment);
+    }
+
+    [HttpGet("appointment-audit")]
+    public ActionResult<IReadOnlyList<AppointmentAuditListItem>> AppointmentAudit(
+        [FromQuery] DateTimeOffset? from = null,
+        [FromQuery] DateTimeOffset? to = null,
+        [FromQuery] string? action = null)
+    {
+        if (from.HasValue && to.HasValue && to.Value < from.Value)
+            return BadRequest("to must not be before from.");
+        if (!string.IsNullOrWhiteSpace(action) &&
+            !AppointmentAuditEntry.KnownActions.Contains(action.Trim()))
+            return BadRequest("Unknown action. Use CREATED, RESCHEDULED, STATUS_CHANGE, or CANCELLED.");
+
+        var entries = audit?.Query(from, to, action) ?? [];
+        var items = entries.Select(entry =>
+        {
+            var appointment = appointments.GetById(entry.AppointmentId);
+            var actor = users.GetById(entry.ChangedByUserId);
+            var actorName = actor is null
+                ? null
+                : $"{actor.FirstName} {actor.LastName}".Trim();
+            return new AppointmentAuditListItem
+            {
+                Id = entry.Id,
+                AppointmentId = entry.AppointmentId,
+                AppointmentTitle = appointment?.Title,
+                ChangedByUserId = entry.ChangedByUserId,
+                ChangedByName = string.IsNullOrWhiteSpace(actorName) ? actor?.Username : actorName,
+                Timestamp = entry.Timestamp,
+                Action = entry.Action,
+                OldStatus = entry.OldStatus,
+                NewStatus = entry.NewStatus
+            };
+        }).ToList();
+        return Ok(items);
     }
 
     [HttpGet("activity")]
@@ -214,4 +256,39 @@ public sealed class AdminController(
 
     private static string ActivityMessage(string action, string subject, string changes) =>
         $"{action}: {subject}; {ActivityChangeFormatter.Summary(changes)}";
+
+    private void WriteAdminAudit(
+        Appointment appointment,
+        DateTimeOffset originalStart,
+        DateTimeOffset originalEnd,
+        AppointmentStatus originalStatus)
+    {
+        if (audit is null || currentUser.UserId is null) return;
+
+        if (appointment.StartDateTime != originalStart || appointment.EndDateTime != originalEnd)
+        {
+            audit.Add(new AppointmentAuditEntry
+            {
+                AppointmentId = appointment.Id,
+                ChangedByUserId = currentUser.UserId,
+                Action = AppointmentAuditEntry.Rescheduled,
+                OldStatus = originalStatus,
+                NewStatus = appointment.Status
+            });
+        }
+
+        if (appointment.Status == originalStatus) return;
+
+        var action = appointment.Status == AppointmentStatus.Canceled
+            ? AppointmentAuditEntry.Cancelled
+            : AppointmentAuditEntry.StatusChange;
+        audit.Add(new AppointmentAuditEntry
+        {
+            AppointmentId = appointment.Id,
+            ChangedByUserId = currentUser.UserId,
+            Action = action,
+            OldStatus = originalStatus,
+            NewStatus = appointment.Status
+        });
+    }
 }

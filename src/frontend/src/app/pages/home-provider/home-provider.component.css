@@ -242,3 +242,58 @@ footer {
 .slot-category {
   font-size: 13px;
 }
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.edit-time {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.edit-time input {
+  padding: 10px 12px;
+  border: 1px solid #344945;
+  border-radius: 12px;
+  font: inherit;
+}
+
+.action-error {
+  margin: 16px 0;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: #fbeceb;
+}
+
+.confirm-dialog {
+  border: 0;
+  border-radius: 20px;
+  padding: 0;
+  max-width: 440px;
+  width: calc(100% - 32px);
+  background: #f7f5f1;
+  color: #344945;
+}
+
+.confirm-dialog::backdrop {
+  background: rgb(33 44 42 / 45%);
+}
+
+.confirm-prompt {
+  padding: 28px;
+}
+
+.confirm-prompt h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.confirm-prompt p {
+  margin: 0 0 20px;
+}

@@ -60,5 +60,51 @@ public sealed class InMemoryAppointmentStore : IAppointmentStore {
         }
     }
 
+    public bool UpdateBookedNotes(string id, string clientId, string notes) {
+        lock (_slotGate) {
+            if (!TryGetBookedForClient(id, clientId, out var cur)) return false;
+            cur!.Notes = notes;
+            return true;
+        }
+    }
+
+    public bool ReleaseBooking(string id, string clientId) {
+        lock (_slotGate) {
+            if (!TryGetBookedForClient(id, clientId, out var cur)) return false;
+            cur!.UserId = null;
+            cur.Status = AppointmentStatus.Available;
+            cur.Notes = "";
+            return true;
+        }
+    }
+
+    public bool RescheduleBooked(string id, string clientId, DateTimeOffset start, DateTimeOffset end) {
+        lock (_slotGate) {
+            if (!TryGetBookedForClient(id, clientId, out var cur)) return false;
+            cur!.StartDateTime = start;
+            cur.EndDateTime = end;
+            return true;
+        }
+    }
+
+    public bool CancelBooked(string id) {
+        lock (_slotGate) {
+            if (!_items.TryGetValue(id, out var cur) || cur.IsDeleted ||
+                cur.Status != AppointmentStatus.Booked) return false;
+            cur.Status = AppointmentStatus.Canceled;
+            return true;
+        }
+    }
+
+    private bool TryGetBookedForClient(string id, string clientId, out Appointment? cur) {
+        if (!_items.TryGetValue(id, out cur) || cur.IsDeleted ||
+            cur.Status != AppointmentStatus.Booked ||
+            !string.Equals(cur.UserId, clientId, StringComparison.Ordinal)) {
+            cur = null;
+            return false;
+        }
+        return true;
+    }
+
     public bool Remove(string id) => _items.TryRemove(id, out _);
 }

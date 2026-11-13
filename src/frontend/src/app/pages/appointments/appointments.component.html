@@ -1,10 +1,3 @@
-<!--
-  appointments.component.html — the AppointmentsComponent template (the screen at "/appointments").
-
-  Purpose: a one-line placeholder so the top bar, routing, build, and tests can all be verified
-  before any real UI exists. Replace this markup when the appointment scheduler ticket is picked up.
-
--->
 <section class="overview" aria-labelledby="appointments-title">
   <header class="page-header">
     <h1 id="appointments-title">Appointments</h1>
@@ -19,6 +12,10 @@
       <button type="button" (click)="load()">Try again</button>
     </div>
   } @else {
+    @if (actionError) {
+      <div class="error" role="alert"><p>{{ actionError }}</p></div>
+    }
+
     <section class="upcoming-card" aria-labelledby="upcoming-title">
       @if (nextAppointment; as appointment) {
         <div>
@@ -38,6 +35,8 @@
             [attr.aria-expanded]="selectedId === appointment.id" (click)="toggleDetails(appointment.id)">
             {{ selectedId === appointment.id ? 'Hide details' : 'View details' }}
           </button>
+          <button type="button" class="secondary" (click)="startEditNotes(appointment)">Edit note</button>
+          <button type="button" class="danger" (click)="openCancelDialog(appointment)">Cancel appointment</button>
         </div>
 
         @if (selectedId === appointment.id) {
@@ -46,7 +45,18 @@
             <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
             <dt>Status</dt><dd>{{ appointment.status }}</dd>
             <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
-            <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
+            <dt>Notes</dt>
+            <dd>
+              @if (editingNotesId === appointment.id) {
+                <textarea [(ngModel)]="notesDraft" rows="3" aria-label="Appointment notes"></textarea>
+                <div class="card-actions notes-actions">
+                  <button type="button" class="primary" [disabled]="saving" (click)="saveNotes(appointment)">Save note</button>
+                  <button type="button" class="secondary" [disabled]="saving" (click)="cancelEditNotes()">Cancel</button>
+                </div>
+              } @else {
+                {{ appointment.notes || 'No notes' }}
+              }
+            </dd>
           </dl>
         }
       } @else {
@@ -57,5 +67,46 @@
         </div>
       }
     </section>
+
+    @if (upcomingAppointments.length > 1) {
+      <section class="booking-list" aria-labelledby="all-bookings-title">
+        <h2 id="all-bookings-title">All upcoming bookings</h2>
+        @for (appointment of upcomingAppointments; track appointment.id) {
+          <article class="booking-row">
+            <div>
+              <p class="meta">{{ appointment.category }} · {{ appointment.startDateTime | date:'MMM d, h:mm a' }}</p>
+              <h3>{{ appointment.title }}</h3>
+              <p class="provider">{{ appointment.providerName || appointment.providerId }}</p>
+              @if (editingNotesId === appointment.id) {
+                <textarea [(ngModel)]="notesDraft" rows="3" aria-label="Appointment notes"></textarea>
+                <div class="card-actions notes-actions">
+                  <button type="button" class="primary" [disabled]="saving" (click)="saveNotes(appointment)">Save note</button>
+                  <button type="button" class="secondary" [disabled]="saving" (click)="cancelEditNotes()">Cancel</button>
+                </div>
+              } @else if (appointment.notes) {
+                <p class="provider">{{ appointment.notes }}</p>
+              }
+            </div>
+            <div class="card-actions">
+              <button type="button" class="secondary" (click)="startEditNotes(appointment)">Edit note</button>
+              <button type="button" class="danger" (click)="openCancelDialog(appointment)">Cancel</button>
+            </div>
+          </article>
+        }
+      </section>
+    }
   }
 </section>
+
+<dialog #cancelDialog class="confirm-dialog" aria-labelledby="cancel-dialog-title">
+  <section class="confirm-prompt">
+    <h2 id="cancel-dialog-title">Cancel this appointment?</h2>
+    @if (pendingCancel; as appointment) {
+      <p>{{ appointment.title }} · {{ appointment.startDateTime | date:'medium' }}</p>
+    }
+    <div class="card-actions">
+      <button type="button" class="danger" [disabled]="saving" (click)="confirmCancel()">Yes, cancel</button>
+      <button type="button" class="secondary" [disabled]="saving" (click)="closeCancelDialog()">No, go back</button>
+    </div>
+  </section>
+</dialog>

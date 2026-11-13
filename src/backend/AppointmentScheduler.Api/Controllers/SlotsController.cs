@@ -4,6 +4,7 @@ using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace AppointmentScheduler.Api.Controllers;
 
@@ -15,7 +16,8 @@ public sealed class SlotsController(
     IAppointmentTypeStore types,
     ILocationStore locations,
     ICurrentUser currentUser,
-    INotificationService? notificationService = null) : ControllerBase {
+    INotificationService? notificationService = null,
+    IAppointmentAuditStore? audit = null) : ControllerBase {
     [HttpPost]
     public ActionResult<Appointment> Create([FromBody] CreateSlotDto dto) {
         var check = Validate(dto.AppointmentTypeId!, dto.StartTime!.Value, ignoreSlotId: null);
@@ -24,6 +26,13 @@ public sealed class SlotsController(
         var slot = Build(check, id: null);
         var created = appointments.AddSlot(slot);
         notificationService?.OnSlotCreated(currentUser.UserId!, created.Id, created.Category, created.Title);
+        audit?.Add(new AppointmentAuditEntry
+        {
+            AppointmentId = created.Id,
+            ChangedByUserId = currentUser.UserId!,
+            Action = AppointmentAuditEntry.Created,
+            NewStatus = AppointmentStatus.Available
+        });
         return CreatedAtAction(nameof(GetMine), new { }, created);
     }
 
@@ -126,6 +135,14 @@ public sealed class SlotsController(
         var booked = appointments.GetById(slot.Id);
         if (booked is not null)
         {
+            audit?.Add(new AppointmentAuditEntry
+            {
+                AppointmentId = booked.Id,
+                ChangedByUserId = client.Id,
+                Action = AppointmentAuditEntry.StatusChange,
+                OldStatus = AppointmentStatus.Available,
+                NewStatus = AppointmentStatus.Booked
+            });
             var clientUser = users.GetById(client.Id);
             notificationService?.OnAppointmentBooked(
                 client.Id, ownerId, booked.Id, booked.Category, booked.Title,
@@ -141,41 +158,204 @@ public sealed class SlotsController(
         if (error is not null) return error;
 
         var existing = appointments.GetById(id);
-        if (existing is null || existing.ProviderId != provider!.Id) return NotFound();
-        if (existing.Status != AppointmentStatus.Available) return Conflict("Slot is no longer available.");
+        if (existing is null) return NotFound();
+        if (existing.ProviderId != provider!.Id) return Forbid();
+
+        if (existing.Status == AppointmentStatus.Booked)
+            return UpdateBooked(existing, provider, dto);
+        if (existing.Status != AppointmentStatus.Available)
+            return Conflict("Slot is no longer available.");
+
+        return UpdateAvailable(existing, provider, dto);
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(
+        string id,
+        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] ConfirmDto? dto = null) {
+        var (provider, error) = GetApprovedProvider();
+        if (error is not null) return error;
+
+        var existing = appointments.GetById(id);
+        if (existing is null) return NotFound();
+        if (existing.ProviderId != provider!.Id) return Forbid();
+
+        if (existing.Status == AppointmentStatus.Booked) {
+            if (dto?.Confirm != true)
+                return Conflict(BookedConflict(existing));
+
+            var clientId = existing.UserId;
+            if (!appointments.CancelBooked(id))
+                return Conflict("The appointment was modified by another process. Please retry.");
+
+            audit?.Add(new AppointmentAuditEntry
+            {
+                AppointmentId = existing.Id,
+                ChangedByUserId = provider.Id,
+                Action = AppointmentAuditEntry.Cancelled,
+                OldStatus = AppointmentStatus.Booked,
+                NewStatus = AppointmentStatus.Canceled
+            });
+            if (!string.IsNullOrWhiteSpace(clientId))
+                notificationService?.OnBookingCancelled(
+                    clientId, provider.Id, existing.Id, existing.Category, existing.Title, "");
+            return NoContent();
+        }
+
+        if (existing.Status != AppointmentStatus.Available)
+            return Conflict("Only Available slots can be deleted.");
+
+        if (!appointments.SoftDeleteSlot(id)) return Conflict("Slot is no longer available.");
+        audit?.Add(new AppointmentAuditEntry
+        {
+            AppointmentId = existing.Id,
+            ChangedByUserId = provider.Id,
+            Action = AppointmentAuditEntry.Cancelled,
+            OldStatus = AppointmentStatus.Available,
+            NewStatus = AppointmentStatus.Available
+        });
+        notificationService?.OnAppointmentCancelled(string.Empty, provider.Id, existing.Id, existing.Category, existing.Title, string.Empty);
+        return NoContent();
+    }
+
+    // ---------- helpers ----------
+
+    private ActionResult<Appointment> UpdateBooked(Appointment existing, User provider, UpdateSlotDto dto) {
+        if (!dto.Confirm)
+            return Conflict(BookedConflict(existing));
+        if (dto.AppointmentTypeId is not null)
+            return BadRequest("Cannot change the appointment type of a booked slot.");
+        if (dto.StartTime is null)
+            return BadRequest("StartTime is required when rescheduling a booked slot.");
+        if (string.IsNullOrWhiteSpace(existing.UserId))
+            return Conflict("Booked slot has no client.");
+
+        var start = dto.StartTime.Value.ToUniversalTime();
+        if (start <= DateTimeOffset.UtcNow) return BadRequest("Start time must be in the future.");
+        var duration = existing.EndDateTime - existing.StartDateTime;
+        var end = start + duration;
+
+        if (ProviderOverlaps(provider.Id, start, end, existing.Id))
+            return Conflict("Overlaps an existing appointment.");
+        if (ClientOverlaps(existing.UserId, start, end, existing.Id))
+            return Conflict("The client already has an appointment at this time.");
+
+        if (!appointments.RescheduleBooked(existing.Id, existing.UserId, start, end))
+            return Conflict("The appointment was modified by another process. Please retry.");
+
+        var updated = appointments.GetById(existing.Id)!;
+        audit?.Add(new AppointmentAuditEntry
+        {
+            AppointmentId = updated.Id,
+            ChangedByUserId = provider.Id,
+            Action = AppointmentAuditEntry.Rescheduled,
+            OldStatus = AppointmentStatus.Booked,
+            NewStatus = AppointmentStatus.Booked
+        });
+        notificationService?.OnBookingRescheduled(
+            existing.UserId, provider.Id, updated.Id, updated.Category, updated.Title, updated.StartDateTime);
+        return Ok(updated);
+    }
+
+    private ActionResult<Appointment> UpdateAvailable(Appointment existing, User provider, UpdateSlotDto dto) {
+        // Time-only move: keep fields and duration, skip type lookup (publish-created slots
+        // often have type ids that are not in the appointment-type store).
+        if (dto.AppointmentTypeId is null && dto.StartTime is not null) {
+            var start = dto.StartTime.Value.ToUniversalTime();
+            if (start <= DateTimeOffset.UtcNow) return BadRequest("Start time must be in the future.");
+            var duration = existing.EndDateTime - existing.StartDateTime;
+            var end = start + duration;
+            if (ProviderOverlaps(provider.Id, start, end, existing.Id))
+                return Conflict("Overlaps an existing appointment.");
+
+            var moved = Clone(existing);
+            moved.StartDateTime = start;
+            moved.EndDateTime = end;
+            if (!appointments.UpdateSlot(moved)) return Conflict("Slot is no longer available.");
+            audit?.Add(new AppointmentAuditEntry
+            {
+                AppointmentId = moved.Id,
+                ChangedByUserId = provider.Id,
+                Action = AppointmentAuditEntry.Rescheduled,
+                OldStatus = AppointmentStatus.Available,
+                NewStatus = AppointmentStatus.Available
+            });
+            var changes = ActivityChangeFormatter.Describe(
+                ("Start", existing.StartDateTime, moved.StartDateTime),
+                ("End", existing.EndDateTime, moved.EndDateTime));
+            notificationService?.OnAppointmentUpdated(moved.Id, moved.Category, moved.Title, currentUser.UserId, changes);
+            return Ok(moved);
+        }
 
         var check = Validate(dto.AppointmentTypeId ?? existing.AppointmentTypeId!,
-            dto.StartTime ?? existing.StartDateTime, ignoreSlotId: id);
+            dto.StartTime ?? existing.StartDateTime, ignoreSlotId: existing.Id);
         if (check.Error is not null) return check.Error;
 
-        var updated = Build(check, id);
+        var updated = Build(check, existing.Id);
         if (!appointments.UpdateSlot(updated)) return Conflict("Slot is no longer available.");
-        var changes = ActivityChangeFormatter.Describe(
+        audit?.Add(new AppointmentAuditEntry
+        {
+            AppointmentId = updated.Id,
+            ChangedByUserId = provider.Id,
+            Action = AppointmentAuditEntry.Rescheduled,
+            OldStatus = AppointmentStatus.Available,
+            NewStatus = AppointmentStatus.Available
+        });
+        var typedChanges = ActivityChangeFormatter.Describe(
             ("Title", existing.Title, updated.Title),
             ("Category", existing.Category, updated.Category),
             ("Start", existing.StartDateTime, updated.StartDateTime),
             ("End", existing.EndDateTime, updated.EndDateTime),
             ("Location", existing.Location, updated.Location),
             ("Notes", existing.Notes, updated.Notes));
-        notificationService?.OnAppointmentUpdated(updated.Id, updated.Category, updated.Title, currentUser.UserId, changes);
+        notificationService?.OnAppointmentUpdated(updated.Id, updated.Category, updated.Title, currentUser.UserId, typedChanges);
         return Ok(updated);
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult Delete(string id) {
-        var (provider, error) = GetApprovedProvider();
-        if (error is not null) return error;
-
-        var existing = appointments.GetById(id);
-        if (existing is null || existing.ProviderId != provider!.Id) return NotFound();
-        if (existing.Status != AppointmentStatus.Available) return Conflict("Only Available slots can be deleted.");
-
-        if (!appointments.SoftDeleteSlot(id)) return Conflict("Slot is no longer available.");
-        notificationService?.OnAppointmentCancelled(string.Empty, provider!.Id, existing.Id, existing.Category, existing.Title, string.Empty);
-        return NoContent();
+    private BookedSlotConflict BookedConflict(Appointment existing) {
+        var client = string.IsNullOrWhiteSpace(existing.UserId) ? null : users.GetById(existing.UserId);
+        var clientName = client is null
+            ? existing.UserId
+            : $"{client.FirstName} {client.LastName}".Trim();
+        return new BookedSlotConflict
+        {
+            Message = "This slot is booked. Confirm to continue.",
+            RequiresConfirm = true,
+            ClientName = string.IsNullOrWhiteSpace(clientName) ? existing.UserId : clientName,
+            StartDateTime = existing.StartDateTime
+        };
     }
 
-    // ---------- helpers ----------
+    private bool ProviderOverlaps(string providerId, DateTimeOffset start, DateTimeOffset end, string ignoreId) =>
+        appointments.GetAll().Any(a =>
+            a.ProviderId == providerId
+            && a.Id != ignoreId
+            && a.Status != AppointmentStatus.Canceled
+            && a.StartDateTime < end && start < a.EndDateTime);
+
+    private bool ClientOverlaps(string clientId, DateTimeOffset start, DateTimeOffset end, string ignoreId) =>
+        appointments.GetAll().Any(a =>
+            a.UserId == clientId
+            && a.Id != ignoreId
+            && a.Status != AppointmentStatus.Canceled
+            && a.StartDateTime < end && start < a.EndDateTime);
+
+    private static Appointment Clone(Appointment a) => new() {
+        Id = a.Id,
+        Title = a.Title,
+        Category = a.Category,
+        StartDateTime = a.StartDateTime,
+        EndDateTime = a.EndDateTime,
+        ProviderId = a.ProviderId,
+        ProviderName = a.ProviderName,
+        Location = a.Location,
+        AppointmentTypeId = a.AppointmentTypeId,
+        UserId = a.UserId,
+        Status = a.Status,
+        Notes = a.Notes,
+        IsDeleted = a.IsDeleted,
+        DeletedAt = a.DeletedAt,
+    };
 
     private static T? Cached<T>(Dictionary<string, T?> cache, string key, Func<string, T?> load) where T : class {
         if (!cache.TryGetValue(key, out var value)) cache[key] = value = load(key);
@@ -229,11 +409,7 @@ public sealed class SlotsController(
         if (start <= DateTimeOffset.UtcNow) return Fail(BadRequest("Start time must be in the future."));
 
         var end = start.AddMinutes(type.DurationInMinutes);
-        var overlaps = appointments.GetAll().Any(a =>
-            a.ProviderId == provider.Id
-            && a.Id != ignoreSlotId
-            && a.Status != AppointmentStatus.Canceled
-            && a.StartDateTime < end && start < a.EndDateTime); // half-open intervals
+        var overlaps = ProviderOverlaps(provider.Id, start, end, ignoreSlotId ?? "");
         return overlaps
             ? Fail(Conflict("Overlaps an existing appointment."))
             : new Checked(null, provider, type, start, end);

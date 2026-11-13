@@ -6,7 +6,15 @@ import {AuthService} from './auth.service';
 import {ToastService} from './toast.service';
 
 import {AppointmentCategory} from '../models/appointment';
-import {AvailableSlotFilters, BookedAppointment, BookSlotDto, CreateSlotDto, Slot, UpdateSlotDto} from '../models/slot';
+import {
+  AvailableSlotFilters,
+  BookedAppointment,
+  BookSlotDto,
+  ConfirmDto,
+  CreateSlotDto,
+  Slot,
+  UpdateSlotDto
+} from '../models/slot';
 
 const SLOTS_ENDPOINT = '/api/slots';
 const APPOINTMENTS_ENDPOINT = '/api/appointments';
@@ -61,10 +69,11 @@ export class SlotsService {
     );
   }
 
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`).pipe(
-      tap(() => this.toast.showAppointmentDeleted())
-    );
+  delete(id: string, confirm = false): Observable<void> {
+    const body: ConfirmDto | undefined = confirm ? {confirm: true} : undefined;
+    return this.http
+      .delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, body ? {body} : {})
+      .pipe(tap(() => this.toast.showAppointmentDeleted()));
   }
 
   /** Books an open slot for the signed-in client. The API takes the client from the JWT, never the body. */

@@ -2,6 +2,7 @@ using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Models;
 using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduler.Api.Controllers;
@@ -17,7 +18,8 @@ public sealed class AppointmentsController(
     ICurrentUser? currentUser = null,
     IUserStore? users = null,
     INotificationService? notificationService = null,
-    IActivityStore? activity = null) : ControllerBase {
+    IActivityStore? activity = null,
+    IAppointmentAuditStore? audit = null) : ControllerBase {
     /// <summary>
     /// List appointments with optional filtering and paging.
     /// </summary>
@@ -164,7 +166,13 @@ public sealed class AppointmentsController(
                 null);
         }
 
-        activity?.Add("APPOINTMENT_CREATED", $"Appointment created: {created.Title}", currentUser?.UserId, created.Id);
+        audit?.Add(new AppointmentAuditEntry
+        {
+            AppointmentId = created.Id,
+            ChangedByUserId = currentUser?.UserId ?? created.ProviderId,
+            Action = AppointmentAuditEntry.Created,
+            NewStatus = created.Status
+        });
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
@@ -182,11 +190,68 @@ public sealed class AppointmentsController(
             .ToList());
     }
 
-    /// <summary>Update an appointment (edit / reschedule / cancel via status).</summary>
+    /// <summary>Client updates only the notes on their own future Booked appointment.</summary>
+    [HttpPatch("{id}/notes")]
+    [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public ActionResult<Appointment> UpdateNotes(string id, [FromBody] UpdateNotesDto dto) {
+        var (existing, error) = RequireOwnedFutureBooking(id);
+        if (error is not null) return error;
+
+        var notes = dto.Notes?.Trim() ?? "";
+        if (!store.UpdateBookedNotes(id, currentUser!.UserId!, notes))
+            return Conflict("The appointment was modified by another process. Please retry.");
+
+        var updated = store.GetById(id)!;
+        var ownerId = ResolveOwnerUserId(updated);
+        if (!string.IsNullOrWhiteSpace(ownerId))
+            notificationService?.OnBookingNotesUpdated(
+                ownerId, currentUser.UserId!, updated.Id, updated.Category, updated.Title);
+        return Ok(updated);
+    }
+
+    /// <summary>
+    /// Client cancels their own future Booked appointment. The slot returns to Available
+    /// so someone else can book it.
+    /// </summary>
+    [HttpPost("{id}/cancel")]
+    [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public ActionResult<Appointment> CancelBooking(string id) {
+        var (existing, error) = RequireOwnedFutureBooking(id);
+        if (error is not null) return error;
+
+        var ownerId = ResolveOwnerUserId(existing!);
+        if (!store.ReleaseBooking(id, currentUser!.UserId!))
+            return Conflict("The appointment was modified by another process. Please retry.");
+
+        var released = store.GetById(id)!;
+        audit?.Add(new AppointmentAuditEntry
+        {
+            AppointmentId = released.Id,
+            ChangedByUserId = currentUser.UserId!,
+            Action = AppointmentAuditEntry.Cancelled,
+            OldStatus = AppointmentStatus.Booked,
+            NewStatus = AppointmentStatus.Available
+        });
+        if (!string.IsNullOrWhiteSpace(ownerId))
+            notificationService?.OnBookingCancelled(
+                ownerId, currentUser.UserId!, released.Id, released.Category, released.Title, "");
+        return Ok(released);
+    }
+
+    /// <summary>Update an appointment (edit / reschedule / cancel via status). Admins only.</summary>
     /// <param name="id">Appointment identifier to update.</param>
     /// <param name="dto">Partial update payload. Fields left null are not modified.</param>
     /// <returns>200 OK with the updated appointment, 400 BadRequest for validation errors, or 404 NotFound when the appointment does not exist.</returns>
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -314,7 +379,7 @@ public sealed class AppointmentsController(
         return Ok(existing);
     }
 
-    /// <summary> Cancel an appointment by id (soft delete).</summary>
+    /// <summary> Cancel an appointment by id (soft delete). Admins only.</summary>
     /// <param name="id">Appointment identifier.</param>
     /// <remarks>
     /// Performs a soft delete by setting <c>Status = Canceled</c>. The record
@@ -324,6 +389,7 @@ public sealed class AppointmentsController(
     /// </remarks>
     /// <returns>204 No Content on success, or 404 Not Found when the appointment does not exist.</returns>
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult Delete(string id) {
@@ -356,4 +422,26 @@ public sealed class AppointmentsController(
     /// </summary>
     private bool IsProviderVisible(string providerId) =>
         providerStore?.GetById(providerId) is not { IsApproved: false };
+
+    private (Appointment? Appointment, ActionResult? Error) RequireOwnedFutureBooking(string id) {
+        if (currentUser?.UserId is not { } userId) return (null, Unauthorized());
+        if (users?.GetById(userId) is not { IsClient: true, IsActive: true }) return (null, Forbid());
+
+        var existing = store.GetById(id);
+        if (existing is null) return (null, NotFound());
+        if (!string.Equals(existing.UserId, userId, StringComparison.Ordinal)) return (null, Forbid());
+        if (existing.Status != AppointmentStatus.Booked || existing.StartDateTime <= DateTimeOffset.UtcNow)
+            return (null, Conflict("Only Booked future appointments can be changed or canceled."));
+        return (existing, null);
+    }
+
+    /// <summary>
+    /// Prefer the authenticated User id that owns the provider account when the appointment's
+    /// ProviderId is a Provider document id rather than a User id.
+    /// </summary>
+    private string ResolveOwnerUserId(Appointment appointment) {
+        if (users?.GetById(appointment.ProviderId) is { IsServiceProvider: true })
+            return appointment.ProviderId;
+        return appointment.ProviderId;
+    }
 }

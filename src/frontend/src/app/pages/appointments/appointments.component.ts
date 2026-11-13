@@ -1,15 +1,13 @@
 /**
- * appointments.component.ts — AppointmentsComponent, the page served at "/appointments".
+ * appointments.component.ts — client appointments page at "/appointments".
  *
- * Purpose: placeholder screen for the appointment scheduler (create, update, and delete an
- * appointment's category, date/time, provider, user, and location). It renders only
- * "<h1>Appointments Here!</h1>" until that ticket is picked up.
- *
+ * Lists upcoming Booked appointments with edit-note and cancel actions.
  */
 
 import { DatePipe } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { Appointment } from '../../core/models/appointment';
@@ -19,7 +17,7 @@ import { LoadingComponent } from '../../core/components/loading/loading.componen
 @Component({
   selector: 'app-appointments',
   standalone: true,
-  imports: [DatePipe, RouterLink, LoadingComponent],
+  imports: [DatePipe, FormsModule, RouterLink, LoadingComponent],
   templateUrl: './appointments.component.html',
   styleUrl: './appointments.component.css'
 })
@@ -27,10 +25,17 @@ export class AppointmentsComponent implements OnInit {
   private readonly service = inject(AppointmentsOverviewService);
   private readonly destroyRef = inject(DestroyRef);
 
+  @ViewChild('cancelDialog') private cancelDialog?: ElementRef<HTMLDialogElement>;
+
   appointments: Appointment[] = [];
   loading = false;
+  saving = false;
   error = '';
+  actionError = '';
   selectedId = '';
+  editingNotesId = '';
+  notesDraft = '';
+  pendingCancel: Appointment | null = null;
 
   get bookedAppointments(): Appointment[] {
     return this.appointments
@@ -55,7 +60,10 @@ export class AppointmentsComponent implements OnInit {
     if (this.loading) return;
     this.loading = true;
     this.error = '';
+    this.actionError = '';
     this.selectedId = '';
+    this.editingNotesId = '';
+    this.pendingCancel = null;
 
     this.service.loadAppointments()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -75,4 +83,70 @@ export class AppointmentsComponent implements OnInit {
     this.selectedId = this.selectedId === id ? '' : id;
   }
 
+  startEditNotes(appointment: Appointment): void {
+    this.editingNotesId = appointment.id;
+    this.notesDraft = appointment.notes ?? '';
+    this.actionError = '';
+    this.selectedId = appointment.id;
+  }
+
+  cancelEditNotes(): void {
+    this.editingNotesId = '';
+    this.notesDraft = '';
+  }
+
+  saveNotes(appointment: Appointment): void {
+    if (this.saving) return;
+    this.saving = true;
+    this.actionError = '';
+    this.service.updateNotes(appointment.id, this.notesDraft)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.editingNotesId = '';
+          this.load();
+        },
+        error: (err) => {
+          this.saving = false;
+          this.actionError = err?.status === 409
+            ? 'Only Booked future appointments can be changed.'
+            : 'Notes could not be saved. Please try again.';
+        }
+      });
+  }
+
+  openCancelDialog(appointment: Appointment): void {
+    this.pendingCancel = appointment;
+    this.actionError = '';
+    this.cancelDialog?.nativeElement.showModal();
+  }
+
+  closeCancelDialog(): void {
+    this.cancelDialog?.nativeElement.close();
+    this.pendingCancel = null;
+  }
+
+  confirmCancel(): void {
+    const appointment = this.pendingCancel;
+    if (!appointment || this.saving) return;
+    this.saving = true;
+    this.actionError = '';
+    this.service.cancelBooking(appointment.id, appointment.title)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.closeCancelDialog();
+          this.load();
+        },
+        error: (err) => {
+          this.saving = false;
+          this.actionError = err?.status === 409
+            ? 'Only Booked future appointments can be canceled.'
+            : 'Appointment could not be canceled. Please try again.';
+          this.closeCancelDialog();
+        }
+      });
+  }
 }

@@ -174,9 +174,27 @@ describe('SlotsService', () => {
 
     const request = httpTesting.expectOne('/api/slots/s1');
     expect(request.request.method).toBe('DELETE');
+    expect(request.request.body).toBeNull();
     request.flush(null);
 
     expect(completed).toBeTrue();
+  });
+
+  it('should DELETE /api/slots/{id} with confirm body when requested', () => {
+    service.delete('s1', true).subscribe();
+
+    const request = httpTesting.expectOne('/api/slots/s1');
+    expect(request.request.method).toBe('DELETE');
+    expect(request.request.body).toEqual({confirm: true});
+    request.flush(null);
+  });
+
+  it('should PUT /api/slots/{id} with confirm for booked reschedule', () => {
+    service.update('s1', {startTime: '2027-01-01T12:00:00Z', confirm: true}).subscribe();
+
+    const request = httpTesting.expectOne('/api/slots/s1');
+    expect(request.request.body).toEqual({startTime: '2027-01-01T12:00:00Z', confirm: true});
+    request.flush({...slot, startDateTime: '2027-01-01T12:00:00Z', status: 'Booked', userId: 'c1'});
   });
 
   it('should surface an error when the backend rejects the request', () => {
