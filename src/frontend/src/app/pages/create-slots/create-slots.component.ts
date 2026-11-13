@@ -11,6 +11,7 @@ import { AppointmentCategory } from '../../core/models/appointment';
 import { Slot } from '../../core/models/slot';
 import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
 import { fieldErrorMessage } from '../../core/validation/field-error';
+import { DropdownComponent, DropdownOption } from '../../shared/dropdown/dropdown.component';
 
 interface AppointmentForm {
   title: string;
@@ -25,7 +26,7 @@ interface AppointmentForm {
 @Component({
   selector: 'app-create-slots',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, DropdownComponent],
   templateUrl: './create-slots.component.html',
   styleUrl: './create-slots.component.css'
 })
@@ -42,6 +43,10 @@ export class CreateSlotsComponent implements OnInit {
     const allowed: AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
     return allowed.filter(category => user.serviceTypes?.some(value =>
       value.trim().toLowerCase() === category.toLowerCase()));
+  }
+
+  get categoryOptions(): readonly DropdownOption[] {
+    return this.categories.map(category => ({ value: category, label: category }));
   }
 
   get today(): string {
@@ -105,8 +110,20 @@ export class CreateSlotsComponent implements OnInit {
     return new Date(`${this.selectedDate}T12:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
+  get canViewPreviousWeek(): boolean {
+    return this.weekStart(this.selectedDate).getTime() > this.weekStart(this.today).getTime();
+  }
+
   get durationMinutes(): number {
     return 60;
+  }
+
+  changeWeek(offset: -1 | 1): void {
+    if (offset < 0 && !this.canViewPreviousWeek) return;
+    const selected = new Date(`${this.selectedDate}T12:00`);
+    selected.setDate(selected.getDate() + offset * 7);
+    const date = this.localInput(selected.toISOString()).split('T')[0];
+    this.chooseDate(date < this.today ? this.today : date);
   }
 
   chooseDate(date: string): void {
@@ -263,6 +280,12 @@ export class CreateSlotsComponent implements OnInit {
     const date = new Date(value);
     const pad = (part: number) => String(part).padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  private weekStart(value: string): Date {
+    const date = new Date(`${value}T12:00`);
+    date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+    return date;
   }
 
 }

@@ -43,7 +43,6 @@ fieldset {
   padding: 0;
   margin: 0;
   border: 0;
-  min-width: 0;
 }
 
 .form-grid {
@@ -60,7 +59,6 @@ fieldset {
   border: 1px solid #ded9cf;
   border-radius: 20px;
   background: linear-gradient(135deg, #fffdf9, #f9f7f2);
-  box-shadow: 0 5px 16px rgb(52 73 69 / 6%);
 }
 
 .field-pair {
@@ -102,11 +100,35 @@ button {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 0;
 }
 
 .date-section > input {
-  max-width: 240px;
+  max-width: 280px;
+}
+
+.week-strip {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.week-arrow {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #d4d0c6;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.week-arrow svg {
+  width: 20px;
+  fill: none;
+  stroke: currentColor;
 }
 
 .date-option {
@@ -139,14 +161,6 @@ button {
   margin: 0;
   color: #6a7773;
   font-size: 12px;
-}
-
-.selection-summary {
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: #e4e3bc;
-  font-size: 12px;
-  white-space: nowrap;
 }
 
 .time-options {

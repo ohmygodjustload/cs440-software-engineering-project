@@ -84,6 +84,30 @@ describe('CreateSlotsComponent', () => {
     expect(minutes).toBe(60);
   });
 
+  it('moves between calendar weeks with previous and next controls', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+    component.chooseDate(date);
+
+    component.changeWeek(1);
+    expect(
+      (Date.parse(component.selectedDate) - Date.parse(date)) / 86400000
+    ).toBe(7);
+
+    component.changeWeek(-1);
+    expect(component.selectedDate).toBe(date);
+  });
+
+  it('does not navigate to a week before the current week', () => {
+    const component = create().componentInstance;
+    component.chooseDate(component.today);
+    const selected = component.selectedDate;
+
+    expect(component.canViewPreviousWeek).toBeFalse();
+    component.changeWeek(-1);
+    expect(component.selectedDate).toBe(selected);
+  });
+
   it('renders nine one-hour ranges from 9:00–10:00 AM through 5:00–6:00 PM', () => {
     const fixture = create();
     const buttons: HTMLButtonElement[] = Array.from(
