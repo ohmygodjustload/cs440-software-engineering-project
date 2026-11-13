@@ -34,6 +34,11 @@ button {
   border-color: #78908a;
 }
 
+.dropdown-trigger[aria-expanded="true"] {
+  border-bottom-color: transparent;
+  border-radius: 12px 12px 0 0;
+}
+
 .dropdown-trigger:focus-visible {
   outline: 3px solid #577b86;
   outline-offset: 2px;
@@ -70,14 +75,15 @@ button {
 .dropdown-menu {
   position: absolute;
   z-index: 20;
-  top: calc(100% + 6px);
+  top: calc(100% - 1px);
   right: 0;
   left: 0;
   max-height: 240px;
   padding: 6px;
   overflow-y: auto;
   border: 1px solid #d8d4ca;
-  border-radius: 14px;
+  border-top-color: #78908a;
+  border-radius: 0 0 12px 12px;
   background: #fffdf9;
   box-shadow: 0 12px 28px rgb(52 73 69 / 18%);
 }
