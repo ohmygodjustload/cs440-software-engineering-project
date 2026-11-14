@@ -102,6 +102,41 @@ describe('LoginComponent', () => {
     });
   });
 
+  describe('when arriving after being redirected from a protected route', () => {
+    beforeEach(async () => {
+      await TestBed.resetTestingModule()
+        .configureTestingModule({
+          imports: [LoginComponent],
+          providers: [
+            provideRouter([]),
+            {
+              provide: ActivatedRoute,
+              useValue: {
+                snapshot: { queryParamMap: convertToParamMap({ reason: 'auth' }) }
+              }
+            },
+            { provide: AuthService, useValue: authService },
+            { provide: ToastService, useValue: toastService },
+            { provide: UserSettingsService, useValue: settingsService },
+            { provide: NotificationsService, useValue: notificationsService }
+          ]
+        })
+        .compileComponents();
+
+      fixture = TestBed.createComponent(LoginComponent);
+      fixture.detectChanges();
+    });
+
+    it('should not show the sign-in prompt', () => {
+      const page = fixture.nativeElement as HTMLElement;
+      expect(page.textContent).not.toContain('Please sign in first.');
+    });
+
+    it('should not set an error message', () => {
+      expect(fixture.componentInstance.errorMessage).toBeNull();
+    });
+  });
+
   it('should require username and password before submission can proceed', () => {
     const component = fixture.componentInstance;
 

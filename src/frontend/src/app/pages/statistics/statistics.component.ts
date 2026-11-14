@@ -1,20 +1,11 @@
-/**
- * statistics.component.ts — StatisticsComponent, the page served at "/statistics".
- *
- * Purpose: placeholder screen for the statistics panel (historical appointments by category, day of
- * the week, and time of day). It renders only "<h1>Statistics Here!</h1>" until that ticket is
- * picked up.
- *
- */
-
-/** Client appointment history, grouped by category and local start time. */
+/** Client bookings or provider appointment history, grouped by local start time. */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
 import { Appointment } from '../../core/models/appointment';
-import { StatisticsService } from '../../core/services/statistics.service';
+import { StatisticsRole, StatisticsService } from '../../core/services/statistics.service';
 
 interface ChartCount {
   label: string;
@@ -32,6 +23,8 @@ export class StatisticsComponent implements OnInit {
   private readonly service = inject(StatisticsService);
   private readonly destroyRef = inject(DestroyRef);
 
+  roles: StatisticsRole[] = [];
+  role: StatisticsRole = 'client';
   appointments: Appointment[] = [];
   rangeDays = 90;
   loading = false;
@@ -91,16 +84,19 @@ export class StatisticsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.roles = this.service.availableRoles();
+    this.role = this.roles[0] ?? 'client';
     this.load();
   }
 
   load(): void {
     if (this.loading) return;
     this.loading = true;
+    this.appointments = [];
     this.error = '';
     this.now = new Date();
 
-    this.service.loadAppointments()
+    this.service.loadAppointments(this.role)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (items) => {
@@ -116,4 +112,3 @@ export class StatisticsComponent implements OnInit {
       });
   }
 }
-

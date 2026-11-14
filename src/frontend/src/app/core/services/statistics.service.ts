@@ -2,9 +2,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, expand, map, reduce, EMPTY, throwError } from 'rxjs';
 
+import { ProviderHomeService } from './home-provider.service';
 import { AuthService } from './auth.service';
 
 import { Appointment, PagedResult } from '../models/appointment';
+
+export type StatisticsRole = 'client' | 'provider';
 
 @Injectable({ providedIn: 'root' })
 export class StatisticsService {
@@ -12,11 +15,28 @@ export class StatisticsService {
 
   private readonly auth = inject(AuthService);
 
-  loadAppointments(): Observable<Appointment[]> {
+  private readonly providerHome = inject(ProviderHomeService);
+
+  availableRoles() : StatisticsRole[] {
+    const user = this.auth.getCurrentUser();
+    if (!user || user.isAdmin || user.isActive === false) return [];
+    const roles: StatisticsRole[] = [];
+    if (user.isServiceProvider) roles.push('provider');
+    if (user.isClient) roles.push('client');
+    return roles;
+  }
+
+  loadAppointments(role: StatisticsRole = this.availableRoles()[0] ?? 'client'): Observable<Appointment[]> {
     const user = this.auth.getCurrentUser();
     if (!user) return throwError(() => new Error('Please sign in to view statistics.'));
-    if (!user.isClient || user.isAdmin || user.isServiceProvider) {
-      return throwError(() => new Error('Client statistics require a client account.'));
+    if (!this.availableRoles().includes(role)) {
+      return throwError(() => new Error('This statistics view is not available for your account.'));
+    }
+    if (role === 'provider'){
+      // This existing endpoint resolves provider ownership from the JWT, inclding linked provider records.
+      return this.providerHome.bookings().pipe(
+        map(items => items.filter(item => !!item.userId && item.status !== 'Available'))
+      );
     }
 
     return this.loadPage(1).pipe(
