@@ -156,9 +156,19 @@ export class ProviderHomeComponent implements OnInit {
 
   deleteSlot(appointment: Appointment, confirm = false): void {
     if (this.saving) return;
+
+    // Open slots: confirm in the UI before sending DELETE.
+    if (!confirm && appointment.status === 'Available') {
+      this.pendingAction = { kind: 'delete', appointment };
+      this.pendingConflict = null;
+      this.actionError = '';
+      this.confirmDialog?.nativeElement.showModal();
+      return;
+    }
+
     this.saving = true;
     this.actionError = '';
-    this.slots.delete(appointment.id, confirm)
+    this.slots.delete(appointment, confirm)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

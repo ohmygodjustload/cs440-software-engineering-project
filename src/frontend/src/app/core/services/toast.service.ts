@@ -177,23 +177,24 @@ export class ToastService {
     });
   }
 
-  /** Appointment soft-deleted. */
-  showAppointmentDeleted(title?: string | null): string {
+  /** Appointment soft-deleted (open slot removed). */
+  showAppointmentDeleted(title?: string | null, startDateTime?: string | null): string {
+    const when = formatWhen(startDateTime ?? undefined);
     return this.show({
       title: 'Appointment deleted',
-      message: title?.trim() ?? '',
-      variant: 'info',
+      message: [title?.trim() || 'Appointment', when].filter(Boolean).join(' · '),
+      variant: 'success',
       actionUrl: '/appointments'
     });
   }
 
-  /** Appointment cancelled (status -> Canceled). */
+  /** Appointment cancelled (booking released or soft-deleted). */
   showAppointmentCancelled(title: string, startDateTime?: string | null): string {
     const when = formatWhen(startDateTime ?? undefined);
     return this.show({
       title: 'Appointment cancelled',
       message: [title?.trim() || 'Appointment', when].filter(Boolean).join(' · '),
-      variant: 'info',
+      variant: 'success',
       actionUrl: '/appointments'
     });
   }

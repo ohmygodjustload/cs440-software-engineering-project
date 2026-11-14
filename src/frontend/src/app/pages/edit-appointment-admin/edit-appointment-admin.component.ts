@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -23,10 +23,15 @@ export class EditAppointmentAdminComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
 
+  @ViewChild('cancelDialog') private cancelDialog?: ElementRef<HTMLDialogElement>;
+
   appointment: Appointment | null = null;
   loading = true;
   saving = false;
+  cancelling = false;
   error: string | null = null;
+  /** Original UTC start time for toast formatting after local-input conversion. */
+  originalStartIso = '';
 
   private originalValues: string | null = null;
 
@@ -59,6 +64,7 @@ export class EditAppointmentAdminComponent implements OnInit {
       .get<Appointment>(`/api/appointments/${encodeURIComponent(id)}`)
       .subscribe({
         next: (appointment) => {
+          this.originalStartIso = appointment.startDateTime;
           this.appointment = {
             ...appointment,
             startDateTime: this.toDateTimeLocal(appointment.startDateTime),
@@ -73,6 +79,43 @@ export class EditAppointmentAdminComponent implements OnInit {
           this.loading = false;
         }
       });
+  }
+
+  get canCancelAppointment(): boolean {
+    const status = this.appointment?.status;
+    return status === 'Available' || status === 'Booked';
+  }
+
+  openCancelDialog(): void {
+    if (!this.canCancelAppointment || this.cancelling || this.saving) return;
+    this.cancelDialog?.nativeElement.showModal();
+  }
+
+  closeCancelDialog(): void {
+    this.cancelDialog?.nativeElement.close();
+  }
+
+  confirmCancel(): void {
+    if (!this.appointment || this.cancelling || !this.canCancelAppointment) return;
+
+    this.cancelling = true;
+    this.error = null;
+    const { id, title } = this.appointment;
+    const startForToast = this.originalStartIso || this.appointment.startDateTime;
+
+    this.http.delete(`/api/appointments/${encodeURIComponent(id)}`).subscribe({
+      next: () => {
+        this.cancelling = false;
+        this.closeCancelDialog();
+        this.toastService.showAppointmentCancelled(title, startForToast);
+        void this.router.navigate(['/appointments-admin']);
+      },
+      error: () => {
+        this.cancelling = false;
+        this.error = 'Could not cancel this appointment.';
+        this.closeCancelDialog();
+      }
+    });
   }
 
   save(): void {

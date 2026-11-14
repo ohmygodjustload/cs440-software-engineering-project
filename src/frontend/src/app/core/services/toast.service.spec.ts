@@ -88,7 +88,7 @@ describe('ToastService', () => {
   it('should expose appointment booked/updated/deleted/cancelled copy', () => {
     service.showAppointmentBooked('Annual physical', '2026-10-20T09:00:00Z');
     service.showAppointmentModified('Haircut', null);
-    service.showAppointmentDeleted('Old visit');
+    service.showAppointmentDeleted('Old visit', '2026-10-20T09:00:00Z');
     service.showAppointmentCancelled('Yoga', '2026-10-21T10:00:00Z');
 
     expect(service.toasts.map((toast) => toast.title)).toEqual([
@@ -98,7 +98,11 @@ describe('ToastService', () => {
       'Appointment cancelled'
     ]);
     expect(service.toasts[0].message).toContain('Annual physical');
-    expect(service.toasts[2].message).toBe('Old visit');
+    expect(service.toasts[0].variant).toBe('success');
+    expect(service.toasts[2].message).toContain('Old visit');
+    expect(service.toasts[2].variant).toBe('success');
+    expect(service.toasts[3].message).toContain('Yoga');
+    expect(service.toasts[3].variant).toBe('success');
   });
 
   it('should expose missed + settings-changed copy', () => {

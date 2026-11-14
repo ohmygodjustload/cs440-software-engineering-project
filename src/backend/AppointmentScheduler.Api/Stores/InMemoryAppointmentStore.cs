@@ -92,6 +92,9 @@ public sealed class InMemoryAppointmentStore : IAppointmentStore {
             if (!_items.TryGetValue(id, out var cur) || cur.IsDeleted ||
                 cur.Status != AppointmentStatus.Booked) return false;
             cur.Status = AppointmentStatus.Canceled;
+            cur.UserId = null;
+            cur.IsDeleted = true;
+            cur.DeletedAt = DateTimeOffset.UtcNow;
             return true;
         }
     }

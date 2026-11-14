@@ -85,8 +85,8 @@ textarea { min-height: 100px; resize: vertical; }
   font-size: 13px;
 }
 
-.actions { display: flex; justify-content: flex-end; gap: 12px; }
-.primary, .secondary {
+.actions { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.primary, .secondary, .danger {
   padding: 12px 24px;
   border: 0;
   border-radius: 999px;
@@ -95,10 +95,48 @@ textarea { min-height: 100px; resize: vertical; }
 }
 .primary { background: #344945; color: #f7f5f1; }
 .secondary { background: #e0dcd1; color: #344945; }
+.danger { background: #8b3a3a; color: #f7f5f1; margin-right: auto; }
 .error, [role="alert"] { padding: 14px; border-radius: 12px; background: #fbeaea; }
 button:disabled, select:disabled { opacity: .45; cursor: not-allowed; }
 
 button:disabled { pointer-events: none; }
+
+.confirm-dialog {
+  border: 0;
+  border-radius: 20px;
+  padding: 0;
+  max-width: 420px;
+  width: calc(100% - 32px);
+  background: #f7f5f1;
+  color: #344945;
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(52, 73, 69, 0.45);
+}
+
+.confirm-prompt {
+  padding: 28px;
+}
+
+.confirm-prompt h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.confirm-prompt p {
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.confirm-prompt .actions {
+  justify-content: flex-end;
+}
+
+.confirm-prompt .danger {
+  margin-right: 0;
+}
 
 @media (max-width: 650px) {
   .slot-page { margin: 12px; padding: 24px 18px; }

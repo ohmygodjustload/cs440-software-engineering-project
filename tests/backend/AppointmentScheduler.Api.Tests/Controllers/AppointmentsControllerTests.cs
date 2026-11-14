@@ -122,25 +122,49 @@ public class AppointmentsControllerTests {
         var updated = controller.Update(id, new UpdateAppointmentDto { Title = "Renamed" });
         Assert.Equal("Renamed", Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(updated.Result).Value).Title);
 
-        // DELETE is a soft cancel: record stays with Status = Cancelled.
+        // DELETE soft-deletes a Booked appointment so it drops out of live lists.
         Assert.IsType<NoContentResult>(controller.Delete(id));
-        var cancelled = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(controller.GetById(id).Result).Value);
-        Assert.Equal(AppointmentStatus.Canceled, cancelled.Status);
+        Assert.IsType<NotFoundResult>(controller.GetById(id).Result);
     }
 
     [Fact]
-    public void Delete_IsIdempotent_And_KeepsHistory() {
-        var controller = CreateController();
-        var created = Assert.IsType<CreatedAtActionResult>(controller.Create(ValidDto()).Result);
-        var id = Assert.IsType<Appointment>(created.Value).Id;
+    public void Delete_Booked_SoftDeletes_ClearsClient_AndNotifies() {
+        var (c, store, audit, notes) = ClientController(SeedIds.AdminUser);
+        var booked = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
+        booked.Title = "Admin cancel me";
 
-        Assert.IsType<NoContentResult>(controller.Delete(id));
-        Assert.IsType<NoContentResult>(controller.Delete(id));
+        Assert.IsType<NoContentResult>(c.Delete(booked.Id));
+        Assert.Null(store.GetById(booked.Id));
+        Assert.Contains(audit.Query(action: AppointmentAuditEntry.Cancelled), e =>
+            e.AppointmentId == booked.Id
+            && e.ChangedByUserId == SeedIds.AdminUser
+            && e.OldStatus == AppointmentStatus.Booked
+            && e.NewStatus == AppointmentStatus.Canceled);
+        Assert.Contains(notes.GetAll(SeedIds.ClientUser), n => n.Event == "appointment-cancelled");
+        Assert.Contains(notes.GetAll(SeedIds.ProviderUser), n => n.Event == "appointment-cancelled");
+    }
 
-        var list = controller.List(null, null, null, AppointmentStatus.Canceled, null);
-        var ok = Assert.IsType<OkObjectResult>(list.Result);
-        var payload = Assert.IsType<PagedResult<Appointment>>(ok.Value);
-        Assert.Contains(payload.Items, a => a.Id == id);
+    [Fact]
+    public void Delete_Available_SoftDeletes() {
+        var (c, store, audit, notes) = ClientController(SeedIds.AdminUser);
+        var open = AddAt(store, 24, null, AppointmentStatus.Available);
+
+        Assert.IsType<NoContentResult>(c.Delete(open.Id));
+        Assert.Null(store.GetById(open.Id));
+        Assert.Contains(audit.Query(action: AppointmentAuditEntry.Cancelled), e =>
+            e.AppointmentId == open.Id
+            && e.OldStatus == AppointmentStatus.Available
+            && e.NewStatus == AppointmentStatus.Available);
+        Assert.Contains(notes.GetAll(SeedIds.ProviderUser), n => n.Event == "appointment-cancelled");
+    }
+
+    [Fact]
+    public void Delete_Completed_409() {
+        var (c, store, _, _) = ClientController(SeedIds.AdminUser);
+        var completed = AddAt(store, -2, SeedIds.ClientUser, AppointmentStatus.Completed);
+
+        Assert.IsType<ConflictObjectResult>(c.Delete(completed.Id));
+        Assert.NotNull(store.GetById(completed.Id));
     }
 
     [Fact]

@@ -260,4 +260,51 @@ describe('ProviderHomeComponent', () => {
     expect(labels).not.toContain('Edit');
     expect(labels).not.toContain('Delete');
   });
+
+  it('opens the confirm dialog before deleting an open slot', () => {
+    const openSlot: Appointment = {
+      id: 's1',
+      title: 'Open massage',
+      category: 'Beauty',
+      startDateTime: new Date(Date.now() + 172800000).toISOString(),
+      endDateTime: new Date(Date.now() + 176400000).toISOString(),
+      providerId: 'p1',
+      userId: null,
+      status: 'Available'
+    };
+    const deleteSpy = jasmine.createSpy('delete').and.returnValue(of(void 0));
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [ProviderHomeComponent],
+      providers: [
+        provideRouter([]),
+        { provide: ProviderHomeService, useValue: { bookings: () => of([booked, openSlot]) } },
+        {
+          provide: SlotsService,
+          useValue: {
+            update: () => of(openSlot),
+            delete: deleteSpy
+          }
+        }
+      ]
+    });
+    const fixture = TestBed.createComponent(ProviderHomeComponent);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const dialog = document.createElement('dialog');
+    spyOn(dialog, 'showModal');
+    component['confirmDialog'] = { nativeElement: dialog } as never;
+
+    component.deleteSlot(openSlot);
+
+    expect(deleteSpy).not.toHaveBeenCalled();
+    expect(component.pendingAction?.kind).toBe('delete');
+    expect(component.pendingConflict).toBeNull();
+    expect(dialog.showModal).toHaveBeenCalled();
+
+    component.confirmPending();
+    expect(deleteSpy).toHaveBeenCalledWith(openSlot, true);
+  });
 });

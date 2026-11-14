@@ -76,13 +76,13 @@ public class InMemoryAppointmentStoreTests {
     }
 
     [Fact]
-    public void CancelBooked_SetsCanceled() {
+    public void CancelBooked_SoftDeletes_AndClearsClient() {
         var store = new InMemoryAppointmentStore();
         var slot = Slot(store);
         Assert.False(store.CancelBooked(slot.Id));
-        Assert.True(store.BookSlot(slot.Id, SeedIds.ClientUser, ""));
+        Assert.True(store.BookSlot(slot.Id, SeedIds.ClientUser, "note"));
         Assert.True(store.CancelBooked(slot.Id));
-        Assert.Equal(AppointmentStatus.Canceled, store.GetById(slot.Id)!.Status);
+        Assert.Null(store.GetById(slot.Id));
         Assert.False(store.CancelBooked(slot.Id));
     }
 }

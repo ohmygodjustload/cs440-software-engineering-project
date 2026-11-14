@@ -170,7 +170,7 @@ describe('SlotsService', () => {
   it('should DELETE /api/slots/{id}', () => {
     let completed = false;
 
-    service.delete('s1').subscribe(() => (completed = true));
+    service.delete(slot).subscribe(() => (completed = true));
 
     const request = httpTesting.expectOne('/api/slots/s1');
     expect(request.request.method).toBe('DELETE');
@@ -181,7 +181,7 @@ describe('SlotsService', () => {
   });
 
   it('should DELETE /api/slots/{id} with confirm body when requested', () => {
-    service.delete('s1', true).subscribe();
+    service.delete({ ...slot, status: 'Booked' }, true).subscribe();
 
     const request = httpTesting.expectOne('/api/slots/s1');
     expect(request.request.method).toBe('DELETE');

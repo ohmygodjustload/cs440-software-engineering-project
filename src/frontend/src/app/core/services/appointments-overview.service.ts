@@ -23,9 +23,15 @@ export class AppointmentsOverviewService {
   }
 
   /** Client cancels their booking; the slot returns to Available. */
-  cancelBooking(id: string, title?: string | null): Observable<Appointment> {
+  cancelBooking(
+    id: string,
+    title?: string | null,
+    startDateTime?: string | null
+  ): Observable<Appointment> {
     return this.http
       .post<Appointment>(`/api/appointments/${encodeURIComponent(id)}/cancel`, {})
-      .pipe(tap(() => this.toast.showAppointmentCancelled(title ?? 'Appointment')));
+      .pipe(
+        tap(() => this.toast.showAppointmentCancelled(title ?? 'Appointment', startDateTime))
+      );
   }
 }

@@ -85,7 +85,7 @@ describe('Appointments overview', () => {
     component.pendingCancel = item;
     component.confirmCancel();
 
-    expect(cancelBooking).toHaveBeenCalledWith('a1', 'Physical');
+    expect(cancelBooking).toHaveBeenCalledWith('a1', 'Physical', item.startDateTime);
   });
 
   it('surfaces a 409 when notes cannot be saved', () => {

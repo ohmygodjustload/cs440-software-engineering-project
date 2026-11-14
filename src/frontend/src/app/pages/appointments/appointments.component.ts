@@ -132,7 +132,7 @@ export class AppointmentsComponent implements OnInit {
     if (!appointment || this.saving) return;
     this.saving = true;
     this.actionError = '';
-    this.service.cancelBooking(appointment.id, appointment.title)
+    this.service.cancelBooking(appointment.id, appointment.title, appointment.startDateTime)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

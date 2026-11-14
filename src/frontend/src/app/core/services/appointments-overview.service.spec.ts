@@ -50,7 +50,7 @@ describe('AppointmentsOverviewService', () => {
     const released = { id: 'a1', status: 'Available', userId: null } as Appointment;
     let actual: Appointment | undefined;
 
-    service.cancelBooking('a1', 'Checkup').subscribe((item) => (actual = item));
+    service.cancelBooking('a1', 'Checkup', '2027-01-01T10:00:00Z').subscribe((item) => (actual = item));
 
     const request = httpTesting.expectOne('/api/appointments/a1/cancel');
     expect(request.request.method).toBe('POST');

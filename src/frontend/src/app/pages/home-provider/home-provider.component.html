@@ -189,11 +189,17 @@
 
 <dialog #confirmDialog class="confirm-dialog" aria-labelledby="provider-confirm-title">
   <section class="confirm-prompt">
-    <h2 id="provider-confirm-title">This slot is booked</h2>
     @if (pendingConflict; as conflict) {
+      <h2 id="provider-confirm-title">This slot is booked</h2>
       <p>
         {{ conflict.clientName || 'A client' }} is booked for
         {{ conflict.startDateTime | date:'medium' }}. Continue anyway?
+      </p>
+    } @else if (pendingAction) {
+      <h2 id="provider-confirm-title">Delete this open slot?</h2>
+      <p>
+        {{ pendingAction.appointment.title || 'Appointment' }} ·
+        {{ pendingAction.appointment.startDateTime | date:'medium' }}
       </p>
     }
     <div class="row-actions">

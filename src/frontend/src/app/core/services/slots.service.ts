@@ -5,7 +5,7 @@ import {Observable, tap, throwError} from 'rxjs';
 import {AuthService} from './auth.service';
 import {ToastService} from './toast.service';
 
-import {AppointmentCategory} from '../models/appointment';
+import {Appointment, AppointmentCategory} from '../models/appointment';
 import {
   AvailableSlotFilters,
   BookedAppointment,
@@ -69,11 +69,22 @@ export class SlotsService {
     );
   }
 
-  delete(id: string, confirm = false): Observable<void> {
+  delete(
+    slot: Pick<Appointment, 'id' | 'title' | 'startDateTime' | 'status'>,
+    confirm = false
+  ): Observable<void> {
     const body: ConfirmDto | undefined = confirm ? {confirm: true} : undefined;
     return this.http
-      .delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(id)}`, body ? {body} : {})
-      .pipe(tap(() => this.toast.showAppointmentDeleted()));
+      .delete<void>(`${SLOTS_ENDPOINT}/${encodeURIComponent(slot.id)}`, body ? {body} : {})
+      .pipe(
+        tap(() => {
+          if (slot.status === 'Booked') {
+            this.toast.showAppointmentCancelled(slot.title, slot.startDateTime);
+          } else {
+            this.toast.showAppointmentDeleted(slot.title, slot.startDateTime);
+          }
+        })
+      );
   }
 
   /** Books an open slot for the signed-in client. The API takes the client from the JWT, never the body. */

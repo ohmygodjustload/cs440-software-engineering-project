@@ -29,6 +29,9 @@ public interface IAppointmentStore {
     /// <summary>Moves a Booked appointment's times while keeping the same client.</summary>
     bool RescheduleBooked(string id, string clientId, DateTimeOffset start, DateTimeOffset end);
 
-    /// <summary>Sets a Booked appointment's status to Canceled.</summary>
+    /// <summary>
+    /// Cancels a Booked appointment: status becomes Canceled, the client is removed,
+    /// and the appointment is soft-deleted so it drops out of live lists.
+    /// </summary>
     bool CancelBooked(string id);
 }

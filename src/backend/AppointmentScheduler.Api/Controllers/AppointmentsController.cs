@@ -331,7 +331,8 @@ public sealed class AppointmentsController(
 
         if (dto.Status.HasValue
             && oldStatus != AppointmentStatus.Canceled
-            && existing.Status == AppointmentStatus.Canceled) {
+            && existing.Status == AppointmentStatus.Canceled
+            && !string.IsNullOrWhiteSpace(existing.UserId)) {
             notificationService?.OnAppointmentCancelled(
                 existing.UserId, notifyingProviderId, existing.Id, existing.Category, existing.Title, existing.Notes ?? string.Empty);
         }
@@ -379,33 +380,73 @@ public sealed class AppointmentsController(
         return Ok(existing);
     }
 
-    /// <summary> Cancel an appointment by id (soft delete). Admins only.</summary>
+    /// <summary>Cancel an appointment by id. Admins only.</summary>
     /// <param name="id">Appointment identifier.</param>
     /// <remarks>
-    /// Performs a soft delete by setting <c>Status = Canceled</c>. The record
-    /// is retained for history and is still returned by GET /api/appointments/{id}
-    /// and GET /api/appointments?status=Canceled. Cancelling an already-canceled
-    /// appointment is a no-op and returns 204 No Content.
+    /// Booked: status becomes Canceled, the client is removed, and the appointment is soft-deleted.
+    /// Available: soft-deleted so it drops out of live lists.
+    /// Other statuses return 409 Conflict.
     /// </remarks>
-    /// <returns>204 No Content on success, or 404 Not Found when the appointment does not exist.</returns>
+    /// <returns>204 No Content on success, 404 Not Found, or 409 Conflict.</returns>
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public IActionResult Delete(string id) {
         var existing = store.GetById(id);
         if (existing is null) {
             return NotFound();
         }
 
-        if (existing.Status == AppointmentStatus.Canceled) return NoContent();
-        existing.Status = AppointmentStatus.Canceled;
-        store.Update(existing);
+        var adminId = currentUser?.UserId;
+        if (existing.Status == AppointmentStatus.Booked) {
+            var clientId = existing.UserId;
+            if (!store.CancelBooked(id))
+                return Conflict("The appointment was modified by another process. Please retry.");
 
-        notificationService?.OnAppointmentCancelled(
-            existing.UserId, existing.ProviderId, existing.Id, existing.Category, existing.Title, existing.Notes ?? string.Empty);
+            if (!string.IsNullOrWhiteSpace(adminId)) {
+                audit?.Add(new AppointmentAuditEntry
+                {
+                    AppointmentId = existing.Id,
+                    ChangedByUserId = adminId,
+                    Action = AppointmentAuditEntry.Cancelled,
+                    OldStatus = AppointmentStatus.Booked,
+                    NewStatus = AppointmentStatus.Canceled
+                });
+            }
 
-        return NoContent();
+            if (!string.IsNullOrWhiteSpace(clientId) && !string.IsNullOrWhiteSpace(adminId))
+                notificationService?.OnBookingCancelled(
+                    clientId, adminId, existing.Id, existing.Category, existing.Title, "");
+            if (!string.IsNullOrWhiteSpace(existing.ProviderId) && !string.IsNullOrWhiteSpace(adminId))
+                notificationService?.OnBookingCancelled(
+                    existing.ProviderId, adminId, existing.Id, existing.Category, existing.Title, "");
+            return NoContent();
+        }
+
+        if (existing.Status == AppointmentStatus.Available) {
+            if (!store.SoftDeleteSlot(id))
+                return Conflict("Slot is no longer available.");
+
+            if (!string.IsNullOrWhiteSpace(adminId)) {
+                audit?.Add(new AppointmentAuditEntry
+                {
+                    AppointmentId = existing.Id,
+                    ChangedByUserId = adminId,
+                    Action = AppointmentAuditEntry.Cancelled,
+                    OldStatus = AppointmentStatus.Available,
+                    NewStatus = AppointmentStatus.Available
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(existing.ProviderId) && !string.IsNullOrWhiteSpace(adminId))
+                notificationService?.OnBookingCancelled(
+                    existing.ProviderId, adminId, existing.Id, existing.Category, existing.Title, "");
+            return NoContent();
+        }
+
+        return Conflict("Only Booked or Available appointments can be cancelled.");
     }
 
     /// <summary>

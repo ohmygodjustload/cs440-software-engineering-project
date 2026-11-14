@@ -173,7 +173,11 @@ public sealed class MongoAppointmentStore : IAppointmentStore
     {
         var canceledId = FindStatusId("Canceled") ?? FindStatusId("Cancelled")
             ?? throw new InvalidOperationException("Status 'Canceled' (or 'Cancelled') not found in Status collection.");
-        var update = Builders<BsonDocument>.Update.Set("StatusId", canceledId);
+        var update = Builders<BsonDocument>.Update
+            .Set("StatusId", canceledId)
+            .Set("UserId", BsonNull.Value)
+            .Set("IsDeleted", true)
+            .Set("DeletedAt", DateTime.UtcNow);
         return _raw.UpdateOne(BookedFilter(id), update).ModifiedCount == 1;
     }
 
