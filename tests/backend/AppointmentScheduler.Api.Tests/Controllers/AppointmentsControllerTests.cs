@@ -1,7 +1,10 @@
+using System.Reflection;
 using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Controllers;
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +17,17 @@ public class AppointmentsControllerTests {
 
     private static AppointmentsController CreateController() {
         return new AppointmentsController(new InMemoryAppointmentStore());
+    }
+
+    private static (AppointmentsController c, InMemoryAppointmentStore store, InMemoryAppointmentAuditStore audit, InMemoryNotificationStore notes)
+        ClientController(string? userId = SeedIds.ClientUser) {
+        var store = new InMemoryAppointmentStore();
+        var users = new InMemoryUserStore();
+        var notifications = new InMemoryNotificationStore();
+        var audit = new InMemoryAppointmentAuditStore();
+        var service = new NotificationService(notifications, users);
+        var c = new AppointmentsController(store, null, new FakeUser(userId), users, service, null, audit);
+        return (c, store, audit, notifications);
     }
 
     private static CreateAppointmentDto ValidDto() => new() {
@@ -236,5 +250,78 @@ public class AppointmentsControllerTests {
 
         var payload = Assert.IsType<PagedResult<Appointment>>(Assert.IsType<OkObjectResult>(result.Result).Value);
         Assert.Single(payload.Items);
+    }
+
+    [Fact]
+    public void Update_And_Delete_RequireAdminRole() {
+        Assert.NotNull(typeof(AppointmentsController).GetMethod(nameof(AppointmentsController.Update))!
+            .GetCustomAttribute<AuthorizeAttribute>());
+        Assert.Equal("Admin", typeof(AppointmentsController).GetMethod(nameof(AppointmentsController.Update))!
+            .GetCustomAttribute<AuthorizeAttribute>()!.Roles);
+        Assert.Equal("Admin", typeof(AppointmentsController).GetMethod(nameof(AppointmentsController.Delete))!
+            .GetCustomAttribute<AuthorizeAttribute>()!.Roles);
+    }
+
+    [Fact]
+    public void UpdateNotes_ChangesOnlyNotes_AndNotifiesProvider() {
+        var (c, store, _, notes) = ClientController();
+        var booked = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
+        booked.Title = "Checkup";
+        booked.Category = AppointmentCategory.Medical;
+        var originalStart = booked.StartDateTime;
+
+        var updated = Assert.IsType<Appointment>(
+            Assert.IsType<OkObjectResult>(c.UpdateNotes(booked.Id, new UpdateNotesDto { Notes = "  bring forms  " }).Result).Value);
+
+        Assert.Equal("bring forms", updated.Notes);
+        Assert.Equal(originalStart, updated.StartDateTime);
+        Assert.Equal(AppointmentStatus.Booked, updated.Status);
+        Assert.Equal(SeedIds.ClientUser, updated.UserId);
+        Assert.Contains(notes.GetAll(SeedIds.ProviderUser), n => n.Event == "appointment-edited");
+    }
+
+    [Fact]
+    public void UpdateNotes_UnauthorizedForbiddenNotFoundConflict() {
+        var (c, store, _, _) = ClientController();
+        var booked = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
+        var past = AddAt(store, -1, SeedIds.ClientUser, AppointmentStatus.Booked);
+        var other = AddAt(store, 24, "someone-else", AppointmentStatus.Booked);
+
+        Assert.IsType<UnauthorizedResult>(ClientController(null).c.UpdateNotes(booked.Id, new UpdateNotesDto()).Result);
+        Assert.IsType<ForbidResult>(ClientController(SeedIds.ProviderUser).c.UpdateNotes(booked.Id, new UpdateNotesDto()).Result);
+        Assert.IsType<NotFoundResult>(c.UpdateNotes("missing", new UpdateNotesDto()).Result);
+        Assert.IsType<ForbidResult>(c.UpdateNotes(other.Id, new UpdateNotesDto()).Result);
+        Assert.IsType<ConflictObjectResult>(c.UpdateNotes(past.Id, new UpdateNotesDto()).Result);
+    }
+
+    [Fact]
+    public void CancelBooking_ReleasesSlot_WritesAudit_AndNotifiesProvider() {
+        var (c, store, audit, notes) = ClientController();
+        var booked = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
+        booked.Title = "Checkup";
+        booked.Notes = "keep me";
+
+        var released = Assert.IsType<Appointment>(
+            Assert.IsType<OkObjectResult>(c.CancelBooking(booked.Id).Result).Value);
+
+        Assert.Equal(AppointmentStatus.Available, released.Status);
+        Assert.Null(released.UserId);
+        Assert.Equal("", released.Notes);
+        var entry = Assert.Single(audit.Query(action: AppointmentAuditEntry.Cancelled));
+        Assert.Equal(booked.Id, entry.AppointmentId);
+        Assert.Equal(SeedIds.ClientUser, entry.ChangedByUserId);
+        Assert.Equal(AppointmentStatus.Booked, entry.OldStatus);
+        Assert.Equal(AppointmentStatus.Available, entry.NewStatus);
+        Assert.Contains(notes.GetAll(SeedIds.ProviderUser), n => n.Event == "appointment-cancelled");
+    }
+
+    [Fact]
+    public void CancelBooking_PastOrWrongOwner_409Or403() {
+        var (c, store, _, _) = ClientController();
+        var past = AddAt(store, -2, SeedIds.ClientUser, AppointmentStatus.Booked);
+        var other = AddAt(store, 24, "someone-else", AppointmentStatus.Booked);
+
+        Assert.IsType<ConflictObjectResult>(c.CancelBooking(past.Id).Result);
+        Assert.IsType<ForbidResult>(c.CancelBooking(other.Id).Result);
     }
 }

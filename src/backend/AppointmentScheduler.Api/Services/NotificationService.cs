@@ -150,6 +150,87 @@ public sealed class NotificationService : INotificationService
         NotifyAdmins("APPOINTMENT_CANCELLED", "Appointment cancelled", title, appointmentId, category, clientId);
     }
 
+    public void OnBookingCancelled(
+        string recipientId,
+        string actorId,
+        string appointmentId,
+        AppointmentCategory category,
+        string title,
+        string reason)
+    {
+        Ensure(
+            recipientId,
+            category,
+            () => new Notification
+            {
+                UserId = recipientId,
+                Event = NotificationEvent.AppointmentCancelled.ToEventKind(),
+                EventLabel = "Appointment cancelled",
+                Message = title,
+                AppointmentId = appointmentId,
+                Category = category,
+                Reason = reason,
+                IsRead = false,
+                CreatedAt = DateTimeOffset.UtcNow,
+            });
+        NotifyAdmins("APPOINTMENT_CANCELLED", "Appointment cancelled", title, appointmentId, category, actorId);
+    }
+
+    public void OnBookingRescheduled(
+        string clientId,
+        string actorId,
+        string appointmentId,
+        AppointmentCategory category,
+        string title,
+        DateTimeOffset newStart)
+    {
+        Ensure(
+            clientId,
+            category,
+            () => new Notification
+            {
+                UserId = clientId,
+                Event = NotificationEvent.AppointmentEdited.ToEventKind(),
+                EventLabel = "Appointment rescheduled",
+                Message = $"{title} moved to {newStart:u}",
+                AppointmentId = appointmentId,
+                Category = category,
+                IsRead = false,
+                CreatedAt = DateTimeOffset.UtcNow,
+            });
+        NotifyAdmins(
+            "APPOINTMENT_RESCHEDULED",
+            "Appointment rescheduled",
+            $"{title} moved to {newStart:u}",
+            appointmentId,
+            category,
+            actorId);
+    }
+
+    public void OnBookingNotesUpdated(
+        string providerId,
+        string clientId,
+        string appointmentId,
+        AppointmentCategory category,
+        string title)
+    {
+        Ensure(
+            providerId,
+            category,
+            () => new Notification
+            {
+                UserId = providerId,
+                Event = NotificationEvent.AppointmentEdited.ToEventKind(),
+                EventLabel = "Appointment notes updated",
+                Message = title,
+                AppointmentId = appointmentId,
+                Category = category,
+                IsRead = false,
+                CreatedAt = DateTimeOffset.UtcNow,
+            });
+        NotifyAdmins("APPOINTMENT_NOTES_UPDATED", "Appointment notes updated", title, appointmentId, category, clientId);
+    }
+
     public int GetUnreadCount(string userId) => _notifications.GetUnreadCount(userId);
 
     private void Ensure(string userId, AppointmentCategory category, Func<Notification> create)

@@ -38,6 +38,9 @@ public sealed class MongoDbSettings
 
     public string StatusesCollection { get; set; } = "Status";
 
+    /// <summary>Immutable appointment change ledger (BAAAM.AppointmentAuditLog).</summary>
+    public string AppointmentAuditLogCollection { get; set; } = "AppointmentAuditLog";
+
     /// <summary>Sibling collection keyed on user id for per-user notification preferences.</summary>
     public string NotificationPreferencesCollection { get; set; } = "NotificationPreference";
 

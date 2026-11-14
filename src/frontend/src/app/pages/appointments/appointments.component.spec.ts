@@ -1,47 +1,52 @@
-/**
- * appointments.component.spec.ts — unit tests for AppointmentsComponent.
- *
- * Purpose: locks in the two things this page must do while it is a placeholder — construct, and
- * render the text "Appointments Here!". Rewrite these expectations alongside the real scheduler.
- *
- */
-
-/**
- * appointments.component.ts — AppointmentsComponent, the page served at "/appointments".
- *
- * Purpose: placeholder screen for the appointment scheduler (create, update, and delete an
- * appointment's category, date/time, provider, user, and location).
- */
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { Appointment } from '../../core/models/appointment';
 import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
 import { AppointmentsComponent } from './appointments.component';
 
 describe('Appointments overview', () => {
-  it('shows the soonest upcoming booked appointment', () => {
+  const booking = (id: string, start: Date, status: Appointment['status'] = 'Booked'): Appointment => ({
+    id,
+    title: 'Physical',
+    category: 'Medical',
+    startDateTime: start.toISOString(),
+    endDateTime: new Date(start.getTime() + 60 * 60 * 1000).toISOString(),
+    providerId: 'p-1',
+    userId: 'demo-user',
+    status,
+    notes: 'initial'
+  });
+
+  function createComponent(service: Partial<AppointmentsOverviewService> = {}) {
     TestBed.configureTestingModule({
       imports: [AppointmentsComponent],
-      providers: [provideRouter([]), {
-        provide: AppointmentsOverviewService,
-        useValue: { loadAppointments: () => of([]) }
-      }]
+      providers: [
+        provideRouter([]),
+        {
+          provide: AppointmentsOverviewService,
+          useValue: {
+            loadAppointments: () => of([]),
+            updateNotes: () => of({} as Appointment),
+            cancelBooking: () => of({} as Appointment),
+            ...service
+          }
+        }
+      ]
     });
-    const component = TestBed.createComponent(AppointmentsComponent).componentInstance;
+    return TestBed.createComponent(AppointmentsComponent);
+  }
+
+  it('shows the soonest upcoming booked appointment', () => {
+    const fixture = createComponent();
+    const component = fixture.componentInstance;
     const future = new Date();
     future.setDate(future.getDate() + 2);
     const later = new Date();
     later.setDate(later.getDate() + 5);
     const past = new Date();
     past.setDate(past.getDate() - 2);
-    const booking = (id: string, start: Date, status: Appointment['status'] = 'Booked'): Appointment => ({
-      id, title: 'Physical', category: 'Medical',
-      startDateTime: start.toISOString(),
-      endDateTime: new Date(start.getTime() + 60 * 60 * 1000).toISOString(),
-      providerId: 'p-1', userId: 'demo-user', status
-    });
     component.appointments = [
       booking('later', later),
       booking('soonest', future),
@@ -51,5 +56,87 @@ describe('Appointments overview', () => {
 
     expect(component.upcomingAppointments.map((item) => item.id)).toEqual(['soonest', 'later']);
     expect(component.nextAppointment?.id).toBe('soonest');
+  });
+
+  it('saves notes through the overview service', () => {
+    const updated = booking('a1', new Date(Date.now() + 86400000));
+    updated.notes = 'bring forms';
+    const updateNotes = jasmine.createSpy('updateNotes').and.returnValue(of(updated));
+    const loadAppointments = jasmine.createSpy('loadAppointments').and.returnValue(of([updated]));
+    const fixture = createComponent({ updateNotes, loadAppointments });
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.startEditNotes(updated);
+    component.notesDraft = 'bring forms';
+    component.saveNotes(updated);
+
+    expect(updateNotes).toHaveBeenCalledWith('a1', 'bring forms');
+  });
+
+  it('cancels a booking after confirm', () => {
+    const item = booking('a1', new Date(Date.now() + 86400000));
+    const cancelBooking = jasmine.createSpy('cancelBooking').and.returnValue(of({ ...item, status: 'Available', userId: null }));
+    const loadAppointments = jasmine.createSpy('loadAppointments').and.returnValue(of([]));
+    const fixture = createComponent({ cancelBooking, loadAppointments });
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.pendingCancel = item;
+    component.confirmCancel();
+
+    expect(cancelBooking).toHaveBeenCalledWith('a1', 'Physical');
+  });
+
+  it('surfaces a 409 when notes cannot be saved', () => {
+    const item = booking('a1', new Date(Date.now() + 86400000));
+    const updateNotes = jasmine.createSpy('updateNotes').and.returnValue(throwError(() => ({ status: 409 })));
+    const fixture = createComponent({ updateNotes });
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.saveNotes(item);
+
+    expect(component.actionError).toContain('Only Booked future appointments');
+  });
+
+  it('hides Edit note and Cancel while a note is being edited', () => {
+    const soon = booking('soon', new Date(Date.now() + 86400000));
+    const later = booking('later', new Date(Date.now() + 172800000));
+    const loadAppointments = jasmine.createSpy('loadAppointments').and.returnValue(of([soon, later]));
+    const fixture = createComponent({ loadAppointments });
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.startEditNotes(soon);
+    fixture.detectChanges();
+
+    const native: HTMLElement = fixture.nativeElement;
+    const upcomingButtons = Array.from(
+      native.querySelectorAll('.upcoming-card > .card-actions button')
+    ).map((btn) => btn.textContent?.trim());
+
+    expect(upcomingButtons).toContain('Hide details');
+    expect(upcomingButtons).not.toContain('Edit note');
+    expect(upcomingButtons).not.toContain('Cancel appointment');
+    expect(native.querySelector('.upcoming-card textarea')).not.toBeNull();
+    expect(
+      Array.from(native.querySelectorAll('.upcoming-card .notes-actions button')).map((btn) =>
+        btn.textContent?.trim()
+      )
+    ).toContain('Save note');
+
+    component.startEditNotes(later);
+    fixture.detectChanges();
+
+    const laterRow = Array.from(native.querySelectorAll('.booking-row')).find((el) =>
+      el.querySelector('textarea')
+    ) as HTMLElement;
+    const laterLabels = Array.from(laterRow.querySelectorAll('button')).map((btn) =>
+      btn.textContent?.trim()
+    );
+    expect(laterLabels).toContain('Save note');
+    expect(laterLabels).not.toContain('Edit note');
+    expect(laterRow.querySelector('button.danger')).toBeNull();
   });
 });

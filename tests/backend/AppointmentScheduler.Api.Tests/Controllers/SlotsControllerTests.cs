@@ -2,6 +2,7 @@ using System.Reflection;
 using AppointmentScheduler.Api.Auth;
 using AppointmentScheduler.Api.Controllers;
 using AppointmentScheduler.Api.Models;
+using AppointmentScheduler.Api.Services;
 using AppointmentScheduler.Api.Stores;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,18 @@ public class SlotsControllerTests {
         var c = new SlotsController(appts, users ?? new InMemoryUserStore(), new InMemoryAppointmentTypeStore(),
             new InMemoryLocationStore(), new FakeUser(userId));
         return (c, appts);
+    }
+
+    private static (SlotsController c, InMemoryAppointmentStore appts, InMemoryAppointmentAuditStore audit, InMemoryNotificationStore notes)
+        MakeWithAudit(string? userId = SeedIds.ProviderUser, InMemoryUserStore? users = null) {
+        var appts = new InMemoryAppointmentStore();
+        users ??= new InMemoryUserStore();
+        var notes = new InMemoryNotificationStore();
+        var audit = new InMemoryAppointmentAuditStore();
+        var service = new NotificationService(notes, users);
+        var c = new SlotsController(appts, users, new InMemoryAppointmentTypeStore(),
+            new InMemoryLocationStore(), new FakeUser(userId), service, audit);
+        return (c, appts, audit, notes);
     }
 
     private static CreateSlotDto Dto(int hoursFromNow = 24) =>
@@ -336,5 +349,117 @@ public class SlotsControllerTests {
         Assert.Equal(slot.Id, item.Id);
         Assert.Equal(AppointmentStatus.Booked, item.Status);
         Assert.Equal(SeedIds.ClientUser, item.UserId);
+    }
+
+    [Fact]
+    public void Create_And_Book_WriteAuditEntries() {
+        var users = new InMemoryUserStore();
+        var notes = new InMemoryNotificationStore();
+        var audit = new InMemoryAppointmentAuditStore();
+        var appts = new InMemoryAppointmentStore();
+        var service = new NotificationService(notes, users);
+        var provider = new SlotsController(appts, users, new InMemoryAppointmentTypeStore(),
+            new InMemoryLocationStore(), new FakeUser(SeedIds.ProviderUser), service, audit);
+        var client = new SlotsController(appts, users, new InMemoryAppointmentTypeStore(),
+            new InMemoryLocationStore(), new FakeUser(SeedIds.ClientUser), service, audit);
+
+        var created = Assert.IsType<Appointment>(Assert.IsType<CreatedAtActionResult>(provider.Create(Dto()).Result).Value);
+        Assert.Contains(audit.Query(), e => e.AppointmentId == created.Id && e.Action == AppointmentAuditEntry.Created);
+
+        Booked(client.Book(created.Id));
+        Assert.Contains(audit.Query(), e =>
+            e.AppointmentId == created.Id && e.Action == AppointmentAuditEntry.StatusChange
+            && e.OldStatus == AppointmentStatus.Available && e.NewStatus == AppointmentStatus.Booked);
+    }
+
+    [Fact]
+    public void Update_BookedWithoutConfirm_Returns409Payload() {
+        var (c, appts) = Make();
+        var slot = Seed(appts, 24, status: AppointmentStatus.Booked, userId: SeedIds.ClientUser);
+
+        var conflict = Assert.IsType<ConflictObjectResult>(
+            c.Update(slot.Id, new UpdateSlotDto { StartTime = DateTimeOffset.UtcNow.AddHours(30) }).Result);
+        var body = Assert.IsType<BookedSlotConflict>(conflict.Value);
+        Assert.True(body.RequiresConfirm);
+        Assert.Equal("Jane Porter", body.ClientName);
+        Assert.Equal(slot.StartDateTime, body.StartDateTime);
+    }
+
+    [Fact]
+    public void Update_BookedWithConfirm_KeepsClient_AndNotifies() {
+        var (c, appts, audit, notes) = MakeWithAudit();
+        var slot = Seed(appts, 24, status: AppointmentStatus.Booked, userId: SeedIds.ClientUser);
+        var newStart = DateTimeOffset.UtcNow.AddHours(48);
+
+        var updated = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(
+            c.Update(slot.Id, new UpdateSlotDto { StartTime = newStart, Confirm = true }).Result).Value);
+
+        Assert.Equal(SeedIds.ClientUser, updated.UserId);
+        Assert.Equal(AppointmentStatus.Booked, updated.Status);
+        Assert.Equal(newStart, updated.StartDateTime);
+        Assert.Equal(newStart.AddMinutes(30), updated.EndDateTime);
+        Assert.Contains(audit.Query(), e => e.Action == AppointmentAuditEntry.Rescheduled);
+        Assert.Contains(notes.GetAll(SeedIds.ClientUser), n => n.Event == "appointment-edited");
+    }
+
+    [Fact]
+    public void Update_BookedWithConfirm_ProviderOrClientOverlap_409() {
+        var (c, appts) = Make();
+        var booked = Seed(appts, 24, status: AppointmentStatus.Booked, userId: SeedIds.ClientUser);
+        Seed(appts, 48); // provider busy at 48h
+        Seed(appts, 72, providerId: OtherProvider, typeId: null,
+            status: AppointmentStatus.Booked, userId: SeedIds.ClientUser); // client busy at 72h
+
+        Assert.IsType<ConflictObjectResult>(c.Update(booked.Id, new UpdateSlotDto {
+            StartTime = DateTimeOffset.UtcNow.AddHours(48), Confirm = true
+        }).Result);
+        Assert.IsType<ConflictObjectResult>(c.Update(booked.Id, new UpdateSlotDto {
+            StartTime = DateTimeOffset.UtcNow.AddHours(72), Confirm = true
+        }).Result);
+    }
+
+    [Fact]
+    public void Update_OtherProvidersSlot_403() {
+        var (c, appts) = Make();
+        var other = Seed(appts, 24, providerId: OtherProvider, typeId: null);
+        Assert.IsType<ForbidResult>(c.Update(other.Id, new UpdateSlotDto {
+            StartTime = DateTimeOffset.UtcNow.AddHours(30)
+        }).Result);
+    }
+
+    [Fact]
+    public void Update_AvailableTimeOnly_MovesWithoutTypeLookup() {
+        var (c, appts) = Make();
+        var slot = Seed(appts, 24, typeId: "unknown-type-id");
+        var newStart = DateTimeOffset.UtcNow.AddHours(36);
+
+        var updated = Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(
+            c.Update(slot.Id, new UpdateSlotDto { StartTime = newStart }).Result).Value);
+
+        Assert.Equal(newStart, updated.StartDateTime);
+        Assert.Equal(newStart.AddMinutes(30), updated.EndDateTime);
+        Assert.Equal("unknown-type-id", updated.AppointmentTypeId);
+        Assert.Equal(AppointmentStatus.Available, updated.Status);
+    }
+
+    [Fact]
+    public void Delete_BookedWithConfirm_SetsCanceled_AndNotifiesClient() {
+        var (c, appts, audit, notes) = MakeWithAudit();
+        var slot = Seed(appts, 24, status: AppointmentStatus.Booked, userId: SeedIds.ClientUser);
+
+        Assert.IsType<ConflictObjectResult>(c.Delete(slot.Id));
+        Assert.IsType<NoContentResult>(c.Delete(slot.Id, new ConfirmDto { Confirm = true }));
+        Assert.Equal(AppointmentStatus.Canceled, appts.GetById(slot.Id)!.Status);
+        Assert.Contains(audit.Query(), e =>
+            e.Action == AppointmentAuditEntry.Cancelled
+            && e.OldStatus == AppointmentStatus.Booked
+            && e.NewStatus == AppointmentStatus.Canceled);
+        Assert.Contains(notes.GetAll(SeedIds.ClientUser), n => n.Event == "appointment-cancelled");
+    }
+
+    [Fact]
+    public void Delete_OtherProvidersSlot_403() {
+        var (c, appts) = Make();
+        Assert.IsType<ForbidResult>(c.Delete(Seed(appts, 24, providerId: OtherProvider, typeId: null).Id));
     }
 }

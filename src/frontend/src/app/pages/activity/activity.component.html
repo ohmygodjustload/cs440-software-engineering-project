@@ -4,61 +4,110 @@
       <h1>Activity Log</h1>
       <p>Global feed of account and appointment actions.</p>
     </div>
-    <button
-      type="button"
-      class="activity-mark-read"
-      [disabled]="markAllReadSaving || unreadCount === 0"
-      (click)="markAllRead()"
-    >
-      {{ markAllReadSaving ? 'Marking…' : 'Mark all as read' }}
-    </button>
-  </header>
-
-  <form class="controls" role="search" [formGroup]="searchForm">
-    <label class="search-field">
-      <span class="visually-hidden">Search activity</span>
-      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path
-          d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-      <input
-        type="search"
-        formControlName="search"
-        placeholder="Search activity"
-        aria-label="Search activity log"
-      />
-    </label>
-
-    <label class="date-field" [class.date-filter-empty]="$any(searchForm.controls.startDate).value">
-      <span>Date</span>
-      <input
-        type="date"
-        formControlName="startDate"
-        aria-label="Filter activity by date"
-      />
-      @if (!$any(searchForm.controls.startDate).value) {
-        <span class="date-placeholder" aria-hidden="true">All dates</span>
-      }
-    </label>
-
-    @if ($any(searchForm.controls.startDate).value) {
-      <button class="clear-date" type="button" (click)="clearDateFilter()">
-        Clear date
+    @if (activeTab === 'feed') {
+      <button
+        type="button"
+        class="activity-mark-read"
+        [disabled]="markAllReadSaving || unreadCount === 0"
+        (click)="markAllRead()"
+      >
+        {{ markAllReadSaving ? 'Marking…' : 'Mark all as read' }}
       </button>
     }
-  </form>
+  </header>
+
+  <div class="activity-tabs" role="tablist" aria-label="Activity views">
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="activeTab === 'feed'"
+      [class.activity-tab--active]="activeTab === 'feed'"
+      (click)="selectTab('feed')"
+    >
+      Activity feed
+    </button>
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="activeTab === 'audit'"
+      [class.activity-tab--active]="activeTab === 'audit'"
+      (click)="selectTab('audit')"
+    >
+      Appointment audit
+    </button>
+  </div>
+
+  @if (activeTab === 'feed') {
+    <form class="controls" role="search" [formGroup]="searchForm">
+      <label class="search-field">
+        <span class="visually-hidden">Search activity</span>
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path
+            d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <input
+          type="search"
+          formControlName="search"
+          placeholder="Search activity"
+          aria-label="Search activity log"
+        />
+      </label>
+
+      <label class="date-field" [class.date-filter-empty]="$any(searchForm.controls.startDate).value">
+        <span>Date</span>
+        <input
+          type="date"
+          formControlName="startDate"
+          aria-label="Filter activity by date"
+        />
+        @if (!$any(searchForm.controls.startDate).value) {
+          <span class="date-placeholder" aria-hidden="true">All dates</span>
+        }
+      </label>
+
+      @if ($any(searchForm.controls.startDate).value) {
+        <button class="clear-date" type="button" (click)="clearDateFilter()">
+          Clear date
+        </button>
+      }
+    </form>
+  } @else {
+    <form class="controls audit-controls" [formGroup]="auditForm" (ngSubmit)="loadAudit()">
+      <label class="date-field">
+        <span>From</span>
+        <input type="date" formControlName="from" aria-label="Audit from date" />
+      </label>
+      <label class="date-field">
+        <span>To</span>
+        <input type="date" formControlName="to" aria-label="Audit to date" />
+      </label>
+      <label class="type-field">
+        <span>Action</span>
+        <select formControlName="action" aria-label="Filter audit by action">
+          <option value="">All actions</option>
+          @for (action of auditActions; track action) {
+            <option [value]="action">{{ action }}</option>
+          }
+        </select>
+      </label>
+      <button type="submit" class="activity-mark-read">Apply filters</button>
+    </form>
+  }
 
   @if (loading) {
-    <app-loading label="Loading activity…"></app-loading>
+    <app-loading [label]="activeTab === 'feed' ? 'Loading activity…' : 'Loading appointment audit…'"></app-loading>
   } @else if (error) {
-    <div role="alert"><p>{{ error }}</p><button (click)="loadActivity()">Try again</button></div>
-  } @else {
+    <div role="alert">
+      <p>{{ error }}</p>
+      <button (click)="activeTab === 'feed' ? loadActivity() : loadAudit()">Try again</button>
+    </div>
+  } @else if (activeTab === 'feed') {
     @if (markAllReadError) {
       <div class="activity-error" role="alert">{{ markAllReadError }}</div>
     }
@@ -78,7 +127,32 @@
         </div>
       }
     </section>
+  } @else {
+    <section class="activity-list audit-list" aria-label="Appointment audit log">
+      <div class="audit-header" aria-hidden="true">
+        <span>Time</span>
+        <span>Action</span>
+        <span>Appointment</span>
+        <span>Changed by</span>
+        <span>Status</span>
+      </div>
+      @for (entry of paginatedAuditEntries; track entry.id) {
+        <div class="audit-line">
+          <time>{{ entry.timestamp | date:'medium' }}</time>
+          <strong>{{ entry.action }}</strong>
+          <span>{{ entry.appointmentTitle || entry.appointmentId }}</span>
+          <span>{{ entry.changedByName || entry.changedByUserId }}</span>
+          <span>{{ statusLabel(entry.oldStatus, entry.newStatus) }}</span>
+        </div>
+      } @empty {
+        <div class="activity-line">
+          <span>No appointment audit entries found.</span>
+        </div>
+      }
+    </section>
+  }
 
+  @if (!loading && !error) {
     <nav class="activity-pagination" aria-label="Activity log pages">
       @if (showPrevious) {
         <button
@@ -90,7 +164,7 @@
           <span aria-hidden="true">←</span>
         </button>
       }
-       
+
       @for (page of pageNumbers; track page) {
         <button
           type="button"
@@ -102,7 +176,7 @@
           {{ page }}
         </button>
       }
-       
+
       @if (showNext) {
         <button
           type="button"

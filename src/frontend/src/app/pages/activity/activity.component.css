@@ -434,6 +434,61 @@ footer a {
   outline-offset: 3px;
 }
 
+.activity-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 0 0 24px;
+  flex-wrap: wrap;
+}
+
+.activity-tabs button {
+  padding: 10px 18px;
+  border: 1px solid rgb(52 73 69 / 24%);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.activity-tab--active {
+  background: #344945;
+  color: #f7f5f1;
+  border-color: #344945;
+}
+
+.audit-controls .type-field span,
+.audit-controls .date-field span {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.audit-header,
+.audit-line {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 1.3fr 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.audit-header {
+  margin-bottom: 10px;
+  padding: 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgb(52 73 69 / 70%);
+}
+
+.audit-line {
+  padding: 14px 4px;
+  border-top: 1px solid rgb(52 73 69 / 12%);
+  font-size: 14px;
+}
+
 @media (max-width: 700px) {
   .activity-terminal {
     margin: 12px;
@@ -446,6 +501,12 @@ footer a {
   }
 
   .activity-header {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .audit-header,
+  .audit-line {
     grid-template-columns: 1fr;
     gap: 4px;
   }

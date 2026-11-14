@@ -90,6 +90,69 @@ button {
   background: transparent;
 }
 
+.booking-list {
+  margin-top: 36px;
+}
+
+.booking-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 16px;
+  padding: 20px 24px;
+  border: 1px solid var(--appointments-soft);
+  border-radius: 20px;
+}
+
+.booking-row h3 {
+  margin: 6px 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid rgb(52 73 69 / 24%);
+  border-radius: 12px;
+  font: inherit;
+  resize: vertical;
+}
+
+.notes-actions {
+  margin-top: 10px;
+}
+
+.confirm-dialog {
+  border: 0;
+  border-radius: 20px;
+  padding: 0;
+  max-width: 420px;
+  width: calc(100% - 32px);
+  background: var(--appointments-paper);
+  color: var(--appointments-ink);
+}
+
+.confirm-dialog::backdrop {
+  background: rgb(33 44 42 / 45%);
+}
+
+.confirm-prompt {
+  padding: 28px;
+}
+
+.confirm-prompt h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.confirm-prompt p {
+  margin: 0 0 20px;
+  font-size: 14px;
+}
+
 .error button {
   margin-top: 10px;
   padding: 10px 16px;
