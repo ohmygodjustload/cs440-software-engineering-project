@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { Slot } from '../../core/models/slot';
 import { CreateSlotsComponent } from './create-slots.component';
 
 describe('CreateSlotsComponent', () => {
@@ -48,49 +49,125 @@ describe('CreateSlotsComponent', () => {
     });
   });
 
-  it('exposes 18 start times from 9:00 AM through 5:30 PM, including noon', () => {
+  it('exposes nine hourly blocks from 9:00 AM through 5:00 PM', () => {
     const component = create().componentInstance;
 
-    expect(component.startTimes.length).toBe(18);
+    expect(component.startTimes.length).toBe(9);
     expect(component.startTimes[0]).toBe('09:00');
-    expect(component.startTimes[component.startTimes.length - 1]).toBe('17:30');
+    expect(component.startTimes[component.startTimes.length - 1]).toBe('17:00');
     expect(component.startTimes).toContain('12:00');
-    expect(component.startTimes).toContain('12:30');
+    expect(component.startTimes).not.toContain('12:30');
   });
 
-  it('selects 3:30 PM on a future date and sets the end 60 minutes later', () => {
+  it('selects 3:00–4:00 PM on a future date', () => {
     const component = create().componentInstance;
     const date = futureDate();
 
     component.chooseDate(date);
-    component.chooseTime('15:30');
+    component.chooseTime('15:00');
 
-    expect(component.draft.start).toBe(`${date}T15:30`);
+    expect(component.draft.start).toBe(`${date}T15:00`);
     const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
     expect(minutes).toBe(60);
   });
 
-  it('selects 5:30 PM on a future date and sets the end 60 minutes later', () => {
+  it('selects the final 5:00–6:00 PM block', () => {
     const component = create().componentInstance;
     const date = futureDate();
 
     component.chooseDate(date);
-    component.chooseTime('17:30');
+    component.chooseTime('17:00');
 
-    expect(component.draft.start).toBe(`${date}T17:30`);
+    expect(component.draft.start).toBe(`${date}T17:00`);
+    expect(component.draft.end).toBe(`${date}T18:00`);
     const minutes = (Date.parse(component.draft.end) - Date.parse(component.draft.start)) / 60000;
     expect(minutes).toBe(60);
   });
 
-  it('renders 18 start-time buttons with 5:30 PM last and 12:00 PM present', () => {
+  it('moves between calendar weeks with previous and next controls', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+    component.chooseDate(date);
+
+    component.changeWeek(1);
+    expect(
+      (Date.parse(component.selectedDate) - Date.parse(date)) / 86400000
+    ).toBe(7);
+
+    component.changeWeek(-1);
+    expect(component.selectedDate).toBe(date);
+  });
+
+  it('does not navigate to a week before the current week', () => {
+    const component = create().componentInstance;
+    component.chooseDate(component.today);
+    const selected = component.selectedDate;
+
+    expect(component.canViewPreviousWeek).toBeFalse();
+    component.changeWeek(-1);
+    expect(component.selectedDate).toBe(selected);
+  });
+
+  it('renders nine one-hour ranges from 9:00–10:00 AM through 5:00–6:00 PM', () => {
     const fixture = create();
     const buttons: HTMLButtonElement[] = Array.from(
       fixture.nativeElement.querySelectorAll('.time-options button')
     );
     const labels = buttons.map((button) => button.textContent?.trim());
 
-    expect(buttons.length).toBe(18);
-    expect(labels[labels.length - 1]).toBe('5:30 PM');
-    expect(labels).toContain('12:00 PM');
+    expect(buttons.length).toBe(9);
+    expect(labels[0]).toBe('9:00 AM – 10:00 AM');
+    expect(labels[labels.length - 1]).toBe('5:00 PM – 6:00 PM');
+    expect(labels).toContain('12:00 PM – 1:00 PM');
+  });
+
+  it('does not highlight an empty required field before publishing is attempted', () => {
+    const fixture = create();
+    const titleInput: HTMLInputElement = fixture.nativeElement.querySelector('#service');
+
+    titleInput.dispatchEvent(new Event('blur'));
+    fixture.detectChanges();
+
+    expect(titleInput.classList).not.toContain('field-invalid');
+    expect(fixture.nativeElement.querySelector('.field-invalid-label')).toBeNull();
+  });
+
+  it('highlights invalid fields after submitting missing required values', () => {
+    const fixture = create();
+
+    fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    const invalidFields = fixture.nativeElement.querySelectorAll('.field-invalid');
+    const locationInput: HTMLInputElement = fixture.nativeElement.querySelector('#location');
+    expect(invalidFields.length).toBeGreaterThanOrEqual(2);
+    expect(locationInput.classList).toContain('field-invalid');
+    expect(fixture.nativeElement.querySelector('.field-invalid-label')).not.toBeNull();
+    expect(text).toContain('Highlighted fields are required.');
+  });
+
+  it('marks only the overlapping one-hour block unavailable', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+    component.chooseDate(date);
+    component.existingSlots = [{
+      id: 'slot-1',
+      title: 'General checkup',
+      category: 'Medical',
+      startDateTime: new Date(`${date}T14:00`).toISOString(),
+      endDateTime: new Date(`${date}T15:00`).toISOString(),
+      providerId: 'p1',
+      providerName: 'John Smith',
+      userId: null,
+      appointmentTypeId: 'type-1',
+      location: 'Clinic',
+      notes: '',
+      status: 'Available'
+    } satisfies Slot];
+
+    expect(component.isTimeUnavailable('13:00')).toBeFalse();
+    expect(component.isTimeUnavailable('14:00')).toBeTrue();
+    expect(component.isTimeUnavailable('15:00')).toBeFalse();
   });
 });

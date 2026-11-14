@@ -1,14 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormsModule, NgForm, NgModel } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 
 import { AppointmentCategory } from '../../core/models/appointment';
+import { Slot } from '../../core/models/slot';
 import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
+import { fieldErrorMessage } from '../../core/validation/field-error';
+import { DropdownComponent, DropdownOption } from '../../shared/dropdown/dropdown.component';
 
 interface AppointmentForm {
   title: string;
@@ -23,7 +26,7 @@ interface AppointmentForm {
 @Component({
   selector: 'app-create-slots',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, DropdownComponent],
   templateUrl: './create-slots.component.html',
   styleUrl: './create-slots.component.css'
 })
@@ -42,6 +45,10 @@ export class CreateSlotsComponent implements OnInit {
       value.trim().toLowerCase() === category.toLowerCase()));
   }
 
+  get categoryOptions(): readonly DropdownOption[] {
+    return this.categories.map(category => ({ value: category, label: category }));
+  }
+
   get today(): string {
     return this.localInput(new Date().toISOString()).split('T')[0];
   }
@@ -54,11 +61,8 @@ export class CreateSlotsComponent implements OnInit {
   isPastTime(time: string): boolean {
     return new Date(`${this.selectedDate}T${time}`).getTime() <= Date.now();
   }
-  // Half-hour start times from 9:00 AM through 5:30 PM, inclusive (18 options).
-  // Slots are 60 minutes, so the last slot ends at 6:30 PM. 18 options fill the
-  // 3-column picker in six even rows. Generated from a range so gaps (like the
-  // earlier missing noon hour) cannot sneak back in.
-  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17.5, 30);
+  // Nine fixed one-hour blocks: 9:00–10:00 AM through 5:00–6:00 PM.
+  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17, 60);
 
   private buildStartTimes(startHour: number, endHour: number, stepMinutes: number): string[] {
     const pad = (n: number) => String(n).padStart(2, '0');
@@ -70,7 +74,9 @@ export class CreateSlotsComponent implements OnInit {
   }
 
   draft = this.emptyDraft();
+  existingSlots: Slot[] = [];
   saving = false;
+  validationAttempted = false;
   formError = '';
   success = '';
 
@@ -104,23 +110,60 @@ export class CreateSlotsComponent implements OnInit {
     return new Date(`${this.selectedDate}T12:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
+  get canViewPreviousWeek(): boolean {
+    return this.weekStart(this.selectedDate).getTime() > this.weekStart(this.today).getTime();
+  }
+
   get durationMinutes(): number {
     return 60;
   }
 
+  changeWeek(offset: -1 | 1): void {
+    if (offset < 0 && !this.canViewPreviousWeek) return;
+    const selected = new Date(`${this.selectedDate}T12:00`);
+    selected.setDate(selected.getDate() + offset * 7);
+    const date = this.localInput(selected.toISOString()).split('T')[0];
+    this.chooseDate(date < this.today ? this.today : date);
+  }
+
   chooseDate(date: string): void {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date < this.today) return;
-    this.setStart(date, this.selectedTime || '10:30');
+    const time = this.startTimes.includes(this.selectedTime) ? this.selectedTime : '10:00';
+    this.setStart(date, time);
   }
 
   chooseTime(time: string): void {
-    if (!this.startTimes.includes(time) || this.isPastTime(time)) return;
+    if (!this.startTimes.includes(time) || this.isTimeUnavailable(time)) return;
     this.setStart(this.selectedDate, time);
+  }
+
+  isTimeUnavailable(time: string): boolean {
+    return this.isPastTime(time) || this.overlapsExistingSlot(time);
+  }
+
+  fieldInvalid(control: NgModel | null): boolean {
+    return this.validationAttempted &&
+      fieldErrorMessage(control?.control ?? null, 'Field', true) !== null;
+  }
+
+  requiredTextInvalid(control: NgModel | null, value: string): boolean {
+    return this.validationAttempted && (!value.trim() || this.fieldInvalid(control));
+  }
+
+  timeInvalid(form: NgForm): boolean {
+    return (form.submitted || this.validationAttempted) && !this.draft.start;
   }
 
   timeLabel(time: string): string {
     const [hour, minute] = time.split(':').map(Number);
     return `${hour % 12 || 12}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`;
+  }
+
+  timeRangeLabel(time: string): string {
+    const [hour, minute] = time.split(':').map(Number);
+    const endMinutes = hour * 60 + minute + this.durationMinutes;
+    const end = `${String(Math.floor(endMinutes / 60)).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}`;
+    return `${this.timeLabel(time)} – ${this.timeLabel(end)}`;
   }
 
   private setStart(date: string, time: string): void {
@@ -133,10 +176,12 @@ export class CreateSlotsComponent implements OnInit {
     // User ID and scheduler provider ID are different; do not substitute one for the other.
     this.draft.providerId = this.route.snapshot.data['providerId'] ?? '';
     this.providerChanged();
+    this.loadExistingSlots();
   }
 
   save(form: NgForm): void {
     if (this.saving) return;
+    this.validationAttempted = true;
     this.formError = '';
     this.success = '';
     if (this.draft.start && Number.isFinite(Date.parse(this.draft.start))) {
@@ -147,9 +192,9 @@ export class CreateSlotsComponent implements OnInit {
     const start = new Date(this.draft.start);
     const end = new Date(this.draft.end);
 
-    if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim()) {
+    if (form.invalid || !this.draft.title.trim() || !this.draft.location.trim() || !this.draft.start) {
       form.control.markAllAsTouched();
-      this.formError = 'Enter a category, service title, future date, start time, and location.';
+      this.formError = 'Highlighted fields are required.';
       return;
     }
 
@@ -185,8 +230,10 @@ export class CreateSlotsComponent implements OnInit {
         finalize(() => this.saving = false)
       )
       .subscribe({
-        next: () => {
+        next: (slot) => {
           this.success = 'Your available slot has been published.';
+          this.existingSlots = [...this.existingSlots, slot];
+          this.validationAttempted = false;
           const category = this.draft.category;
           this.draft = this.emptyDraft();
           this.draft.category = category;
@@ -196,6 +243,25 @@ export class CreateSlotsComponent implements OnInit {
           this.formError = this.auth.getErrorMessage(error);
         }
       });
+  }
+
+  private loadExistingSlots(): void {
+    this.service.getMine()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (slots) => this.existingSlots = slots,
+        error: () => this.existingSlots = []
+      });
+  }
+
+  private overlapsExistingSlot(time: string): boolean {
+    const candidateStart = Date.parse(`${this.selectedDate}T${time}`);
+    const candidateEnd = candidateStart + this.durationMinutes * 60000;
+    return this.existingSlots.some((slot) => {
+      const slotStart = Date.parse(slot.startDateTime);
+      const slotEnd = Date.parse(slot.endDateTime);
+      return candidateStart < slotEnd && candidateEnd > slotStart;
+    });
   }
 
   private emptyDraft(): AppointmentForm {
@@ -214,6 +280,12 @@ export class CreateSlotsComponent implements OnInit {
     const date = new Date(value);
     const pad = (part: number) => String(part).padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  private weekStart(value: string): Date {
+    const date = new Date(`${value}T12:00`);
+    date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+    return date;
   }
 
 }
