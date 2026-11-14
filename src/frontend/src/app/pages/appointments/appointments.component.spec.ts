@@ -18,13 +18,18 @@ import { of } from 'rxjs';
 
 import { Appointment } from '../../core/models/appointment';
 import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ProviderHomeService } from '../../core/services/home-provider.service';
 import { AppointmentsComponent } from './appointments.component';
 
 describe('Appointments overview', () => {
   it('shows the soonest upcoming booked appointment', () => {
     TestBed.configureTestingModule({
       imports: [AppointmentsComponent],
-      providers: [provideRouter([]), {
+      providers: [provideRouter([]),
+        { provide: AuthService, useValue: { getCurrentUser: () => null } },
+        { provide: ProviderHomeService, useValue: { bookings: () => of([]) } },
+        {
         provide: AppointmentsOverviewService,
         useValue: { loadAppointments: () => of([]) }
       }]

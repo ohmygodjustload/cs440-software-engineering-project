@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
+import { homeRoute, isEnhancedUser } from '../routing/home-route';
 import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = (_route, state) => {
@@ -34,8 +35,7 @@ export const adminGuard: CanActivateFn = () => {
 
   return authService.getCurrentUser()?.isAdmin
     ? true
-    : router.createUrlTree([authService.getCurrentUser()?.isServiceProvider ? '/home-provider' : '/home']);
-};
+    : router.createUrlTree([homeRoute(authService.getCurrentUser())]);};
 
 /** Keeps the notification settings page available to clients and providers, not admins. */
 export const nonAdminGuard: CanActivateFn = () => {
@@ -75,3 +75,19 @@ export const providerGuard: CanActivateFn = (_route, state) => {
     ? true
     : router.createUrlTree([user?.isAdmin ? '/home-admin' : '/home']);
 };
+
+/** Redirects /home to the dashboard belonging to the signed-in account. */
+export const homeGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  const destination = homeRoute(auth.getCurrentUser());
+  return destination === '/home' ? true: router.createUrlTree([destination]);
+};
+
+  /** Both capabilities must already exist on the authentication account. */
+export const enhancedGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  const user = auth.getCurrentUser();
+  return isEnhancedUser(user) ? true : router.createUrlTree([homeRoute(user)]);
+}

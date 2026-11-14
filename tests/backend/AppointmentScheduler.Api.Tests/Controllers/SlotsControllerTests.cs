@@ -8,13 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduler.Api.Tests.Controllers;
 
-public class SlotsControllerTests {
-    private sealed class FakeUser(string? id) : ICurrentUser {
+public class SlotsControllerTests
+{
+    private sealed class FakeUser(string? id) : ICurrentUser
+    {
         public string? UserId => id;
     }
 
     private static (SlotsController c, InMemoryAppointmentStore appts) Make(
-        string? userId = SeedIds.ProviderUser, InMemoryUserStore? users = null) {
+        string? userId = SeedIds.ProviderUser, InMemoryUserStore? users = null)
+    {
         var appts = new InMemoryAppointmentStore();
         var c = new SlotsController(appts, users ?? new InMemoryUserStore(), new InMemoryAppointmentTypeStore(),
             new InMemoryLocationStore(), new FakeUser(userId));
@@ -27,7 +30,8 @@ public class SlotsControllerTests {
     private const string OtherProvider = "6abc2000a313dfdf8ecc0010";
     private const string InactiveProvider = "6abc2000a313dfdf8ecc0011";
 
-    private static InMemoryUserStore UsersWith(params User[] extra) {
+    private static InMemoryUserStore UsersWith(params User[] extra)
+    {
         var users = new InMemoryUserStore();
         foreach (var u in extra) users.Add(u);
         return users;
@@ -36,11 +40,19 @@ public class SlotsControllerTests {
     private static Appointment Seed(InMemoryAppointmentStore appts, double hoursFromNow,
         string providerId = SeedIds.ProviderUser, string? typeId = SeedIds.Type,
         AppointmentCategory category = AppointmentCategory.Medical,
-        AppointmentStatus status = AppointmentStatus.Available, string? userId = null) {
+        AppointmentStatus status = AppointmentStatus.Available, string? userId = null)
+    {
         var start = DateTimeOffset.UtcNow.AddHours(hoursFromNow);
-        return appts.Add(new Appointment {
-            Title = "Seeded", Category = category, ProviderId = providerId, AppointmentTypeId = typeId,
-            StartDateTime = start, EndDateTime = start.AddMinutes(30), Status = status, UserId = userId,
+        return appts.Add(new Appointment
+        {
+            Title = "Seeded",
+            Category = category,
+            ProviderId = providerId,
+            AppointmentTypeId = typeId,
+            StartDateTime = start,
+            EndDateTime = start.AddMinutes(30),
+            Status = status,
+            UserId = userId,
         });
     }
 
@@ -57,7 +69,8 @@ public class SlotsControllerTests {
         Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(result.Result).Value);
 
     [Fact]
-    public void GetAvailable_ReturnsOnlyOpenFutureSlots_SoonestFirst() {
+    public void GetAvailable_ReturnsOnlyOpenFutureSlots_SoonestFirst()
+    {
         var (c, appts) = Make();
         var later = Seed(appts, 48);
         var sooner = Seed(appts, 24);
@@ -70,7 +83,8 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void GetAvailable_AllowsAnonymousCallers() {
+    public void GetAvailable_AllowsAnonymousCallers()
+    {
         var method = typeof(SlotsController).GetMethod(nameof(SlotsController.GetAvailable))!;
         Assert.NotNull(method.GetCustomAttribute<AllowAnonymousAttribute>());
 
@@ -80,10 +94,16 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void GetAvailable_ExcludesSlotsOfUnapprovedProviders() {
-        var users = UsersWith(new User {
-            Id = InactiveProvider, FirstName = "Ina", LastName = "Active", Username = "InaActive",
-            IsServiceProvider = true, IsActive = false,
+    public void GetAvailable_ExcludesSlotsOfUnapprovedProviders()
+    {
+        var users = UsersWith(new User
+        {
+            Id = InactiveProvider,
+            FirstName = "Ina",
+            LastName = "Active",
+            Username = "InaActive",
+            IsServiceProvider = true,
+            IsActive = false,
         });
         var (c, appts) = Make(users: users);
         var approved = Seed(appts, 24);
@@ -95,7 +115,8 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void GetAvailable_IncludesProviderServiceLocationAndTimes() {
+    public void GetAvailable_IncludesProviderServiceLocationAndTimes()
+    {
         var (c, appts) = Make();
         var seeded = Seed(appts, 24);
 
@@ -110,10 +131,17 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void GetAvailable_FiltersByCategoryProviderAndStartRange() {
-        var users = UsersWith(new User {
-            Id = OtherProvider, FirstName = "Bea", LastName = "Stylist", Username = "BeaStylist",
-            IsServiceProvider = true, IsActive = true, ServiceTypes = [AppointmentCategory.Beauty],
+    public void GetAvailable_FiltersByCategoryProviderAndStartRange()
+    {
+        var users = UsersWith(new User
+        {
+            Id = OtherProvider,
+            FirstName = "Bea",
+            LastName = "Stylist",
+            Username = "BeaStylist",
+            IsServiceProvider = true,
+            IsActive = true,
+            ServiceTypes = [AppointmentCategory.Beauty],
         });
         var (c, appts) = Make(users: users);
         var medical = Seed(appts, 24, category: AppointmentCategory.Fitness); // the seeded type says Medical
@@ -131,14 +159,16 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void GetAvailable_FromNotBeforeTo_400() {
+    public void GetAvailable_FromNotBeforeTo_400()
+    {
         var now = DateTimeOffset.UtcNow;
         Assert.IsType<BadRequestObjectResult>(
             Make().c.GetAvailable(from: now.AddDays(2), to: now.AddDays(1)).Result);
     }
 
     [Fact]
-    public void Create_Succeeds_WithComputedEnd_AndAvailableStatus() {
+    public void Create_Succeeds_WithComputedEnd_AndAvailableStatus()
+    {
         var (c, _) = Make();
         var dto = Dto();
         var slot = Assert.IsType<Appointment>(Assert.IsType<CreatedAtActionResult>(c.Create(dto).Result).Value);
@@ -154,7 +184,8 @@ public class SlotsControllerTests {
     public void Create_ClientUser_403() => Assert.IsType<ForbidResult>(Make(SeedIds.ClientUser).c.Create(Dto()).Result);
 
     [Fact]
-    public void Create_UnknownType_400() {
+    public void Create_UnknownType_400()
+    {
         var dto = Dto();
         dto.AppointmentTypeId = "nope";
         Assert.IsType<BadRequestObjectResult>(Make().c.Create(dto).Result);
@@ -164,21 +195,25 @@ public class SlotsControllerTests {
     public void Create_PastStart_400() => Assert.IsType<BadRequestObjectResult>(Make().c.Create(Dto(-1)).Result);
 
     [Fact]
-    public void Create_Overlap_409_ButBackToBackIsAllowed() {
+    public void Create_Overlap_409_ButBackToBackIsAllowed()
+    {
         var (c, _) = Make();
         c.Create(Dto(24)); // 24h -> 24h30
-        Assert.IsType<ConflictObjectResult>(c.Create(new CreateSlotDto {
+        Assert.IsType<ConflictObjectResult>(c.Create(new CreateSlotDto
+        {
             AppointmentTypeId = SeedIds.Type,
             StartTime = DateTimeOffset.UtcNow.AddHours(24).AddMinutes(15)
         }).Result);
-        Assert.IsType<CreatedAtActionResult>(c.Create(new CreateSlotDto {
+        Assert.IsType<CreatedAtActionResult>(c.Create(new CreateSlotDto
+        {
             AppointmentTypeId = SeedIds.Type,
             StartTime = DateTimeOffset.UtcNow.AddHours(24).AddMinutes(30)
         }).Result); // starts exactly at end
     }
 
     [Fact]
-    public void GetMine_ReturnsOnlyOwnAvailable_NotDeleted() {
+    public void GetMine_ReturnsOnlyOwnAvailable_NotDeleted()
+    {
         var (c, appts) = Make();
         var id = Assert.IsType<Appointment>(Assert.IsType<CreatedAtActionResult>(c.Create(Dto()).Result).Value).Id;
         Assert.Single(Assert.IsType<List<Appointment>>(Assert.IsType<OkObjectResult>(c.GetMine().Result).Value));
@@ -187,7 +222,8 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void Update_RecomputesEnd_AndMayOverlapItself() {
+    public void Update_RecomputesEnd_AndMayOverlapItself()
+    {
         var (c, _) = Make();
         var id = Assert.IsType<Appointment>(Assert.IsType<CreatedAtActionResult>(c.Create(Dto(24)).Result).Value).Id;
         var res = c.Update(id, new UpdateSlotDto { StartTime = DateTimeOffset.UtcNow.AddHours(24).AddMinutes(10) });
@@ -195,7 +231,8 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void Update_And_Delete_Return409_WhenBooked() {
+    public void Update_And_Delete_Return409_WhenBooked()
+    {
         var (c, appts) = Make();
         var slot = Assert.IsType<Appointment>(Assert.IsType<CreatedAtActionResult>(c.Create(Dto()).Result).Value);
         slot.Status = AppointmentStatus.Booked; // simulate a client booking
@@ -207,7 +244,8 @@ public class SlotsControllerTests {
     public void Delete_UnknownId_404() => Assert.IsType<NotFoundResult>(Make().c.Delete("missing"));
 
     [Fact]
-    public void Book_SetsClientStatusAndNotes_AndReturnsConfirmationDetails() {
+    public void Book_SetsClientStatusAndNotes_AndReturnsConfirmationDetails()
+    {
         var (c, appts) = Make(SeedIds.ClientUser);
         var seeded = Seed(appts, 24);
 
@@ -231,13 +269,15 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void Book_WithoutNotes_StoresEmptyNotes() {
+    public void Book_WithoutNotes_StoresEmptyNotes()
+    {
         var (c, appts) = Make(SeedIds.ClientUser);
         Assert.Equal("", Booked(c.Book(Seed(appts, 24).Id)).Notes);
     }
 
     [Fact]
-    public void Book_NoUser_401() {
+    public void Book_NoUser_401()
+    {
         var (c, appts) = Make(null);
         Assert.IsType<UnauthorizedResult>(c.Book(Seed(appts, 24).Id).Result);
     }
@@ -247,10 +287,16 @@ public class SlotsControllerTests {
     [InlineData(SeedIds.AdminUser)]
     [InlineData(InactiveClient)]
     [InlineData("unknown-user")]
-    public void Book_NotAnActiveClient_403(string userId) {
-        var users = UsersWith(new User {
-            Id = InactiveClient, FirstName = "Ina", LastName = "Client", Username = "InaClient",
-            IsClient = true, IsActive = false,
+    public void Book_NotAnActiveClient_403(string userId)
+    {
+        var users = UsersWith(new User
+        {
+            Id = InactiveClient,
+            FirstName = "Ina",
+            LastName = "Client",
+            Username = "InaClient",
+            IsClient = true,
+            IsActive = false,
         });
         var (c, appts) = Make(userId, users);
         var slot = Seed(appts, 24);
@@ -260,17 +306,44 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void Book_OwnSlot_403() {
-        var users = UsersWith(new User {
-            Id = DualRoleUser, FirstName = "Dee", LastName = "Dual", Username = "DeeDual",
-            IsClient = true, IsServiceProvider = true, IsActive = true,
+    public void GetAvailable_HidesOwnSlotsForEnhancedAccount()
+    {
+        var users = UsersWith(new User
+        {
+            Id = DualRoleUser,
+            Username = "DeeDual",
+            IsClient = true,
+            IsServiceProvider = true,
+            IsActive = true,
+        });
+        var (c, appts) = Make(DualRoleUser, users);
+        Seed(appts, 24, providerId: DualRoleUser, typeId: null);
+        var otherSlot = Seed(appts, 25);
+
+        Assert.Equal(new[] { otherSlot.Id }, Ids(c.GetAvailable()));
+        Assert.Empty(Ids(c.GetAvailable(providerId: DualRoleUser)));
+    }
+
+    [Fact]
+    public void Book_OwnSlot_403()
+    {
+        var users = UsersWith(new User
+        {
+            Id = DualRoleUser,
+            FirstName = "Dee",
+            LastName = "Dual",
+            Username = "DeeDual",
+            IsClient = true,
+            IsServiceProvider = true,
+            IsActive = true,
         });
         var (c, appts) = Make(DualRoleUser, users);
         Assert.IsType<ForbidResult>(c.Book(Seed(appts, 24, providerId: DualRoleUser, typeId: null).Id).Result);
     }
 
     [Fact]
-    public void Book_MissingOrDeletedSlot_404() {
+    public void Book_MissingOrDeletedSlot_404()
+    {
         var (c, appts) = Make(SeedIds.ClientUser);
         var deleted = Seed(appts, 24);
         appts.SoftDeleteSlot(deleted.Id);
@@ -280,23 +353,31 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void Book_SlotOfUnapprovedProvider_404() {
-        var users = UsersWith(new User {
-            Id = InactiveProvider, FirstName = "Ina", LastName = "Active", Username = "InaActive",
-            IsServiceProvider = true, IsActive = false,
+    public void Book_SlotOfUnapprovedProvider_404()
+    {
+        var users = UsersWith(new User
+        {
+            Id = InactiveProvider,
+            FirstName = "Ina",
+            LastName = "Active",
+            Username = "InaActive",
+            IsServiceProvider = true,
+            IsActive = false,
         });
         var (c, appts) = Make(SeedIds.ClientUser, users);
         Assert.IsType<NotFoundResult>(c.Book(Seed(appts, 24, providerId: InactiveProvider, typeId: null).Id).Result);
     }
 
     [Fact]
-    public void Book_PastSlot_400() {
+    public void Book_PastSlot_400()
+    {
         var (c, appts) = Make(SeedIds.ClientUser);
         Assert.IsType<BadRequestObjectResult>(c.Book(Seed(appts, -1).Id).Result);
     }
 
     [Fact]
-    public void Book_SlotNoLongerAvailable_409() {
+    public void Book_SlotNoLongerAvailable_409()
+    {
         var (c, appts) = Make(SeedIds.ClientUser);
         var slot = Seed(appts, 24);
         Booked(c.Book(slot.Id));
@@ -307,7 +388,8 @@ public class SlotsControllerTests {
     }
 
     [Fact]
-    public void Book_OverlapsClientsAppointment_409_ButCanceledAndBackToBackDoNot() {
+    public void Book_OverlapsClientsAppointment_409_ButCanceledAndBackToBackDoNot()
+    {
         var (c, appts) = Make(SeedIds.ClientUser);
         Seed(appts, 24, providerId: OtherProvider, typeId: null,
             status: AppointmentStatus.Booked, userId: SeedIds.ClientUser); // 24h -> 24h30
@@ -323,8 +405,38 @@ public class SlotsControllerTests {
         Booked(c.Book(overCanceled.Id));
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Book_RejectsOverlappingAppointmentsAcrossRoles(bool enhancedUserIsBooking)
+    {
+        var users = new InMemoryUserStore();
+        users.Add(new User
+        {
+            Id = DualRoleUser,
+            Username = "enhanced",
+            IsClient = true,
+            IsServiceProvider = true,
+            IsActive = true,
+        });
+        var (c, appts) = Make(enhancedUserIsBooking ? DualRoleUser : SeedIds.ClientUser, users);
+
+        Seed(appts, 24,
+            providerId: enhancedUserIsBooking ? DualRoleUser : OtherProvider,
+            typeId: null,
+            status: AppointmentStatus.Booked,
+            userId: enhancedUserIsBooking ? "other-client" : DualRoleUser);
+        var slot = Seed(appts, 24.25,
+            providerId: enhancedUserIsBooking ? SeedIds.ProviderUser : DualRoleUser,
+            typeId: null);
+
+        Assert.IsType<ConflictObjectResult>(c.Book(slot.Id).Result);
+        Assert.Equal(AppointmentStatus.Available, appts.GetById(slot.Id)!.Status);
+    }
+
     [Fact]
-    public void Book_ProviderSeesBookingInAppointmentsList() {
+    public void Book_ProviderSeesBookingInAppointmentsList()
+    {
         var (c, appts) = Make(SeedIds.ClientUser);
         var slot = Seed(appts, 24);
         Booked(c.Book(slot.Id));

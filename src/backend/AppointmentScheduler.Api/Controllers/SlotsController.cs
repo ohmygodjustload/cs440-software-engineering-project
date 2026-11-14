@@ -15,9 +15,11 @@ public sealed class SlotsController(
     IAppointmentTypeStore types,
     ILocationStore locations,
     ICurrentUser currentUser,
-    INotificationService? notificationService = null) : ControllerBase {
+    INotificationService? notificationService = null) : ControllerBase
+{
     [HttpPost]
-    public ActionResult<Appointment> Create([FromBody] CreateSlotDto dto) {
+    public ActionResult<Appointment> Create([FromBody] CreateSlotDto dto)
+    {
         var check = Validate(dto.AppointmentTypeId!, dto.StartTime!.Value, ignoreSlotId: null);
         if (check.Error is not null) return check.Error;
 
@@ -28,7 +30,8 @@ public sealed class SlotsController(
     }
 
     [HttpGet("mine")]
-    public ActionResult<IReadOnlyList<Appointment>> GetMine() {
+    public ActionResult<IReadOnlyList<Appointment>> GetMine()
+    {
         var (provider, error) = GetApprovedProvider();
         if (error is not null) return error;
         return Ok(appointments.GetAll()
@@ -47,20 +50,27 @@ public sealed class SlotsController(
         AppointmentCategory? category = null,
         string? providerId = null,
         DateTimeOffset? from = null,
-        DateTimeOffset? to = null) {
+        DateTimeOffset? to = null)
+    {
         if (from >= to) return BadRequest("'from' must be before 'to'.");
 
         var now = DateTimeOffset.UtcNow;
         var typeCache = new Dictionary<string, AppointmentType?>(StringComparer.OrdinalIgnoreCase);
         var providerCache = new Dictionary<string, User?>(StringComparer.OrdinalIgnoreCase);
+        var ownProviderId = currentUser.UserId is { } userId
+            && Cached(providerCache, userId, users.GetById) is { IsClient: true, IsServiceProvider: true }
+            ? userId
+            : null;
         var open = new List<Appointment>();
 
-        foreach (var a in appointments.GetAll()) {
+        foreach (var a in appointments.GetAll())
+        {
             if (a.IsDeleted || a.Status != AppointmentStatus.Available || a.UserId is not null) continue;
             if (a.StartDateTime <= now || a.StartDateTime < from || a.StartDateTime >= to) continue;
 
             var type = a.AppointmentTypeId is null ? null : Cached(typeCache, a.AppointmentTypeId, types.GetById);
             var ownerId = type?.ProviderId ?? a.ProviderId;
+            if (string.Equals(ownerId, ownProviderId, StringComparison.OrdinalIgnoreCase)) continue;
             if (!string.IsNullOrWhiteSpace(providerId)
                 && !string.Equals(ownerId, providerId.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
 
@@ -71,7 +81,8 @@ public sealed class SlotsController(
                 { IsServiceProvider: true, IsActive: true } provider)
                 continue;
 
-            open.Add(new Appointment {
+            open.Add(new Appointment
+            {
                 Id = a.Id,
                 Title = type is not null && !string.IsNullOrWhiteSpace(type.CustomServiceName)
                     ? type.CustomServiceName
@@ -97,7 +108,8 @@ public sealed class SlotsController(
     /// never the body. Returns what the confirmation screen needs: provider, service, location, and time.
     /// </summary>
     [HttpPost("{id}/book")]
-    public ActionResult<Appointment> Book(string id, [FromBody] BookSlotDto? dto = null) {
+    public ActionResult<Appointment> Book(string id, [FromBody] BookSlotDto? dto = null)
+    {
         if (currentUser.UserId is null) return Unauthorized();
         if (users.GetById(currentUser.UserId) is not { IsClient: true, IsActive: true } client) return Forbid();
 
@@ -113,12 +125,25 @@ public sealed class SlotsController(
         if (slot.Status != AppointmentStatus.Available || slot.UserId is not null)
             return Conflict("Slot is no longer available.");
 
+        bool IsParticipant(string? userId) =>
+            string.Equals(userId, client.Id, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(userId, provider.Id, StringComparison.OrdinalIgnoreCase);
+
         var overlaps = appointments.GetAll().Any(a =>
-            a.UserId == client.Id
-            && a.Id != slot.Id
-            && a.Status != AppointmentStatus.Canceled
-            && a.StartDateTime < slot.EndDateTime && slot.StartDateTime < a.EndDateTime); // half-open intervals
-        if (overlaps) return Conflict("You already have an appointment at this time.");
+        {
+            if (a.IsDeleted || a.Id == slot.Id || a.Status == AppointmentStatus.Canceled
+                || a.StartDateTime >= slot.EndDateTime || slot.StartDateTime >= a.EndDateTime)
+            {
+                return false;
+            }
+
+            if (IsParticipant(a.UserId)) return true;
+            if (a.Status != AppointmentStatus.Booked) return false;
+
+            var bookedType = a.AppointmentTypeId is null ? null : types.GetById(a.AppointmentTypeId);
+            return IsParticipant(bookedType?.ProviderId ?? a.ProviderId);
+        });
+        if (overlaps) return Conflict("This time overlaps an existing appointment for you or the provider.");
 
         var notes = dto?.Notes?.Trim() ?? "";
         if (!appointments.BookSlot(slot.Id, client.Id, notes)) return Conflict("Slot is no longer available.");
@@ -136,7 +161,8 @@ public sealed class SlotsController(
     }
 
     [HttpPut("{id}")]
-    public ActionResult<Appointment> Update(string id, [FromBody] UpdateSlotDto dto) {
+    public ActionResult<Appointment> Update(string id, [FromBody] UpdateSlotDto dto)
+    {
         var (provider, error) = GetApprovedProvider();
         if (error is not null) return error;
 
@@ -162,7 +188,8 @@ public sealed class SlotsController(
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(string id) {
+    public IActionResult Delete(string id)
+    {
         var (provider, error) = GetApprovedProvider();
         if (error is not null) return error;
 
@@ -177,12 +204,14 @@ public sealed class SlotsController(
 
     // ---------- helpers ----------
 
-    private static T? Cached<T>(Dictionary<string, T?> cache, string key, Func<string, T?> load) where T : class {
+    private static T? Cached<T>(Dictionary<string, T?> cache, string key, Func<string, T?> load) where T : class
+    {
         if (!cache.TryGetValue(key, out var value)) cache[key] = value = load(key);
         return value;
     }
 
-    private Appointment Describe(Appointment a, AppointmentType? type, User provider) => new() {
+    private Appointment Describe(Appointment a, AppointmentType? type, User provider) => new()
+    {
         Id = a.Id,
         Title = type is not null && !string.IsNullOrWhiteSpace(type.CustomServiceName)
             ? type.CustomServiceName
@@ -203,7 +232,8 @@ public sealed class SlotsController(
         t.IsBeauty ? AppointmentCategory.Beauty
         : t.IsFitness ? AppointmentCategory.Fitness : AppointmentCategory.Medical;
 
-    private (User? User, ActionResult? Error) GetApprovedProvider() {
+    private (User? User, ActionResult? Error) GetApprovedProvider()
+    {
         if (currentUser.UserId is null) return (null, Unauthorized());
         var user = users.GetById(currentUser.UserId);
         return user is null || !user.IsServiceProvider || !user.IsActive ? (null, Forbid()) : (user, null);
@@ -216,7 +246,8 @@ public sealed class SlotsController(
         DateTimeOffset Start,
         DateTimeOffset End);
 
-    private Checked Validate(string typeId, DateTimeOffset start, string? ignoreSlotId) {
+    private Checked Validate(string typeId, DateTimeOffset start, string? ignoreSlotId)
+    {
         var (provider, error) = GetApprovedProvider();
         if (error is not null) return new Checked(error, null, null, default, default);
 
@@ -241,7 +272,8 @@ public sealed class SlotsController(
         static Checked Fail(ActionResult e) => new(e, null, null, default, default);
     }
 
-    private Appointment Build(Checked c, string? id) => new() {
+    private Appointment Build(Checked c, string? id) => new()
+    {
         Id = id ?? Guid.NewGuid().ToString("N"),
         Title = c.Type!.CustomServiceName,
         Category = CategoryOf(c.Type),

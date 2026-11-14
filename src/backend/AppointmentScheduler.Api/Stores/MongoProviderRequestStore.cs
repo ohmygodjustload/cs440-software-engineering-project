@@ -81,7 +81,7 @@ public sealed class MongoProviderRequestStore : IProviderRequestStore
         return _raw.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).FirstOrDefault();
     }
 
-    private static BsonDocument ToDocument(ProviderRequest request) => new()
+    internal static BsonDocument ToDocument(ProviderRequest request) => new()
     {
         ["UserId"] = request.UserId,
         ["ProviderName"] = request.ProviderName,
@@ -102,7 +102,7 @@ public sealed class MongoProviderRequestStore : IProviderRequestStore
             : BsonValue.Create(request.DeletedAt.Value.UtcDateTime),
     };
 
-    private static ProviderRequest Map(BsonDocument d) => new()
+    internal static ProviderRequest Map(BsonDocument d) => new()
     {
         Id = ReadId(d, "_id") ?? Guid.NewGuid().ToString("N"),
         UserId = ReadString(d, "UserId") ?? string.Empty,
