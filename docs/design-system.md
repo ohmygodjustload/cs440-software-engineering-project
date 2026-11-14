@@ -8,7 +8,7 @@ The design system the Angular frontend actually uses, documented from its CSS fo
 - Font loading: [`src/frontend/src/index.html`](../src/frontend/src/index.html)
 - 24 component stylesheets under `src/frontend/src/app/**/*.css`. The signup-provider page has no stylesheet of its own; it reuses `signup.component.css`.
 
-All counts come from scanning those files. A "count" is the number of declarations (or hex literals) with that exact value.
+All counts come from scanning those files. A "count" is the number of declarations (or color values) with that exact value.
 
 ## Global design tokens: defined, not yet adopted
 
@@ -25,34 +25,7 @@ All counts come from scanning those files. A "count" is the number of declaratio
 | `--radius` | `8px` |
 | `--display` | `block` |
 
-Status: **defined, not yet adopted.** Only the `body` rule in `styles.css` uses them (`--color-ink` and `--color-surface-muted`). No component stylesheet references any `--color-*` token or `--radius`. Components hard-code their colors instead: **380 hex literals across the 24 component files** (386 including the six in `styles.css`).
-
-| Component stylesheet | Hex literals |
-| --- | ---: |
-| `pages/book-appointment` | 34 |
-| `pages/notifications` | 33 |
-| `pages/settings` | 32 |
-| `pages/appointments-admin` | 26 |
-| `pages/activity` | 24 |
-| `pages/edit-account` | 23 |
-| `app.component.css` (shell) | 23 |
-| `pages/requests` | 19 |
-| `pages/accounts` | 16 |
-| `pages/calendar` | 16 |
-| `pages/statistics` | 15 |
-| `pages/home-provider` | 15 |
-| `pages/create-slots` | 14 |
-| `pages/confirmation` | 14 |
-| `shared/notification-popup` | 12 |
-| `pages/home-admin` | 12 |
-| `pages/edit-appointment-admin` | 11 |
-| `pages/home` | 10 |
-| `pages/review-request` | 9 |
-| `pages/signup` | 7 |
-| `pages/login` | 5 |
-| `pages/appointments` | 4 |
-| `pages/signup-selection` | 3 |
-| `core/components/loading` | 3 |
+Status: **defined, not yet adopted.** Only the `body` rule in `styles.css` uses them (`--color-ink` and `--color-surface-muted`). No component stylesheet references any `--color-*` token or `--radius`. Components hard-code their colors instead (380 color values across the 24 component stylesheets), so changing a brand color today means editing many files rather than one token.
 
 ## Page-scoped tokens
 
@@ -252,7 +225,7 @@ Earlier versions of the app also had no media queries on accounts and appointmen
 
 ## Gaps and recommendations
 
-1. **Adopt one set of tokens.** Either point the `:root` tokens at the warm palette the app really uses (`#344945`, `#f7f5f1`, `#e0dcd1`) or drop them, then replace the 380 hard-coded hex literals with `var()` references.
+1. **Adopt one set of tokens.** Either point the `:root` tokens at the warm palette the app really uses (`#344945`, `#f7f5f1`, `#e0dcd1`) or drop them, then replace the hard-coded colors with `var()` references.
 2. **Merge the duplicate page-scoped tokens.** `--login-*`, `--signup-*`, `--appointments-*`, and review-request's `--paper` / `--ink` / `--soft` define the same three colors five times over.
 3. **Standardize breakpoints** on two or three widths (for example 650px and 1150px, plus 760px if needed) instead of thirteen.
 4. **Share button, form, and card styles.** One `.primary` / `.secondary` style (or shared Angular components) would replace `.primary-button`, `.primary-action`, and the confirmation button classes.
