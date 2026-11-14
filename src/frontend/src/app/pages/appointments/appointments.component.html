@@ -35,8 +35,10 @@
             [attr.aria-expanded]="selectedId === appointment.id" (click)="toggleDetails(appointment.id)">
             {{ selectedId === appointment.id ? 'Hide details' : 'View details' }}
           </button>
-          <button type="button" class="secondary" (click)="startEditNotes(appointment)">Edit note</button>
-          <button type="button" class="danger" (click)="openCancelDialog(appointment)">Cancel appointment</button>
+          @if (editingNotesId !== appointment.id) {
+            <button type="button" class="secondary" (click)="startEditNotes(appointment)">Edit note</button>
+            <button type="button" class="danger" (click)="openCancelDialog(appointment)">Cancel appointment</button>
+          }
         </div>
 
         @if (selectedId === appointment.id) {
@@ -87,10 +89,12 @@
                 <p class="provider">{{ appointment.notes }}</p>
               }
             </div>
-            <div class="card-actions">
-              <button type="button" class="secondary" (click)="startEditNotes(appointment)">Edit note</button>
-              <button type="button" class="danger" (click)="openCancelDialog(appointment)">Cancel</button>
-            </div>
+            @if (editingNotesId !== appointment.id) {
+              <div class="card-actions">
+                <button type="button" class="secondary" (click)="startEditNotes(appointment)">Edit note</button>
+                <button type="button" class="danger" (click)="openCancelDialog(appointment)">Cancel</button>
+              </div>
+            }
           </article>
         }
       </section>

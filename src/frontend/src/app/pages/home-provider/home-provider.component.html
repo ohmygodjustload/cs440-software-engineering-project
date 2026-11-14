@@ -64,10 +64,12 @@
                 </div>
               }
             </div>
-            <div class="row-actions">
-              <button type="button" (click)="startEdit(slot)">Edit</button>
-              <button type="button" [disabled]="saving" (click)="deleteSlot(slot)">Delete</button>
-            </div>
+            @if (editingId !== slot.id) {
+              <div class="row-actions">
+                <button type="button" (click)="startEdit(slot)">Edit</button>
+                <button type="button" [disabled]="saving" (click)="deleteSlot(slot)">Delete</button>
+              </div>
+            }
           </article>
         } @empty {
           <p>No future open slots. Create a slot to add availability.</p>
@@ -96,12 +98,25 @@
               </div>
             }
           </div>
-          <div class="row-actions">
-            <button class="primary" (click)="selectedAppointment = appointment">View details</button>
-            <button type="button" (click)="startEdit(appointment)">Edit</button>
-            <button type="button" [disabled]="saving" (click)="deleteSlot(appointment)">Cancel booking</button>
-          </div>
+          @if (editingId !== appointment.id) {
+            <div class="row-actions">
+              <button
+                type="button"
+                class="primary"
+                [attr.aria-expanded]="detailsOpen('booked:' + appointment.id)"
+                (click)="toggleDetails('booked:' + appointment.id)"
+              >
+                {{ detailsOpen('booked:' + appointment.id) ? 'Hide details' : 'View details' }}
+                <span aria-hidden="true">{{ detailsOpen('booked:' + appointment.id) ? '▴' : '▾' }}</span>
+              </button>
+              <button type="button" (click)="startEdit(appointment)">Edit</button>
+              <button type="button" [disabled]="saving" (click)="deleteSlot(appointment)">Cancel booking</button>
+            </div>
+          }
         </article>
+        @if (detailsOpen('booked:' + appointment.id)) {
+          <ng-container *ngTemplateOutlet="appointmentDetails; context: { $implicit: appointment }" />
+        }
       } @empty {
         <p>No upcoming booked appointments.</p>
       }
@@ -117,25 +132,21 @@
             <p>Client ID: {{ appointment.userId || 'Not provided' }}</p>
             <p>{{ appointment.location || 'Location not provided' }}</p>
           </div>
-          <button class="primary" (click)="selectedAppointment = appointment">View details</button>
+          <button
+            type="button"
+            class="primary"
+            [attr.aria-expanded]="detailsOpen('next:' + appointment.id)"
+            (click)="toggleDetails('next:' + appointment.id)"
+          >
+            {{ detailsOpen('next:' + appointment.id) ? 'Hide details' : 'View details' }}
+            <span aria-hidden="true">{{ detailsOpen('next:' + appointment.id) ? '▴' : '▾' }}</span>
+          </button>
         </article>
+        @if (detailsOpen('next:' + appointment.id)) {
+          <ng-container *ngTemplateOutlet="appointmentDetails; context: { $implicit: appointment }" />
+        }
       } @else { <p>No upcoming booked appointments.</p> }
     </section>
-
-    @if (selectedAppointment; as appointment) {
-      <section class="details" aria-label="Appointment details">
-        <h2>{{ appointment.title }}</h2>
-        <dl>
-          <dt>Client ID</dt><dd>{{ appointment.userId || 'Not provided' }}</dd>
-          <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
-          <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
-          <dt>Status</dt><dd>{{ appointment.status }}</dd>
-          <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
-          <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
-        </dl>
-        <button (click)="selectedAppointment = null">Close details</button>
-      </section>
-    }
 
     <section>
       <h2>Recent appointments</h2>
@@ -144,13 +155,37 @@
           <span>{{ appointment.startDateTime | date:'MMM d' }}</span>
           <span>{{ appointment.title }}</span>
           <span>{{ appointment.status }}</span>
-          <button (click)="selectedAppointment = appointment">View details</button>
+          <button
+            type="button"
+            [attr.aria-expanded]="detailsOpen('recent:' + appointment.id)"
+            (click)="toggleDetails('recent:' + appointment.id)"
+          >
+            {{ detailsOpen('recent:' + appointment.id) ? 'Hide details' : 'View details' }}
+            <span aria-hidden="true">{{ detailsOpen('recent:' + appointment.id) ? '▴' : '▾' }}</span>
+          </button>
         </div>
+        @if (detailsOpen('recent:' + appointment.id)) {
+          <ng-container *ngTemplateOutlet="appointmentDetails; context: { $implicit: appointment }" />
+        }
       } @empty { <p>No recent appointments.</p> }
     </section>
-    <footer><a routerLink="/provider">Manage appointments</a><button (click)="load()">Refresh</button></footer>
+    <footer><button (click)="load()">Refresh</button></footer>
   }
 </main>
+
+<ng-template #appointmentDetails let-appointment>
+  <section class="details" aria-label="Appointment details">
+    <h2>{{ appointment.title }}</h2>
+    <dl>
+      <dt>Client ID</dt><dd>{{ appointment.userId || 'Not provided' }}</dd>
+      <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
+      <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
+      <dt>Status</dt><dd>{{ appointment.status }}</dd>
+      <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
+      <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
+    </dl>
+  </section>
+</ng-template>
 
 <dialog #confirmDialog class="confirm-dialog" aria-labelledby="provider-confirm-title">
   <section class="confirm-prompt">

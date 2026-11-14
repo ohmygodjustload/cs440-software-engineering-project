@@ -99,4 +99,44 @@ describe('Appointments overview', () => {
 
     expect(component.actionError).toContain('Only Booked future appointments');
   });
+
+  it('hides Edit note and Cancel while a note is being edited', () => {
+    const soon = booking('soon', new Date(Date.now() + 86400000));
+    const later = booking('later', new Date(Date.now() + 172800000));
+    const loadAppointments = jasmine.createSpy('loadAppointments').and.returnValue(of([soon, later]));
+    const fixture = createComponent({ loadAppointments });
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.startEditNotes(soon);
+    fixture.detectChanges();
+
+    const native: HTMLElement = fixture.nativeElement;
+    const upcomingButtons = Array.from(
+      native.querySelectorAll('.upcoming-card > .card-actions button')
+    ).map((btn) => btn.textContent?.trim());
+
+    expect(upcomingButtons).toContain('Hide details');
+    expect(upcomingButtons).not.toContain('Edit note');
+    expect(upcomingButtons).not.toContain('Cancel appointment');
+    expect(native.querySelector('.upcoming-card textarea')).not.toBeNull();
+    expect(
+      Array.from(native.querySelectorAll('.upcoming-card .notes-actions button')).map((btn) =>
+        btn.textContent?.trim()
+      )
+    ).toContain('Save note');
+
+    component.startEditNotes(later);
+    fixture.detectChanges();
+
+    const laterRow = Array.from(native.querySelectorAll('.booking-row')).find((el) =>
+      el.querySelector('textarea')
+    ) as HTMLElement;
+    const laterLabels = Array.from(laterRow.querySelectorAll('button')).map((btn) =>
+      btn.textContent?.trim()
+    );
+    expect(laterLabels).toContain('Save note');
+    expect(laterLabels).not.toContain('Edit note');
+    expect(laterRow.querySelector('button.danger')).toBeNull();
+  });
 });

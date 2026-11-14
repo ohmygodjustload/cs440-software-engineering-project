@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,7 +15,7 @@ import { LoadingComponent } from '../../core/components/loading/loading.componen
 @Component({
   selector: 'app-provider-home',
   standalone: true,
-  imports: [DatePipe, FormsModule, RouterLink, LoadingComponent],
+  imports: [DatePipe, FormsModule, NgTemplateOutlet, RouterLink, LoadingComponent],
   templateUrl: './home-provider.component.html',
   styleUrl: './home-provider.component.css'
 })
@@ -28,7 +28,7 @@ export class ProviderHomeComponent implements OnInit {
   @ViewChild('confirmDialog') private confirmDialog?: ElementRef<HTMLDialogElement>;
 
   appointments: Appointment[] = [];
-  selectedAppointment: Appointment | null = null;
+  selectedKey = '';
   showAvailability = false;
   loading = false;
   saving = false;
@@ -91,10 +91,18 @@ export class ProviderHomeComponent implements OnInit {
     this.load();
   }
 
+  toggleDetails(key: string): void {
+    this.selectedKey = this.selectedKey === key ? '' : key;
+  }
+
+  detailsOpen(key: string): boolean {
+    return this.selectedKey === key;
+  }
+
   load(): void {
     this.request?.unsubscribe();
     this.appointments = [];
-    this.selectedAppointment = null;
+    this.selectedKey = '';
     this.error = '';
     this.actionError = '';
     this.editingId = '';
