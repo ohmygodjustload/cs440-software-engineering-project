@@ -169,6 +169,13 @@
       @if (saveSuccess) {
         <div class="settings-alert settings-alert--success" role="status"><p>Settings saved.</p></div>
       }
+      @if (activeTabId !== 'privacy') {
+        <div class="settings-actions">
+          <button type="submit" class="settings-save" [disabled]="!canSave">
+            {{ saving ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      }
     </form>
     }
   }
