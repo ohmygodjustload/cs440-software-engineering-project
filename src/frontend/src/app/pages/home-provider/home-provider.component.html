@@ -65,28 +65,18 @@
           <div>
             <p>{{ appointment.category }} · {{ appointment.startDateTime | date:'MMM d, h:mm a' }}</p>
             <h3>{{ appointment.title }}</h3>
-            <p>Client ID: {{ appointment.userId || 'Not provided' }}</p>
-            <p>{{ appointment.location || 'Location not provided' }}</p>
+            <p>Client username: {{ appointment.clientUsername || 'Username unavailable' }}</p>            <p>{{ appointment.location || 'Location not provided' }}</p>
           </div>
-          <button class="primary" (click)="selectedAppointment = appointment">View details</button>
+          <button type="button" class="primary" [attr.aria-expanded]="selectedAppointment?.id === appointment.id"
+            (click)="selectedAppointment = selectedAppointment?.id === appointment.id ? null : appointment">
+            {{ selectedAppointment?.id === appointment.id ? 'Hide details' : 'View details' }}
+          </button>
+          @if (selectedAppointment?.id === appointment.id) {
+            <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
+          }
         </article>
       } @else { <p>No upcoming booked appointments.</p> }
     </section>
-
-    @if (selectedAppointment; as appointment) {
-      <section class="details" aria-label="Appointment details">
-        <h2>{{ appointment.title }}</h2>
-        <dl>
-          <dt>Client ID</dt><dd>{{ appointment.userId || 'Not provided' }}</dd>
-          <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
-          <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
-          <dt>Status</dt><dd>{{ appointment.status }}</dd>
-          <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
-          <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
-        </dl>
-        <button (click)="selectedAppointment = null">Close details</button>
-      </section>
-    }
 
     <section>
       <h2>Recent appointments</h2>
@@ -95,9 +85,30 @@
           <span>{{ appointment.startDateTime | date:'MMM d' }}</span>
           <span>{{ appointment.title }}</span>
           <span>{{ appointment.status }}</span>
-          <button (click)="selectedAppointment = appointment">View details</button>
+          <button type="button" [attr.aria-expanded]="selectedAppointment?.id === appointment.id"
+            (click)="selectedAppointment = selectedAppointment?.id === appointment.id ? null : appointment">
+            {{ selectedAppointment?.id === appointment.id ? 'Hide details' : 'View details' }}
+          </button>
+          @if (selectedAppointment?.id === appointment.id) {
+            <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
+          }
         </div>
       } @empty { <p>No recent appointments.</p> }
     </section>
+    <ng-template #appointmentDetails>
+      @if (selectedAppointment; as appointment) {
+      <section class="details" aria-label="Appointment details">
+        <h2>{{ appointment.title }}</h2>
+        <dl>
+          <dt>Client username</dt><dd>{{ appointment.clientUsername || 'Username unavailable' }}</dd>
+          <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
+          <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
+          <dt>Status</dt><dd>{{ appointment.status }}</dd>
+          <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
+          <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
+        </dl>
+      </section>
+      }
+    </ng-template>
   }
 </main>

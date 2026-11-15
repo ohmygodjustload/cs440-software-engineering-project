@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,7 @@ import { LoadingComponent } from '../../core/components/loading/loading.componen
 @Component({
   selector: 'app-provider-home',
   standalone: true,
-  imports: [DatePipe, FormsModule, RouterLink, LoadingComponent],
+  imports: [DatePipe, NgTemplateOutlet, FormsModule, RouterLink, LoadingComponent],
   templateUrl: './home-provider.component.html',
   styleUrl: './home-provider.component.css'
 })

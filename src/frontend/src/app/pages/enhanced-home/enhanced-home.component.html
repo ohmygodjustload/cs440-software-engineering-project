@@ -66,8 +66,7 @@
               <p>{{ item.category }} · {{ item.startDateTime | date:'MMM d, h:mm a' }}</p>
               <h4>{{ item.title }}</h4>
               @if (summary.role === 'client') { <p>{{ item.providerName || 'Provider ID: ' + item.providerId }}</p> }
-              @else { <p>Client ID: {{ item.userId || 'Not provided' }}</p> }
-              <p>{{ item.location || 'Location not provided' }}</p>
+              @else { <p>Client username: {{ item.clientUsername || 'Username unavailable' }}</p> }              <p>{{ item.location || 'Location not provided' }}</p>
               <button type="button" class="primary" [attr.aria-expanded]="detailsAreOpen(item, summary)" (click)="showDetails(item, summary)">
                 {{ detailsAreOpen(item, summary) ? 'Hide details' : 'View details' }}
                 <span aria-hidden="true">{{ detailsAreOpen(item, summary) ? '▴' : '▾' }}</span>
@@ -103,8 +102,7 @@
           <dt>Start</dt><dd>{{ item.startDateTime | date:'medium' }}</dd>
           <dt>End</dt><dd>{{ item.endDateTime | date:'medium' }}</dd>
           @if (selectedRole === 'client') { <dt>Provider</dt><dd>{{ item.providerName || item.providerId }}</dd> }
-          @else if (item.userId) { <dt>Client ID</dt><dd>{{ item.userId }}</dd> }
-          <dt>Status</dt><dd>{{ item.status }}</dd>
+          @else if (item.userId) { <dt>Client username</dt><dd>{{ item.clientUsername || 'Username unavailable' }}</dd> }          <dt>Status</dt><dd>{{ item.status }}</dd>
           <dt>Location</dt><dd>{{ item.location || 'Not provided' }}</dd>
           <dt>Notes</dt><dd>{{ item.notes || 'No notes' }}</dd>
         </dl>

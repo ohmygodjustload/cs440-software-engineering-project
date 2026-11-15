@@ -18,7 +18,7 @@
   padding: 0 4rem;
   position: relative;
   background: #faf9f6;
-  aspect-ratio: 16/9;
+  flex-shrink: 0;
   /* Fades with the page in the fallback transition (never triggers on native cross-fades). */
   transition: opacity 180ms ease;
 }
@@ -74,6 +74,7 @@
 
   color: #344b48;
   text-decoration: none;
+  white-space: nowrap;
 
   font-size: 13px;
 
@@ -201,28 +202,26 @@
   }
 }
 
-.app-header--provider .app-nav {
-  min-width: 0;
-}
-
-.app-header--provider .app-nav__list {
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-@media (min-width: 1151px) and (max-width: 1450px) {
-  .app-header--provider {
-    grid-template-columns: minmax(0, 1fr) auto;
+@media (max-width: 1450px) {
+  .app-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    height: auto;
+    gap: 12px;
+    padding: 12px clamp(16px, 3vw, 48px);
   }
 
-  .app-header--provider .app-nav {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-self: center;
+  .app-nav {
+    position: static;
+    transform: none;
+    order: 1;
+    width: 100%;
+    overflow-x: auto;
   }
 
-  .app-header--provider .app-account {
-    grid-column: 2;
-    grid-row: 1;
+  .app-nav__list {
+    width: max-content;
+    margin-inline: auto;
   }
 }

@@ -17,20 +17,26 @@ namespace AppointmentScheduler.Api.Controllers;
 [Route("api/provider-dashboard")]
 public sealed class ProviderDashboardController(
     IUserStore users, IAppointmentStore appointments, IServiceProvider services,
-    IOptions<MongoDbSettings> options, ILogger<ProviderDashboardController> logger) : ControllerBase {
+    IOptions<MongoDbSettings> options, ILogger<ProviderDashboardController> logger) : ControllerBase
+{
     [HttpGet("appointments")]
-    public ActionResult<IReadOnlyList<Appointment>> GetAppointments() {
+    public IActionResult GetAppointments()
+    {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
         var user = users.GetById(userId);
         if (user is null || !user.IsActive || !user.IsServiceProvider) return Forbid();
-        try {
+        try
+        {
             // Old slot endpoints use the user ID; new Mongo slots reference Provider._id.
             var ownedIds = new HashSet<string>(StringComparer.Ordinal) { userId };
             var context = services.GetService<MongoDbContext>();
-            if (context is null) {
+            if (context is null)
+            {
                 ownedIds.Add(Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes("provider:" + userId)))[..24].ToLowerInvariant());
-            } else {
+            }
+            else
+            {
                 var rows = context.Database.GetCollection<BsonDocument>(options.Value.ProvidersCollection);
                 var filter = Builders<BsonDocument>.Filter.Eq("UserId", userId);
                 if (ObjectId.TryParse(userId, out var objectId))
@@ -39,9 +45,34 @@ public sealed class ProviderDashboardController(
                 foreach (var row in rows.Find(filter).ToList())
                     if (row.TryGetValue("_id", out var id)) ownedIds.Add(id.ToString()!);
             }
-            return Ok(appointments.GetAll().Where(item => !item.IsDeleted && ownedIds.Contains(item.ProviderId))
-                .OrderBy(item => item.StartDateTime).ToList());
-        } catch (Exception ex) {
+            var booked = appointments.GetAll()
+                .Where(item => !item.IsDeleted && ownedIds.Contains(item.ProviderId))
+                .OrderBy(item => item.StartDateTime).ToList();
+            var usernames = booked.Select(item => item.UserId)
+                .OfType<string>()
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct(StringComparer.Ordinal)
+                .ToDictionary(id => id, id => users.GetById(id)?.Username, StringComparer.Ordinal);
+            return Ok(booked.Select(item => new
+            {
+                item.Id,
+                item.Title,
+                item.Category,
+                item.StartDateTime,
+                item.EndDateTime,
+                item.ProviderId,
+                item.ProviderName,
+                item.UserId,
+                item.AppointmentTypeId,
+                item.Location,
+                item.Notes,
+                item.Status,
+                ClientUsername = item.UserId is { } clientId
+                    && usernames.TryGetValue(clientId, out var username) ? username : null
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
             logger.LogError(ex, "Provider dashboard load failed for {UserId}", userId);
             return StatusCode(503, "Your appointments could not be loaded. Please retry.");
         }

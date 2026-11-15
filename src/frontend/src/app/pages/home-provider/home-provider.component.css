@@ -242,3 +242,18 @@ footer {
 .slot-category {
   font-size: 13px;
 }
+
+.appointment-card:has(.details) {
+  flex-wrap: wrap;
+}
+
+.appointment-card > .details {
+  flex: 0 0 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.recent-row > .details {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
