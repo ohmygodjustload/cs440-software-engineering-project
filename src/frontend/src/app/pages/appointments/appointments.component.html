@@ -110,7 +110,7 @@
     }
     <div class="card-actions">
       <button type="button" class="danger" [disabled]="saving" (click)="confirmCancel()">Yes, cancel</button>
-      <button type="button" class="secondary" [disabled]="saving" (click)="closeCancelDialog()">No, go back</button>
+      <button type="button" class="secondary" (click)="closeCancelDialog()">No, go back</button>
     </div>
   </section>
 </dialog>

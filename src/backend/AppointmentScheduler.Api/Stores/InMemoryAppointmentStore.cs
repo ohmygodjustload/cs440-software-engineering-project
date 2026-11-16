@@ -11,6 +11,13 @@ public sealed class InMemoryAppointmentStore : IAppointmentStore {
     public IReadOnlyList<Appointment> GetAll() =>
         [.. _items.Values.Where(a => !a.IsDeleted).OrderBy(a => a.StartDateTime)];
 
+    /// <summary>
+    /// Returns all appointments, including soft-deleted ones, sorted by start time.
+    /// Used by admin views that need to show historical/canceled appointments.
+    /// </summary>
+    public IReadOnlyList<Appointment> GetAllIncludingDeleted() =>
+        [.. _items.Values.OrderBy(a => a.StartDateTime)];
+
     public Appointment? GetById(string id) =>
         _items.TryGetValue(id, out var a) && !a.IsDeleted ? a : null;
 

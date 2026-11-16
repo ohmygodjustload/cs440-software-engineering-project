@@ -61,7 +61,14 @@ public sealed class AdminController(
         [FromQuery] string? search = null,
         [FromQuery] DateTimeOffset? date = null)
     {
-        var result = appointments.GetAll().AsEnumerable();
+        var result = appointments.GetAllIncludingDeleted().AsEnumerable();
+        // Soft-deleted appointments (IsDeleted == true) are shown as Canceled so the
+        // admin appointments tab reflects their true status, matching the activity log.
+        foreach (var item in result)
+        {
+            if (item.IsDeleted)
+                item.Status = AppointmentStatus.Canceled;
+        }
         if (date.HasValue)
         {
             var start = date.Value.Date;

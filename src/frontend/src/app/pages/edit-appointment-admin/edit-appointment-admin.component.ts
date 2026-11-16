@@ -113,7 +113,6 @@ export class EditAppointmentAdminComponent implements OnInit {
       error: () => {
         this.cancelling = false;
         this.error = 'Could not cancel this appointment.';
-        this.closeCancelDialog();
       }
     });
   }

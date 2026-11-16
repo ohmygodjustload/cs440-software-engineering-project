@@ -34,4 +34,9 @@ public interface IAppointmentStore {
     /// and the appointment is soft-deleted so it drops out of live lists.
     /// </summary>
     bool CancelBooked(string id);
+    /// <summary>
+    /// Returns all appointments, including soft-deleted ones, sorted by start time.
+    /// Used by admin views that need to show historical/canceled appointments.
+    /// </summary>
+    IReadOnlyList<Appointment> GetAllIncludingDeleted();
 }

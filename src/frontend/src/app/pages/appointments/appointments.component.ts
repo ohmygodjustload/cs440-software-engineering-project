@@ -145,7 +145,6 @@ export class AppointmentsComponent implements OnInit {
           this.actionError = err?.status === 409
             ? 'Only Booked future appointments can be canceled.'
             : 'Appointment could not be canceled. Please try again.';
-          this.closeCancelDialog();
         }
       });
   }

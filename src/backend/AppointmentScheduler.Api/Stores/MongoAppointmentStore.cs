@@ -38,6 +38,17 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         _raw = _db.GetCollection<BsonDocument>(_settings.AppointmentsCollection);
     }
 
+    public IReadOnlyList<Appointment> GetAllIncludingDeleted()
+    {
+        var lookups = LoadLookups();
+        return [
+            .. _raw.Find(FilterDefinition<BsonDocument>.Empty)
+                .ToList()
+                .Select(d => Map(d, lookups))
+                .OrderBy(a => a.StartDateTime)
+        ];
+    }
+
     public IReadOnlyList<Appointment> GetAll()
     {
         var lookups = LoadLookups();
@@ -368,6 +379,7 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             Notes = ReadString(d, "Notes"),
             Status = NormalizeStatus(statusName),
             AppointmentTypeId = appointmentTypeId,
+            IsDeleted = IsDeleted(d),
         };
     }
 
