@@ -299,6 +299,11 @@ footer {
   margin: 0 0 20px;
 }
 
+.confirm-prompt button:focus-visible {
+  outline: none;
+  outline-offset: 0;
+}
+
 .confirm-prompt .danger {
   background: #8b3a3a;
   color: #f7f5f1;

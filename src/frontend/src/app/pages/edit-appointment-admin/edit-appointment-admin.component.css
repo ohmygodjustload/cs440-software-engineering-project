@@ -138,6 +138,11 @@ button:disabled { pointer-events: none; }
   margin-right: 0;
 }
 
+.confirm-prompt button:focus-visible {
+  outline: none;
+  outline-offset: 0;
+}
+
 @media (max-width: 650px) {
   .slot-page { margin: 12px; padding: 24px 18px; }
   .form-grid { grid-template-columns: 1fr; gap: 24px; }
