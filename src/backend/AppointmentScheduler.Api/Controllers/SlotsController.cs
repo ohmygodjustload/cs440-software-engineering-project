@@ -319,7 +319,7 @@ public sealed class SlotsController(
             : $"{client.FirstName} {client.LastName}".Trim();
         return new BookedSlotConflict
         {
-            Message = "This slot is booked. Confirm to continue.",
+            Message = "This slot is booked. Please select another time.",
             RequiresConfirm = true,
             ClientName = string.IsNullOrWhiteSpace(clientName) ? existing.UserId : clientName,
             StartDateTime = existing.StartDateTime

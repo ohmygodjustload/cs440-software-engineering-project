@@ -38,6 +38,7 @@ export class ProviderHomeComponent implements OnInit {
 
   editingId = '';
   editStartLocal = '';
+  originalEditStartLocal = '';
   pendingAction: { kind: 'update' | 'delete'; appointment: Appointment; startTime?: string } | null = null;
   pendingConflict: BookedSlotConflict | null = null;
 
@@ -124,6 +125,7 @@ export class ProviderHomeComponent implements OnInit {
   startEdit(appointment: Appointment): void {
     this.editingId = appointment.id;
     this.editStartLocal = this.toLocalInput(appointment.startDateTime);
+    this.originalEditStartLocal = this.editStartLocal;
     this.actionError = '';
   }
 
@@ -132,12 +134,26 @@ export class ProviderHomeComponent implements OnInit {
     this.editStartLocal = '';
   }
 
-  saveEdit(appointment: Appointment, confirm = false): void {
+  saveEdit(appointment: Appointment): void {
     if (this.saving || !this.editStartLocal) return;
+
+    // No changes were made; exit edit mode without modifying the slot.
+    if (this.editStartLocal === this.originalEditStartLocal) {
+      this.cancelEdit();
+      return;
+    }
+
     const startTime = new Date(this.editStartLocal).toISOString();
+
+    // Prevent saving to a time that is already in the past.
+    if (new Date(startTime).getTime() <= Date.now()) {
+      this.actionError = 'Choose a future appointment time.';
+      return;
+    }
+
     this.saving = true;
     this.actionError = '';
-    this.slots.update(appointment.id, { startTime, confirm })
+    this.slots.update(appointment.id, { startTime, confirm: appointment.status === 'Booked' })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -146,19 +162,15 @@ export class ProviderHomeComponent implements OnInit {
           this.closeConfirmDialog();
           this.load();
         },
-        error: (err: HttpErrorResponse) => this.handleSlotError(err, {
-          kind: 'update',
-          appointment,
-          startTime
-        })
+        error: (err: HttpErrorResponse) => this.handleSlotError(err)
       });
   }
 
   deleteSlot(appointment: Appointment, confirm = false): void {
     if (this.saving) return;
 
-    // Open slots: confirm in the UI before sending DELETE.
-    if (!confirm && appointment.status === 'Available') {
+    // Confirm in the UI before sending any DELETE.
+    if (!confirm) {
       this.pendingAction = { kind: 'delete', appointment };
       this.pendingConflict = null;
       this.actionError = '';
@@ -168,7 +180,7 @@ export class ProviderHomeComponent implements OnInit {
 
     this.saving = true;
     this.actionError = '';
-    this.slots.delete(appointment, confirm)
+    this.slots.delete(appointment, true)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -176,21 +188,14 @@ export class ProviderHomeComponent implements OnInit {
           this.closeConfirmDialog();
           this.load();
         },
-        error: (err: HttpErrorResponse) => this.handleSlotError(err, {
-          kind: 'delete',
-          appointment
-        })
+        error: (err: HttpErrorResponse) => this.handleSlotError(err)
       });
   }
 
   confirmPending(): void {
     const pending = this.pendingAction;
     if (!pending) return;
-    if (pending.kind === 'update') {
-      this.editStartLocal = this.toLocalInput(pending.startTime ?? pending.appointment.startDateTime);
-      this.saveEdit(pending.appointment, true);
-      return;
-    }
+    // pendingAction is only ever a delete now; updates can no longer be confirmed/forced.
     this.deleteSlot(pending.appointment, true);
   }
 
@@ -200,16 +205,16 @@ export class ProviderHomeComponent implements OnInit {
     this.pendingConflict = null;
   }
 
-  private handleSlotError(
-    err: HttpErrorResponse,
-    pending: { kind: 'update' | 'delete'; appointment: Appointment; startTime?: string }
-  ): void {
+  private handleSlotError(err: HttpErrorResponse): void {
     this.saving = false;
     const body = err.error as BookedSlotConflict | string | null;
     if (err.status === 409 && body && typeof body === 'object' && body.requiresConfirm) {
-      this.pendingAction = pending;
-      this.pendingConflict = body;
-      this.confirmDialog?.nativeElement.showModal();
+      // A modification cannot override an existing appointment. Show the conflict as an
+      // error message instead of offering a "Continue anyway" override.
+      this.actionError =
+        typeof body.message === 'string' && body.message.trim()
+          ? body.message
+          : 'That change conflicts with another appointment.';
       return;
     }
     this.actionError = typeof body === 'string' && body.trim()

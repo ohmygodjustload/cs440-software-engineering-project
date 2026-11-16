@@ -189,17 +189,15 @@
 
 <dialog #confirmDialog class="confirm-dialog" aria-labelledby="provider-confirm-title">
   <section class="confirm-prompt">
-    @if (pendingConflict; as conflict) {
-      <h2 id="provider-confirm-title">This slot is booked</h2>
+    @if (pendingAction?.kind === 'delete') {
+      @if (pendingAction!.appointment.status === 'Available') {
+        <h2 id="provider-confirm-title">Delete this open slot?</h2>
+      } @else {
+        <h2 id="provider-confirm-title">Cancel this appointment?</h2>
+      }
       <p>
-        {{ conflict.clientName || 'A client' }} is booked for
-        {{ conflict.startDateTime | date:'medium' }}. Continue anyway?
-      </p>
-    } @else if (pendingAction) {
-      <h2 id="provider-confirm-title">Delete this open slot?</h2>
-      <p>
-        {{ pendingAction.appointment.title || 'Appointment' }} ·
-        {{ pendingAction.appointment.startDateTime | date:'medium' }}
+        {{ pendingAction!.appointment.title || 'Appointment' }} ·
+        {{ pendingAction!.appointment.startDateTime | date:'medium' }}
       </p>
     }
     <div class="row-actions">

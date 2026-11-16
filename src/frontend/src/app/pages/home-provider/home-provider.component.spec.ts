@@ -47,14 +47,14 @@ describe('ProviderHomeComponent', () => {
     expect(component.upcomingBooked.map((item) => item.id)).toEqual(['b1']);
   });
 
-  it('opens the confirm dialog when update returns a booked-slot 409', () => {
+  it('shows an error instead of allowing override when update conflicts with a booked slot', () => {
     const update = jasmine.createSpy('update').and.returnValue(
       throwError(
         () =>
           new HttpErrorResponse({
             status: 409,
             error: {
-              message: 'This slot is booked. Confirm to continue.',
+              message: 'This slot is booked. Please select another time.',
               requiresConfirm: true,
               clientName: 'Jane Porter',
               startDateTime: booked.startDateTime
@@ -75,12 +75,13 @@ describe('ProviderHomeComponent', () => {
     component.saveEdit(booked);
 
     expect(update).toHaveBeenCalled();
-    expect(component.pendingConflict?.clientName).toBe('Jane Porter');
-    expect(component.pendingAction?.kind).toBe('update');
-    expect(dialog.showModal).toHaveBeenCalled();
+    expect(component.pendingConflict).toBeNull();
+    expect(component.pendingAction).toBeNull();
+    expect(dialog.showModal).not.toHaveBeenCalled();
+    expect(component.actionError).toBe('This slot is booked. Please select another time.');
   });
 
-  it('resends with confirm after the warning dialog', () => {
+  it('does not resend an update after a conflict dialog', () => {
     const update = jasmine.createSpy('update').and.returnValue(of(booked));
     const fixture = createComponent({ update });
     const component = fixture.componentInstance;
@@ -93,9 +94,52 @@ describe('ProviderHomeComponent', () => {
     };
     component.confirmPending();
 
+    // confirmPending no longer handles updates; nothing is resent.
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it('sends confirm true when rescheduling a booked appointment', () => {
+    const update = jasmine.createSpy('update').and.returnValue(of(booked));
+    const fixture = createComponent({ update });
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const future = new Date(Date.now() + 172800000).toISOString();
+    component.startEdit(booked);
+    component.editStartLocal = component['toLocalInput'](future);
+    component.saveEdit(booked);
+
     expect(update).toHaveBeenCalledWith(
       'b1',
       jasmine.objectContaining({ confirm: true })
+    );
+  });
+
+  it('sends confirm false when rescheduling an open slot', () => {
+    const openSlot: Appointment = {
+      id: 's1',
+      title: 'Open massage',
+      category: 'Beauty',
+      startDateTime: '2027-01-01T10:00:00Z',
+      endDateTime: '2027-01-01T11:00:00Z',
+      providerId: 'p1',
+      userId: null,
+      status: 'Available'
+    };
+    const update = jasmine.createSpy('update').and.returnValue(of(openSlot));
+    const fixture = createComponent({ update });
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    // Reschedule to 2 hours later (clearly different local time).
+    const future = '2027-01-01T12:00:00Z';
+    component.startEdit(openSlot);
+    component.editStartLocal = component['toLocalInput'](future);
+    component.saveEdit(openSlot);
+
+    expect(update).toHaveBeenCalledWith(
+      's1',
+      jasmine.objectContaining({ confirm: false })
     );
   });
 
