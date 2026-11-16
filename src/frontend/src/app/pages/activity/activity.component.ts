@@ -26,6 +26,7 @@ export class ActivityComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
   private readonly notificationsService = inject(NotificationsService);
+
   entries: ActivityEntry[] = [];
   filteredEntries: ActivityEntry[] = [];
   loading = false;
@@ -104,7 +105,6 @@ export class ActivityComponent implements OnInit {
       return Array.from({ length: this.totalPages }, (_, index) => index + 1);
     }
 
-    // Calculate the page group window (10 pages at a time)
     const pageGroupSize = 10;
     const currentGroup = Math.ceil(this.currentPage / pageGroupSize);
     const startPage = (currentGroup - 1) * pageGroupSize + 1;

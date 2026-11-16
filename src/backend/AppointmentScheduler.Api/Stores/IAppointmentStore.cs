@@ -19,4 +19,24 @@ public interface IAppointmentStore {
 
     /// <summary>One conditional write: succeeds only while the slot is Available, has no client, and is not deleted.</summary>
     bool BookSlot(string id, string clientId, string notes);
+
+    /// <summary>Updates notes on a Booked appointment owned by <paramref name="clientId"/>.</summary>
+    bool UpdateBookedNotes(string id, string clientId, string notes);
+
+    /// <summary>Returns a Booked appointment to Available (UserId null, Notes empty) for the given client.</summary>
+    bool ReleaseBooking(string id, string clientId);
+
+    /// <summary>Moves a Booked appointment's times while keeping the same client.</summary>
+    bool RescheduleBooked(string id, string clientId, DateTimeOffset start, DateTimeOffset end);
+
+    /// <summary>
+    /// Cancels a Booked appointment: status becomes Canceled, the client is removed,
+    /// and the appointment is soft-deleted so it drops out of live lists.
+    /// </summary>
+    bool CancelBooked(string id);
+    /// <summary>
+    /// Returns all appointments, including soft-deleted ones, sorted by start time.
+    /// Used by admin views that need to show historical/canceled appointments.
+    /// </summary>
+    IReadOnlyList<Appointment> GetAllIncludingDeleted();
 }
