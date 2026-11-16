@@ -48,11 +48,11 @@ public sealed class ProviderDashboardController(
             var booked = appointments.GetAll()
                 .Where(item => !item.IsDeleted && ownedIds.Contains(item.ProviderId))
                 .OrderBy(item => item.StartDateTime).ToList();
-            var usernames = booked.Select(item => item.UserId)
+            var clients = booked.Select(item => item.UserId)
                 .OfType<string>()
                 .Where(id => !string.IsNullOrWhiteSpace(id))
                 .Distinct(StringComparer.Ordinal)
-                .ToDictionary(id => id, id => users.GetById(id)?.Username, StringComparer.Ordinal);
+                .ToDictionary(id => id, id => users.GetById(id), StringComparer.Ordinal);
             return Ok(booked.Select(item => new
             {
                 item.Id,
@@ -68,7 +68,10 @@ public sealed class ProviderDashboardController(
                 item.Notes,
                 item.Status,
                 ClientUsername = item.UserId is { } clientId
-                    && usernames.TryGetValue(clientId, out var username) ? username : null
+                    && clients.TryGetValue(clientId, out var client) ? client?.Username : null,
+                ClientName = item.UserId is { } nameId
+                    && clients.TryGetValue(nameId, out var namedClient) && namedClient is not null
+                    ? $"{namedClient.FirstName} {namedClient.LastName}".Trim() : null
             }).ToList());
         }
         catch (Exception ex)

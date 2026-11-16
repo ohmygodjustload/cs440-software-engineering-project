@@ -65,7 +65,7 @@
           <div>
             <p>{{ appointment.category }} · {{ appointment.startDateTime | date:'MMM d, h:mm a' }}</p>
             <h3>{{ appointment.title }}</h3>
-            <p>Client username: {{ appointment.clientUsername || 'Username unavailable' }}</p>            <p>{{ appointment.location || 'Location not provided' }}</p>
+            <p>Client: {{ appointment.clientName || appointment.clientUsername || 'Name unavailable' }}</p>            <p>{{ appointment.location || 'Location not provided' }}</p>
           </div>
           <button type="button" class="primary" [attr.aria-expanded]="selectedAppointment?.id === appointment.id"
             (click)="selectedAppointment = selectedAppointment?.id === appointment.id ? null : appointment">
@@ -100,7 +100,7 @@
       <section class="details" aria-label="Appointment details">
         <h2>{{ appointment.title }}</h2>
         <dl>
-          <dt>Client username</dt><dd>{{ appointment.clientUsername || 'Username unavailable' }}</dd>
+          <dt>Client</dt><dd>{{ appointment.clientName || appointment.clientUsername || 'Name unavailable' }}</dd>
           <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
           <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
           <dt>Status</dt><dd>{{ appointment.status }}</dd>
