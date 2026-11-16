@@ -20,7 +20,8 @@ public sealed class SlotPublishingController(
     IUserStore users, IProviderStore providers, IAppointmentStore appointments,
     IServiceProvider services, IOptions<MongoDbSettings> options,
     ILogger<SlotPublishingController> logger,
-    INotificationService? notificationService = null) : ControllerBase
+    INotificationService? notificationService = null,
+    IAppointmentAuditStore? audit = null) : ControllerBase
 {
     private static readonly SemaphoreSlim MemoryGate = new(1, 1);
 
@@ -126,6 +127,13 @@ public sealed class SlotPublishingController(
             {
                 appointments.AddSlot(slot);
                 notificationService?.OnSlotCreated(user.Id, slot.Id, slot.Category, slot.Title);
+                audit?.Add(new AppointmentAuditEntry
+                {
+                    AppointmentId = slot.Id,
+                    ChangedByUserId = user.Id,
+                    Action = AppointmentAuditEntry.Created,
+                    NewStatus = AppointmentStatus.Available
+                });
             }
 
             return planned;
@@ -137,6 +145,22 @@ public sealed class SlotPublishingController(
         (await PublishMongoBatch(context, user, [dto], token))[0];
 
     private async Task<List<Appointment>> PublishMongoBatch(MongoDbContext context, User user, List<PublishSlotDto> drafts, CancellationToken token)
+    {
+        var published = await PublishMongoBatchCore(context, user, drafts, token);
+        foreach (var slot in published)
+        {
+            audit?.Add(new AppointmentAuditEntry
+            {
+                AppointmentId = slot.Id,
+                ChangedByUserId = user.Id,
+                Action = AppointmentAuditEntry.Created,
+                NewStatus = AppointmentStatus.Available
+            });
+        }
+        return published;
+    }
+
+    private async Task<List<Appointment>> PublishMongoBatchCore(MongoDbContext context, User user, List<PublishSlotDto> drafts, CancellationToken token)
     {
         var settings = options.Value;
         var db = context.Database;

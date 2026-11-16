@@ -16,6 +16,9 @@ public enum NotificationEvent
     /// <summary>An appointment or slot was cancelled, typically with a reason.</summary>
     AppointmentCancelled,
 
+    /// <summary>An appointment was edited (notes or reschedule).</summary>
+    AppointmentEdited,
+
     /// <summary>System message shown when a user returns with multiple missed notifications.</summary>
     MissedNotifications
 }
@@ -30,6 +33,7 @@ public static class NotificationEventExtensions
         NotificationEvent.AppointmentCreated => "appointment-created",
         NotificationEvent.AppointmentBooked => "appointment-booked",
         NotificationEvent.AppointmentCancelled => "appointment-cancelled",
+        NotificationEvent.AppointmentEdited => "appointment-edited",
         NotificationEvent.MissedNotifications => "missed-notifications",
         _ => throw new ArgumentOutOfRangeException(nameof(value))
     };

@@ -57,7 +57,10 @@
   @if (loading) {
     <app-loading label="Loading activity…"></app-loading>
   } @else if (error) {
-    <div role="alert"><p>{{ error }}</p><button (click)="loadActivity()">Try again</button></div>
+    <div role="alert">
+      <p>{{ error }}</p>
+      <button (click)="loadActivity()">Try again</button>
+    </div>
   } @else {
     @if (markAllReadError) {
       <div class="activity-error" role="alert">{{ markAllReadError }}</div>
@@ -78,7 +81,9 @@
         </div>
       }
     </section>
+  }
 
+  @if (!loading && !error) {
     <nav class="activity-pagination" aria-label="Activity log pages">
       @if (showPrevious) {
         <button
@@ -90,7 +95,7 @@
           <span aria-hidden="true">←</span>
         </button>
       }
-       
+
       @for (page of pageNumbers; track page) {
         <button
           type="button"
@@ -102,7 +107,7 @@
           {{ page }}
         </button>
       }
-       
+
       @if (showNext) {
         <button
           type="button"

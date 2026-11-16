@@ -38,6 +38,17 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         _raw = _db.GetCollection<BsonDocument>(_settings.AppointmentsCollection);
     }
 
+    public IReadOnlyList<Appointment> GetAllIncludingDeleted()
+    {
+        var lookups = LoadLookups();
+        return [
+            .. _raw.Find(FilterDefinition<BsonDocument>.Empty)
+                .ToList()
+                .Select(d => Map(d, lookups))
+                .OrderBy(a => a.StartDateTime)
+        ];
+    }
+
     public IReadOnlyList<Appointment> GetAll()
     {
         var lookups = LoadLookups();
@@ -126,7 +137,7 @@ public sealed class MongoAppointmentStore : IAppointmentStore
     {
         var update = Builders<BsonDocument>.Update
             .Set("IsDeleted", true)
-            .Set("DeletedAt", DateTime.Now);
+            .Set("DeletedAt", DateTime.UtcNow);
         return _raw.UpdateOne(AvailableFilter(id), update).ModifiedCount == 1;
     }
 
@@ -144,11 +155,63 @@ public sealed class MongoAppointmentStore : IAppointmentStore
         return _raw.UpdateOne(filter, update).ModifiedCount == 1;
     }
 
+    public bool UpdateBookedNotes(string id, string clientId, string notes)
+    {
+        var update = Builders<BsonDocument>.Update.Set("Notes", notes);
+        return _raw.UpdateOne(BookedClientFilter(id, clientId), update).ModifiedCount == 1;
+    }
+
+    public bool ReleaseBooking(string id, string clientId)
+    {
+        var availableId = FindStatusId("Available")
+            ?? throw new InvalidOperationException("Status 'Available' not found in Status collection.");
+        var update = Builders<BsonDocument>.Update
+            .Set("StatusId", availableId)
+            .Set("UserId", BsonNull.Value)
+            .Set("Notes", "");
+        return _raw.UpdateOne(BookedClientFilter(id, clientId), update).ModifiedCount == 1;
+    }
+
+    public bool RescheduleBooked(string id, string clientId, DateTimeOffset start, DateTimeOffset end)
+    {
+        var update = Builders<BsonDocument>.Update
+            .Set("StartTime", start.UtcDateTime)
+            .Set("EndTime", end.UtcDateTime);
+        return _raw.UpdateOne(BookedClientFilter(id, clientId), update).ModifiedCount == 1;
+    }
+
+    public bool CancelBooked(string id)
+    {
+        var canceledId = FindStatusId("Canceled") ?? FindStatusId("Cancelled")
+            ?? throw new InvalidOperationException("Status 'Canceled' (or 'Cancelled') not found in Status collection.");
+        var update = Builders<BsonDocument>.Update
+            .Set("StatusId", canceledId)
+            .Set("UserId", BsonNull.Value)
+            .Set("IsDeleted", true)
+            .Set("DeletedAt", DateTime.UtcNow);
+        return _raw.UpdateOne(BookedFilter(id), update).ModifiedCount == 1;
+    }
+
     private FilterDefinition<BsonDocument> AvailableFilter(string id) =>
         Builders<BsonDocument>.Filter.And(
             Builders<BsonDocument>.Filter.Eq("_id", ToObjectIdOrString(id)),
             Builders<BsonDocument>.Filter.Ne("IsDeleted", true),
             Builders<BsonDocument>.Filter.Eq("StatusId", FindStatusId("Available")));
+
+    private FilterDefinition<BsonDocument> BookedFilter(string id)
+    {
+        var bookedId = FindStatusId("Booked") ?? FindStatusId("Scheduled")
+            ?? throw new InvalidOperationException("Status 'Booked' (or 'Scheduled') not found in Status collection.");
+        return Builders<BsonDocument>.Filter.And(
+            Builders<BsonDocument>.Filter.Eq("_id", ToObjectIdOrString(id)),
+            Builders<BsonDocument>.Filter.Ne("IsDeleted", true),
+            Builders<BsonDocument>.Filter.Eq("StatusId", bookedId));
+    }
+
+    private FilterDefinition<BsonDocument> BookedClientFilter(string id, string clientId) =>
+        Builders<BsonDocument>.Filter.And(
+            BookedFilter(id),
+            Builders<BsonDocument>.Filter.Eq("UserId", ToObjectIdOrString(clientId)));
 
     private BsonValue? FindStatusId(string name) =>
         _db.GetCollection<BsonDocument>(_settings.StatusesCollection)
@@ -316,6 +379,7 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             Notes = ReadString(d, "Notes"),
             Status = NormalizeStatus(statusName),
             AppointmentTypeId = appointmentTypeId,
+            IsDeleted = IsDeleted(d),
         };
     }
 
