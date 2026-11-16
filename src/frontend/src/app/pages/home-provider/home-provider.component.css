@@ -298,3 +298,14 @@ footer {
 .confirm-prompt p {
   margin: 0 0 20px;
 }
+
+.confirm-prompt .danger {
+  background: #8b3a3a;
+  color: #f7f5f1;
+  border: 1px solid #8b3a3a;
+}
+
+.confirm-prompt .danger:hover:not(:disabled) {
+  background: #7a3333;
+  border-color: #7a3333;
+}
