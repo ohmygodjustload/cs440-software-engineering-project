@@ -435,6 +435,9 @@ public sealed class SlotsController(
         if (type.DurationInMinutes <= 0) return Fail(BadRequest("Appointment type has no duration."));
 
         start = start.ToUniversalTime();
+        // Allow only top-of-the-hour or 30-minute increments
+        int minute = start.Minute;
+        if (minute != 0 && minute != 30) return Fail(BadRequest("Start time must be at the top of the hour or half-hour (30-minute increments)."));
         if (start <= DateTimeOffset.UtcNow) return Fail(BadRequest("Start time must be in the future."));
 
         var end = start.AddMinutes(type.DurationInMinutes);

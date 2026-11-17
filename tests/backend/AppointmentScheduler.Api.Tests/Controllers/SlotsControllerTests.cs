@@ -38,7 +38,7 @@ public class SlotsControllerTests
     }
 
     private static CreateSlotDto Dto(int hoursFromNow = 24) =>
-        new() { AppointmentTypeId = SeedIds.Type, StartTime = DateTimeOffset.UtcNow.AddHours(hoursFromNow) };
+        new() { AppointmentTypeId = SeedIds.Type, StartTime = DateTimeOffset.UtcNow.AddHours(hoursFromNow).AddMinutes(-(DateTimeOffset.UtcNow.Minute % 30)) };
 
     private const string OtherProvider = "6abc2000a313dfdf8ecc0010";
     private const string InactiveProvider = "6abc2000a313dfdf8ecc0011";
@@ -211,17 +211,14 @@ public class SlotsControllerTests
     public void Create_Overlap_409_ButBackToBackIsAllowed()
     {
         var (c, _) = Make();
-        c.Create(Dto(24)); // 24h -> 24h30
-        Assert.IsType<ConflictObjectResult>(c.Create(new CreateSlotDto
-        {
-            AppointmentTypeId = SeedIds.Type,
-            StartTime = DateTimeOffset.UtcNow.AddHours(24).AddMinutes(15)
-        }).Result);
+        var first = Dto();
+        Assert.IsType<CreatedAtActionResult>(c.Create(first).Result);
+        Assert.IsType<ConflictObjectResult>(c.Create(first).Result);
         Assert.IsType<CreatedAtActionResult>(c.Create(new CreateSlotDto
         {
             AppointmentTypeId = SeedIds.Type,
-            StartTime = DateTimeOffset.UtcNow.AddHours(24).AddMinutes(30)
-        }).Result); // starts exactly at end
+            StartTime = first.StartTime!.Value.AddMinutes(30)
+        }).Result);
     }
 
     [Fact]
@@ -239,7 +236,9 @@ public class SlotsControllerTests
     {
         var (c, _) = Make();
         var id = Assert.IsType<Appointment>(Assert.IsType<CreatedAtActionResult>(c.Create(Dto(24)).Result).Value).Id;
-        var res = c.Update(id, new UpdateSlotDto { StartTime = DateTimeOffset.UtcNow.AddHours(24).AddMinutes(10) });
+        // Use a fixed time at 30-minute increment that is definitely in the future
+        var fixedTime = DateTimeOffset.UtcNow.AddHours(48).AddMinutes(-(DateTimeOffset.UtcNow.Minute % 30));
+        var res = c.Update(id, new UpdateSlotDto { StartTime = fixedTime });
         Assert.IsType<OkObjectResult>(res.Result);
     }
 

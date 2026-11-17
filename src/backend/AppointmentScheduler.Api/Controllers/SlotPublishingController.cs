@@ -38,6 +38,10 @@ public sealed class SlotPublishingController(
             return BadRequest("Enter a service title and location within the allowed lengths.");
         if (dto.StartDateTime is null || dto.StartDateTime <= DateTimeOffset.UtcNow)
             return BadRequest("Start time must be in the future.");
+        // Allow only top-of-the-hour or 30-minute increments
+        var startTime = dto.StartDateTime.Value;
+        int minute = startTime.Minute;
+        if (minute != 0 && minute != 30) return BadRequest("Start time must be at the top of the hour or half-hour (30-minute increments).");
 
         try
         {

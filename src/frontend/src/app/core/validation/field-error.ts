@@ -16,9 +16,10 @@ import { AbstractControl } from '@angular/forms';
  */
 export function fieldErrorMessage(
   control: AbstractControl | null,
-  label: string
+  label: string,
+  showUntouched = false
 ): string | null {
-  if (!control || !control.touched || !control.errors) {
+  if (!control || (!control.touched && !showUntouched) || !control.errors) {
     return null;
   }
 
