@@ -170,8 +170,11 @@ export const routes: Routes = [
   },
   {
     path: 'provider-schedule',
-    redirectTo: 'home-provider',
-    pathMatch: 'full'
+    title: 'Manage provider appointments · BAAAM',
+    canActivate: [authGuard, providerGuard],
+    loadComponent: () =>
+      import('./pages/home-provider/home-provider.component')
+        .then(m => m.ProviderHomeComponent)
   },
   {
     path: 'home-provider',
