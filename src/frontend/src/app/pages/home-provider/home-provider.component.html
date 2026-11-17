@@ -64,7 +64,7 @@
                   <select [ngModel]="editStartLocal.slice(11)"
                     (ngModelChange)="editStartLocal = editStartLocal.slice(0, 10) + 'T' + $event">
                     @for (time of startTimes; track time) {
-                      <option [value]="time">{{ time }}</option>
+                      <option [value]="time">{{ ('2000-01-01T' + time) | date:'h:mm a' }}</option>
                     }
                   </select>
                 </label>
@@ -107,7 +107,7 @@
                 <select [ngModel]="editStartLocal.slice(11)"
                   (ngModelChange)="editStartLocal = editStartLocal.slice(0, 10) + 'T' + $event">
                   @for (time of startTimes; track time) {
-                    <option [value]="time">{{ time }}</option>
+                    <option [value]="time">{{ ('2000-01-01T' + time) | date:'h:mm a' }}</option>
                   }
                 </select>
               </label>
