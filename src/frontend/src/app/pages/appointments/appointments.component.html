@@ -5,6 +5,9 @@
   </header>
 
   @if (isEnhanced) {
+    @if (actionError) {
+      <div class="error" role="alert"><p>{{ actionError }}</p></div>
+    }
     @for (role of ['client', 'provider']; track role) {
       <section class="role-appointments" [attr.aria-labelledby]="role + '-appointments-title'">
         <h2 [id]="role + '-appointments-title'">{{ role === 'client' ? 'As a client' : 'As a service provider' }}</h2>
@@ -29,18 +32,37 @@
                   @if (appointment.location) { <span> · {{ appointment.location }}</span> }
                 </p>
               </div>
-              <button type="button" class="secondary"
-                [attr.aria-expanded]="selectedId === role + ':' + appointment.id"
-                (click)="toggleDetails(role + ':' + appointment.id)">
-                {{ selectedId === role + ':' + appointment.id ? 'Hide details' : 'View details' }}
-              </button>
+              <div class="card-actions">
+                <button type="button" class="secondary"
+                  [attr.aria-expanded]="selectedId === role + ':' + appointment.id"
+                  (click)="toggleDetails(role + ':' + appointment.id)">
+                  {{ selectedId === role + ':' + appointment.id ? 'Hide details' : 'View details' }}
+                </button>
+                @if (role === 'client' && canManageClientBooking(appointment) && editingNotesId !== appointment.id) {
+                  <button type="button" class="secondary" [disabled]="saving"
+                    (click)="startEditNotes(appointment, role + ':' + appointment.id)">Edit note</button>
+                  <button type="button" class="danger" [disabled]="saving"
+                    (click)="openCancelDialog(appointment)">Cancel appointment</button>
+                }
+              </div>
               @if (selectedId === role + ':' + appointment.id) {
                 <dl class="details">
                   <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
                   <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
                   <dt>Status</dt><dd>{{ appointment.status }}</dd>
                   <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
-                  <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
+                  <dt>Notes</dt>
+                  <dd>
+                    @if (role === 'client' && editingNotesId === appointment.id) {
+                      <textarea [(ngModel)]="notesDraft" rows="3" aria-label="Appointment notes"></textarea>
+                      <div class="card-actions notes-actions">
+                        <button type="button" class="primary" [disabled]="saving" (click)="saveNotes(appointment)">Save note</button>
+                        <button type="button" class="secondary" [disabled]="saving" (click)="cancelEditNotes()">Cancel</button>
+                      </div>
+                    } @else {
+                      {{ appointment.notes || 'No notes' }}
+                    }
+                  </dd>
                 </dl>
               }
             </article>

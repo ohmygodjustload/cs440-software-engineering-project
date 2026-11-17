@@ -117,11 +117,15 @@ export class AppointmentsComponent implements OnInit {
     this.selectedId = this.selectedId === id ? '' : id;
   }
 
-  startEditNotes(appointment: Appointment): void {
+  canManageClientBooking(appointment: Appointment): boolean {
+    return appointment.status === 'Booked' && Date.parse(appointment.startDateTime) > Date.now();
+  }
+
+  startEditNotes(appointment: Appointment, detailsId = appointment.id): void {
     this.editingNotesId = appointment.id;
     this.notesDraft = appointment.notes ?? '';
     this.actionError = '';
-    this.selectedId = appointment.id;
+    this.selectedId = detailsId;
   }
 
   cancelEditNotes(): void {
