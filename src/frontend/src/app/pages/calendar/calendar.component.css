@@ -205,6 +205,11 @@ button:focus-visible {
   background: #f1c2c2;  
 }
 
+.available {
+  border: 1.5px dashed currentColor;
+  opacity: 0.85;
+}
+
 .canceled { 
   background:#dfddd3; 
   text-decoration: line-through; 
@@ -213,7 +218,7 @@ button:focus-visible {
 .swatch.available {
   background-color: transparent;
   border: 1.5px dashed currentColor;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 
 .calendar-legend { 
