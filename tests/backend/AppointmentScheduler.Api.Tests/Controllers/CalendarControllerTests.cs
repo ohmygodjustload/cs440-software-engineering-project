@@ -35,18 +35,27 @@ public class CalendarControllerTests
     }
 
     [Fact]
-    public void Get_ExcludesCancelled()
+    public void Get_IncludesCanceledAndAvailableAppointments()
     {
         var store = new InMemoryAppointmentStore();
         var start = new DateTimeOffset(2026, 10, 5, 9, 0, 0, TimeSpan.Zero);
         store.Add(new Appointment
         {
-            Title = "Cancelled visit",
+            Title = "Canceled visit",
             Category = AppointmentCategory.Medical,
             StartDateTime = start,
             EndDateTime = start.AddHours(1),
             ProviderId = "p1",
             Status = AppointmentStatus.Canceled
+        });
+        store.Add(new Appointment
+        {
+            Title = "Open slot",
+            Category = AppointmentCategory.Medical,
+            StartDateTime = start.AddHours(2),
+            EndDateTime = start.AddHours(3),
+            ProviderId = "p1",
+            Status = AppointmentStatus.Available
         });
         var controller = new CalendarController(store);
 
@@ -56,7 +65,10 @@ public class CalendarControllerTests
             null);
 
         var ok = Assert.IsType<OkObjectResult>(result.Result);
-        Assert.Empty(Assert.IsType<List<CalendarItem>>(ok.Value));
+        var items = Assert.IsType<List<CalendarItem>>(ok.Value);
+        Assert.Equal(2, items.Count);
+        Assert.Contains(items, i => i.Title == "Canceled visit" && i.Status == AppointmentStatus.Canceled);
+        Assert.Contains(items, i => i.Title == "Open slot" && i.Status == AppointmentStatus.Available);
     }
 
     [Fact]
