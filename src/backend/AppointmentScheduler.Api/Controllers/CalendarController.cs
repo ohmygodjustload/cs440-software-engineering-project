@@ -32,8 +32,6 @@ public sealed class CalendarController : ControllerBase
     /// <c>to</c> belongs to the next range, and one ending exactly at <c>from</c>
     /// belongs to the previous range. Overlap is therefore
     /// <c>EndDateTime &gt; from &amp;&amp; StartDateTime &lt; to</c>.
-    /// Cancelled appointments are excluded so they do not block the calendar view;
-    /// query <c>GET /api/appointments?status=Cancelled</c> to keep cancelled history.
     /// </remarks>
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<CalendarItem>>(StatusCodes.Status200OK)]
@@ -53,8 +51,9 @@ public sealed class CalendarController : ControllerBase
         }
 
         var userId = _currentUser?.UserId;
-        var query = _store.GetAll()
+        var query = _store.GetAllIncludingDeleted()
             .Where(a => a.EndDateTime > startDateTime && a.StartDateTime < endDateTime);
+
 
         if (!string.IsNullOrWhiteSpace(userId))
         {
@@ -64,41 +63,29 @@ public sealed class CalendarController : ControllerBase
             if (user is not null && user.IsServiceProvider)
             {
                 // --- PROVIDER CALENDAR ---
-                // Providers see:
-                // 1. Appointments linked via their AppointmentType (includes Available slots and Booked appointments)
-                // 2. Their own booked appointments where UserId matches the provider's UserId
-                // They exclude only cancelled appointments; Available and Booked are both shown.
+                // Providers see all appointments (Available, Booked, and Canceled):
+                // 1. Appointments linked via their AppointmentType
+                // 2. Appointments where UserId matches the provider's UserId
 
-                // Get appointment types for this provider
                 var providerTypes = _appointmentTypeStore?.GetByProviderId(userId) ?? new List<AppointmentType>();
                 var providerTypeIds = providerTypes.Select(t => t.Id).ToList();
 
-                // Get appointments linked to this provider's types OR where UserId is this provider
-                // - providerTypeIds.Contains(...) covers Available slots and Booked appointments linked to the type
-                // - a.UserId == userId covers appointments directly owned/assigned to this provider
                 query = query.Where(a =>
-                    // Appointments linked via AppointmentType.ProviderId (covers Available slots + Booked)
                     (providerTypeIds.Count > 0 && providerTypeIds.Contains(a.AppointmentTypeId ?? "")) ||
-                    // Or appointments directly owned by this provider (UserId matches provider's UserId)
                     a.UserId == userId
-                )
-                .Where(a => a.Status != AppointmentStatus.Canceled);
+                );
             }
             else
             {
                 // --- CLIENT CALENDAR ---
-                // Clients see only their booked appointments (UserId matches client's UserId),
-                // excluding Available slots and cancelled appointments.
-                query = query.Where(a => a.UserId == userId)
-                    .Where(a => a.Status != AppointmentStatus.Canceled
-                            && a.Status != AppointmentStatus.Available);
+                // Clients see all appointments (Available, Booked, and Canceled) where UserId matches.
+                query = query.Where(a => a.UserId == userId);
             }
         }
         else
         {
-            // No user authenticated - show only booked appointments (original behavior)
-            query = query.Where(a => a.Status != AppointmentStatus.Canceled
-                                && a.Status != AppointmentStatus.Available);
+            // No user authenticated - show only booked appointments
+            query = query.Where(a => a.Status != AppointmentStatus.Available);
         }
 
         var items = query

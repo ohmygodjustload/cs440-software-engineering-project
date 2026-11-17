@@ -6,37 +6,7 @@
 
 ## 🗺️ System Architecture & Entity Relationships
 
-This system uses a normalized, referenced document methodology. The text block below maps exactly how object references (`ObjectId`) flow across collections:
-
-```text
-                                      +--------------------+
-                                      |  ProviderRequest   | 
-                                      +--------------------+
-                                                ^
-                                                | (Many)
-                                                | 
-                                                | (1)
-    +-----------------------+          +-----------------+  (1) (1) +------------+
-    |    AppointmentType    | <------- |     Provider    | <------- |    User    | 
-    +-----------------------+ (M)  (1) +-----------------+          +------------+ 
-            ^   |  (1)                                                     | (1)
-            |   |           +---------------+                              |
-            |   +---------> |  Appointment  | <----------------------------+
-            |     (Many)    +---------------+   (Many)
-            |                       ^   ^                               
-            |                       |   | (Many)
-            | (Many)                |   | (1)
-            | (1)                   |   v
-        +-----------+               |  +---------------------+
-        | Location  |               |  | AppointmentAuditLog |
-        +-----------+               |  +---------------------+
-                                    | (Many)      ^  
-                                    | (1)         | (Many)
-                              +-----------+       |
-                              |  Status   | <-----+
-                              +-----------+ (1)
-
-```
+Please Reference the Architecture Document for the most up to date information!
 
 ---
 
