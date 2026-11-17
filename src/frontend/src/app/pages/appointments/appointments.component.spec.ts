@@ -7,6 +7,7 @@ import { AppointmentsOverviewService } from '../../core/services/appointments-ov
 import { AuthService } from '../../core/services/auth.service';
 import { ProviderHomeService } from '../../core/services/home-provider.service';
 import { AppointmentsComponent } from './appointments.component';
+import { SlotsService } from '../../core/services/slots.service';
 
 describe('Appointments overview', () => {
   const booking = (id: string, start: Date, status: Appointment['status'] = 'Booked'): Appointment => ({
@@ -29,6 +30,7 @@ describe('Appointments overview', () => {
 
         { provide: AuthService, useValue: { getCurrentUser: () => null } },
         { provide: ProviderHomeService, useValue: { bookings: () => of([]) } },
+        { provide: SlotsService, useValue: {} },
         {
           provide: AppointmentsOverviewService,
           useValue: {

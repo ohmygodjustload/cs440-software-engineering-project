@@ -6,6 +6,8 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { Slot } from '../../core/models/slot';
 import { CreateSlotsComponent } from './create-slots.component';
+import { of } from 'rxjs';
+import { ProviderHomeService } from '../../core/services/home-provider.service';
 
 describe('CreateSlotsComponent', () => {
   let auth: jasmine.SpyObj<AuthService>;
@@ -18,6 +20,7 @@ describe('CreateSlotsComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: auth },
+        { provide: ProviderHomeService, useValue: { bookings: () => of([]) } },
         { provide: ActivatedRoute, useValue: { snapshot: { data: { providerId: 'p1' } } } }
       ]
     });
