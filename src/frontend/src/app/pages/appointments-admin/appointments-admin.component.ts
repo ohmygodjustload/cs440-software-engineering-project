@@ -24,7 +24,7 @@ export class AppointmentsAdminComponent implements OnInit {
   readonly expandedAppointments = new Set<string>();
   readonly categories: readonly AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
   /** Statuses that the admin can filter the appointment list by. */
-  readonly statuses: readonly AppointmentStatus[] = ['Booked', 'Available'];
+  readonly statuses: readonly AppointmentStatus[] = ['Booked', 'Available', 'Canceled', 'Completed', 'Missed'];
   readonly searchForm = new FormGroup({
     search: new FormControl('', { nonNullable: true }),
     appointmentType: new FormControl('all', { nonNullable: true }),
@@ -73,6 +73,9 @@ export class AppointmentsAdminComponent implements OnInit {
         category === 'all' ||
         category === 'Booked' && appointment.status === 'Booked' ||
         category === 'Available' && appointment.status === 'Available' ||
+        category === 'Canceled' && appointment.status === 'Canceled' ||
+        category === 'Completed' && appointment.status === 'Completed' ||
+        category === 'Missed' && appointment.status === 'Missed' ||
         appointment.category === category;
       return (!search || text.includes(search)) &&
         categoryMatch &&

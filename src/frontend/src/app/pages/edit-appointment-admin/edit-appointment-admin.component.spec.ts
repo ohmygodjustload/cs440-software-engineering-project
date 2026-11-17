@@ -15,7 +15,10 @@ describe('EditAppointmentAdminComponent', () => {
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['show']) },
+        {
+          provide: ToastService,
+          useValue: jasmine.createSpyObj('ToastService', ['show', 'showAppointmentCancelled'])
+        },
         { provide: ActivatedRoute, useValue: { snapshot: { queryParamMap: new Map([['id', 'a1']]) } } }
       ]
     });
@@ -113,5 +116,30 @@ describe('EditAppointmentAdminComponent', () => {
       variant: 'success',
       actionUrl: '/appointments-admin'
     });
+  });
+
+  it('cancels an appointment after confirm, toasts, and navigates back', () => {
+    const fixture = create();
+    const component = fixture.componentInstance;
+    const toastService = TestBed.inject(ToastService) as jasmine.SpyObj<ToastService>;
+    const dialog = document.createElement('dialog');
+    spyOn(dialog, 'showModal');
+    spyOn(dialog, 'close');
+    component['cancelDialog'] = { nativeElement: dialog } as never;
+
+    component.openCancelDialog();
+    expect(dialog.showModal).toHaveBeenCalled();
+
+    component.confirmCancel();
+
+    const request = TestBed.inject(HttpTestingController).expectOne('/api/appointments/a1');
+    expect(request.request.method).toBe('DELETE');
+    request.flush(null);
+
+    expect(toastService.showAppointmentCancelled).toHaveBeenCalledWith(
+      'Initial appointment',
+      '2026-10-30T10:00:00'
+    );
+    expect(dialog.close).toHaveBeenCalled();
   });
 });

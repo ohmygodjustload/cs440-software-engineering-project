@@ -1,12 +1,15 @@
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { Appointment } from '../../core/models/appointment';
+import { BookedSlotConflict } from '../../core/models/slot';
 import { ProviderHomeService } from '../../core/services/home-provider.service';
+import { SlotsService } from '../../core/services/slots.service';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 @Component({
@@ -18,15 +21,26 @@ import { LoadingComponent } from '../../core/components/loading/loading.componen
 })
 export class ProviderHomeComponent implements OnInit {
   private readonly service = inject(ProviderHomeService);
+  private readonly slots = inject(SlotsService);
   private readonly destroyRef = inject(DestroyRef);
   private request?: Subscription;
 
+  @ViewChild('confirmDialog') private confirmDialog?: ElementRef<HTMLDialogElement>;
+
   appointments: Appointment[] = [];
-  selectedAppointment: Appointment | null = null;
+  selectedKey = '';
   showAvailability = false;
   loading = false;
+  saving = false;
   error = '';
+  actionError = '';
   now = new Date();
+
+  editingId = '';
+  editStartLocal = '';
+  originalEditStartLocal = '';
+  pendingAction: { kind: 'update' | 'delete'; appointment: Appointment; startTime?: string } | null = null;
+  pendingConflict: BookedSlotConflict | null = null;
 
   get openSlots(): Appointment[] {
     const now = Date.now();
@@ -37,8 +51,14 @@ export class ProviderHomeComponent implements OnInit {
   }
 
   private isBooked(item: Appointment): boolean {
-    // Accept the legacy and renamed backend statuses during migration.
     return ['Scheduled', 'Booked'].includes(item.status);
+  }
+
+  get upcomingBooked(): Appointment[] {
+    const now = Date.now();
+    return this.appointments
+      .filter(item => this.isBooked(item) && Date.parse(item.endDateTime) > now)
+      .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
   }
 
   get todayCount(): number {
@@ -59,9 +79,7 @@ export class ProviderHomeComponent implements OnInit {
   }
 
   get nextAppointment(): Appointment | null {
-    return this.appointments.filter(item => this.isBooked(item) &&
-      new Date(item.endDateTime).getTime() > this.now.getTime())
-      .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime))[0] ?? null;
+    return this.upcomingBooked[0] ?? null;
   }
 
   get recentAppointments(): Appointment[] {
@@ -74,13 +92,22 @@ export class ProviderHomeComponent implements OnInit {
     this.load();
   }
 
+  toggleDetails(key: string): void {
+    this.selectedKey = this.selectedKey === key ? '' : key;
+  }
+
+  detailsOpen(key: string): boolean {
+    return this.selectedKey === key;
+  }
+
   load(): void {
     this.request?.unsubscribe();
     this.appointments = [];
-    this.selectedAppointment = null;
+    this.selectedKey = '';
     this.error = '';
+    this.actionError = '';
+    this.editingId = '';
     this.now = new Date();
-    this.loading = false;
     this.loading = true;
     this.request = this.service.bookings()
       .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -93,5 +120,113 @@ export class ProviderHomeComponent implements OnInit {
           this.error = 'Appointments could not be loaded. Please try again.';
         }
       });
+  }
+
+  startEdit(appointment: Appointment): void {
+    this.editingId = appointment.id;
+    this.editStartLocal = this.toLocalInput(appointment.startDateTime);
+    this.originalEditStartLocal = this.editStartLocal;
+    this.actionError = '';
+  }
+
+  cancelEdit(): void {
+    this.editingId = '';
+    this.editStartLocal = '';
+  }
+
+  saveEdit(appointment: Appointment): void {
+    if (this.saving || !this.editStartLocal) return;
+
+    // No changes were made; exit edit mode without modifying the slot.
+    if (this.editStartLocal === this.originalEditStartLocal) {
+      this.cancelEdit();
+      return;
+    }
+
+    const startTime = new Date(this.editStartLocal).toISOString();
+
+    // Prevent saving to a time that is already in the past.
+    if (new Date(startTime).getTime() <= Date.now()) {
+      this.actionError = 'Choose a future appointment time.';
+      return;
+    }
+
+    this.saving = true;
+    this.actionError = '';
+    this.slots.update(appointment.id, { startTime, confirm: appointment.status === 'Booked' })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.editingId = '';
+          this.closeConfirmDialog();
+          this.load();
+        },
+        error: (err: HttpErrorResponse) => this.handleSlotError(err)
+      });
+  }
+
+  deleteSlot(appointment: Appointment, confirm = false): void {
+    if (this.saving) return;
+
+    // Confirm in the UI before sending any DELETE.
+    if (!confirm) {
+      this.pendingAction = { kind: 'delete', appointment };
+      this.pendingConflict = null;
+      this.actionError = '';
+      this.confirmDialog?.nativeElement.showModal();
+      return;
+    }
+
+    this.saving = true;
+    this.actionError = '';
+    this.slots.delete(appointment, true)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving = false;
+          this.closeConfirmDialog();
+          this.load();
+        },
+        error: (err: HttpErrorResponse) => this.handleSlotError(err)
+      });
+  }
+
+  confirmPending(): void {
+    const pending = this.pendingAction;
+    if (!pending) return;
+    // pendingAction is only ever a delete now; updates can no longer be confirmed/forced.
+    this.deleteSlot(pending.appointment, true);
+  }
+
+  closeConfirmDialog(): void {
+    this.confirmDialog?.nativeElement.close();
+    this.pendingAction = null;
+    this.pendingConflict = null;
+  }
+
+  private handleSlotError(err: HttpErrorResponse): void {
+    this.saving = false;
+    const body = err.error as BookedSlotConflict | string | null;
+    if (err.status === 409 && body && typeof body === 'object' && body.requiresConfirm) {
+      // A modification cannot override an existing appointment. Show the conflict as an
+      // error message instead of offering a "Continue anyway" override.
+      this.actionError =
+        typeof body.message === 'string' && body.message.trim()
+          ? body.message
+          : 'That change conflicts with another appointment.';
+      return;
+    }
+    this.actionError = typeof body === 'string' && body.trim()
+      ? body
+      : err.status === 409
+        ? 'That change conflicts with another appointment.'
+        : 'The slot could not be updated. Please try again.';
+  }
+
+  private toLocalInput(iso: string): string {
+    const date = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 }

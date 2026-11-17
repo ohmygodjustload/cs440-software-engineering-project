@@ -33,27 +33,39 @@ describe('AppointmentsAdminComponent', () => {
         startDateTime: '2026-10-30T12:00:00Z', endDateTime: '2026-10-30T13:00:00Z',
         providerId: 'p2', providerName: 'Elena Rossi', userId: null,
         location: 'Studio', notes: null, status: 'Available'
+      },
+      {
+        id: '3', title: 'Massage', category: 'Beauty',
+        startDateTime: '2026-10-30T14:00:00Z', endDateTime: '2026-10-30T15:00:00Z',
+        providerId: 'p3', providerName: 'Ali Khan', userId: 'u2',
+        location: 'Spa', notes: null, status: 'Canceled'
       }
     ]);
     http.expectOne('/api/admin/accounts').flush([
       {
         id: 'u1', firstName: 'Alex', lastName: 'Client', username: 'alex',
         isClient: true, isServiceProvider: false, isAdmin: false
+      },
+      {
+        id: 'u2', firstName: 'Sam', lastName: 'Beam', username: 'sam',
+        isClient: true, isServiceProvider: false, isAdmin: false
       }
     ]);
 
     expect(component.loading).toBeFalse();
-    expect(component.filteredAppointments.length).toBe(2);
+    expect(component.filteredAppointments.length).toBe(3);
     component.searchForm.patchValue({ search: 'Nair' });
     expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1']);
-    component.searchForm.patchValue({ search: '', appointmentType: 'Fitness' });
-    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['2']);
+    component.searchForm.patchValue({ search: '', appointmentType: 'Beauty' });
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['3']);
     // Filter by status
     component.searchForm.patchValue({ appointmentType: 'Booked' });
     expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1']);
     component.searchForm.patchValue({ appointmentType: 'Available' });
     expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['2']);
+    component.searchForm.patchValue({ appointmentType: 'Canceled' });
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['3']);
     component.searchForm.patchValue({ appointmentType: 'all' });
-    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1', '2']);
+    expect(component.filteredAppointments.map(appointment => appointment.id)).toEqual(['1', '2', '3']);
   });
 });

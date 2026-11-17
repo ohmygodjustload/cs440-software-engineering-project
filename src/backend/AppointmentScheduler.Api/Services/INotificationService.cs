@@ -21,6 +21,15 @@ public interface INotificationService
     /// <summary>An appointment or slot was cancelled with a reason.</summary>
     void OnAppointmentCancelled(string clientId, string providerId, string appointmentId, AppointmentCategory category, string title, string reason);
     void OnAppointmentUpdated(string appointmentId, AppointmentCategory category, string title, string? actorUserId = null, string? changes = null);
+
+    /// <summary>One party cancelled a booking; notify the other party (and admins).</summary>
+    void OnBookingCancelled(string recipientId, string actorId, string appointmentId, AppointmentCategory category, string title, string reason);
+
+    /// <summary>A provider rescheduled a booked appointment; notify the client (and admins).</summary>
+    void OnBookingRescheduled(string clientId, string actorId, string appointmentId, AppointmentCategory category, string title, DateTimeOffset newStart);
+
+    /// <summary>A client updated booking notes; notify the provider (and admins).</summary>
+    void OnBookingNotesUpdated(string providerId, string clientId, string appointmentId, AppointmentCategory category, string title);
     void OnAccountCreated(User user);
     void OnAccountUpdated(User user, string? actorUserId = null, string? changes = null);
     void OnProviderRequestSubmitted(ProviderRequest request);
