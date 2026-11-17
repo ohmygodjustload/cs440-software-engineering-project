@@ -62,7 +62,7 @@ export class CreateSlotsComponent implements OnInit {
     return new Date(`${this.selectedDate}T${time}`).getTime() <= Date.now();
   }
   // Nine fixed one-hour blocks: 9:00–10:00 AM through 5:00–6:00 PM.
-  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17, 60);
+  readonly startTimes: readonly string[] = this.buildStartTimes(9, 17, 30);
 
   private buildStartTimes(startHour: number, endHour: number, stepMinutes: number): string[] {
     const pad = (n: number) => String(n).padStart(2, '0');
