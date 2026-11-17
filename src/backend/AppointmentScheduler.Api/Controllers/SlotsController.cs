@@ -212,7 +212,7 @@ public sealed class SlotsController(
             ChangedByUserId = provider.Id,
             Action = AppointmentAuditEntry.Cancelled,
             OldStatus = AppointmentStatus.Available,
-            NewStatus = AppointmentStatus.Available
+            NewStatus = AppointmentStatus.Canceled
         });
         notificationService?.OnAppointmentCancelled(string.Empty, provider.Id, existing.Id, existing.Category, existing.Title, string.Empty);
         return NoContent();

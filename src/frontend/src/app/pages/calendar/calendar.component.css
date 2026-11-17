@@ -194,7 +194,7 @@ button:focus-visible {
 }
 
 .medical { 
-  background: #dfddd3; 
+  background: #d6e5eb;
 }
 
 .beauty { 
@@ -202,7 +202,23 @@ button:focus-visible {
 }
 
 .fitness { 
-  background: #d6e5eb; 
+  background: #f1c2c2;  
+}
+
+.available {
+  border: 1.5px dashed currentColor;
+  opacity: 0.85;
+}
+
+.canceled { 
+  background:#dfddd3; 
+  text-decoration: line-through; 
+}
+
+.swatch.available {
+  background-color: transparent;
+  border: 1.5px dashed currentColor;
+  opacity: 0.85;
 }
 
 .calendar-legend { 
