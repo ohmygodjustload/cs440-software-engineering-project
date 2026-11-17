@@ -292,3 +292,12 @@ a:focus-visible {
 .role-appointments h3 {
   margin: 0 0 8px;
 }
+
+.role-appointments .appointment-group + .appointment-group {
+  margin-top: 24px;
+}
+
+.role-appointments h4 {
+  margin: 0 0 8px;
+  font-size: 1.17em;
+}

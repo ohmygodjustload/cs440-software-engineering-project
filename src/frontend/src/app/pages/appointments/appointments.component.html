@@ -8,8 +8,8 @@
     @if (actionError) {
       <div class="error" role="alert"><p>{{ actionError }}</p></div>
     }
-    @for (role of ['client', 'provider']; track role) {
-      <section class="role-appointments" [attr.aria-labelledby]="role + '-appointments-title'">
+    @for (role of enhancedRoles; track role) {
+        <section class="role-appointments" [attr.aria-labelledby]="role + '-appointments-title'">
         <h2 [id]="role + '-appointments-title'">{{ role === 'client' ? 'As a client' : 'As a service provider' }}</h2>
         @if (role === 'client' ? loading : providerLoading) {
           <app-loading label="Loading appointments…"></app-loading>
@@ -19,8 +19,10 @@
             <button type="button" (click)="role === 'client' ? load() : loadProviderAppointments()">Try again</button>
           </div>
         } @else {
-          @for (appointment of (role === 'client' ? bookedAppointments : providerAppointments); track appointment.id) {
-            <article class="upcoming-card">
+          @for (group of enhancedAppointmentGroups(role); track group.title; let groupIndex = $index) {
+            <section class="appointment-group" [attr.aria-labelledby]="role + '-group-' + groupIndex">
+              <h3 [id]="role + '-group-' + groupIndex">{{ group.title }}</h3>
+              @for (appointment of group.items; track appointment.id) {            <article class="upcoming-card">
               <div>
                 <h3>{{ appointment.title }}</h3>
                 <p class="meta">{{ appointment.category }} · {{ appointment.startDateTime | date:'EEEE, MMM d, h:mm a' }}</p>
@@ -67,12 +69,21 @@
               }
             </article>
           } @empty {
-            <p>{{ role === 'client' ? 'You have no booked appointments.' : 'No clients have booked appointments with you.' }}</p>
+            <p>{{ group.empty }}</p>
           }
-        }
-      </section>
+          @if (group.hasMore) {
+            <div class="card-actions">
+              <button type="button" class="secondary" (click)="showMoreFinished(role)">
+                Show more finished appointments
+              </button>
+            </div>
+          }
+        </section>
+      }
     }
-  } @else if (loading) {
+  </section>
+}
+} @else if (loading) {
     <app-loading label="Loading appointments…"></app-loading>
   } @else if (error) {
     <div class="error" role="alert">

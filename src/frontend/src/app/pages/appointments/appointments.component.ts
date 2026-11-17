@@ -56,6 +56,50 @@ export class AppointmentsComponent implements OnInit {
       .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
   }
 
+  readonly enhancedRoles = ['client', 'provider'] as const;
+  private readonly finishedPageSize = 5;
+  private readonly finishedVisible = {
+    client: this.finishedPageSize,
+    provider: this.finishedPageSize
+  };
+
+  showMoreFinished(role: 'client' | 'provider'): void {
+    this.finishedVisible[role] += this.finishedPageSize;
+  }
+
+  enhancedAppointmentGroups(role: 'client' | 'provider') {
+      const appointments = role === 'client'
+      ? this.appointments.filter(item => item.status === 'Booked' || item.status === 'Completed')
+      : this.providerAppointments;
+    const now = Date.now();
+    const byStart = (a: Appointment, b: Appointment) =>
+      Date.parse(a.startDateTime) - Date.parse(b.startDateTime);
+    const upcoming: Appointment[] = [];
+    const finished: Appointment[] = [];
+
+    for (const appointment of appointments) {
+      const group = appointment.status === 'Completed' || Date.parse(appointment.endDateTime) <= now
+        ? finished
+        : upcoming;
+      group.push(appointment);
+    }
+
+    return [
+      {
+        title: 'Upcoming appointments',
+        items: upcoming.sort(byStart),
+        empty: 'No upcoming appointments.',
+        hasMore: false
+      },
+      {
+        title: 'Finished appointments',
+        items: finished.sort((a, b) => byStart(b, a)).slice(0, this.finishedVisible[role]),
+        empty: 'No finished appointments.',
+        hasMore: finished.length > this.finishedVisible[role]
+      }
+    ];
+  }
+
   get upcomingAppointments(): Appointment[] {
     const now = Date.now();
     return this.bookedAppointments.filter((item) => Date.parse(item.endDateTime) >= now);
@@ -102,8 +146,7 @@ export class AppointmentsComponent implements OnInit {
       .subscribe({
         next: (items) => {
           this.providerAppointments = items
-            .filter((item) => item.status === 'Booked' && !!item.userId)
-            .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
+          .filter((item) => (item.status === 'Booked' || item.status === 'Completed') && !!item.userId)            .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
           this.providerLoading = false;
         },
         error: () => {
