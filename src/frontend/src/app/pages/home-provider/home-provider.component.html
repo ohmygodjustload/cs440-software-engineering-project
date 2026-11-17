@@ -49,10 +49,12 @@
               <h3>{{ slot.title || 'Appointment name not provided' }}</h3>
               <p>{{ slot.startDateTime | date:'fullDate' }}</p>
               <p>{{ slot.startDateTime | date:'shortTime' }}–{{ slot.endDateTime | date:'shortTime' }}</p>
-              <p>{{ slot.location || 'Location not provided' }}</p>
-              @if (slot.notes) {
-                <p>{{ slot.notes }}</p>
-              }
+              <dl>
+                <dt>Location</dt>
+                <dd>{{ slot.location || 'Not provided' }}</dd>
+                <dt>Notes</dt>
+                <dd>{{ slot.notes || 'No notes' }}</dd>
+              </dl>
               @if (editingId === slot.id) {
                 <label class="edit-time">
                   <span>New start</span>
