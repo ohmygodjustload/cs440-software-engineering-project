@@ -49,14 +49,14 @@ describe('CreateSlotsComponent', () => {
     });
   });
 
-  it('exposes nine hourly blocks from 9:00 AM through 5:00 PM', () => {
-    const component = create().componentInstance;
+  it('exposes seventeen one-hour blocks starting every 30 minutes from 9:00 AM through 5:00 PM', () => {
+  const component = create().componentInstance;
 
-    expect(component.startTimes.length).toBe(9);
-    expect(component.startTimes[0]).toBe('09:00');
-    expect(component.startTimes[component.startTimes.length - 1]).toBe('17:00');
-    expect(component.startTimes).toContain('12:00');
-    expect(component.startTimes).not.toContain('12:30');
+  expect(component.startTimes.length).toBe(17);
+  expect(component.startTimes[0]).toBe('09:00');
+  expect(component.startTimes[component.startTimes.length - 1]).toBe('17:00');
+  expect(component.startTimes).toContain('12:00');
+  expect(component.startTimes).toContain('12:30');
   });
 
   it('selects 3:00–4:00 PM on a future date', () => {
@@ -108,17 +108,18 @@ describe('CreateSlotsComponent', () => {
     expect(component.selectedDate).toBe(selected);
   });
 
-  it('renders nine one-hour ranges from 9:00–10:00 AM through 5:00–6:00 PM', () => {
-    const fixture = create();
-    const buttons: HTMLButtonElement[] = Array.from(
-      fixture.nativeElement.querySelectorAll('.time-options button')
-    );
-    const labels = buttons.map((button) => button.textContent?.trim());
+  it('renders seventeen one-hour ranges starting every 30 minutes from 9:00–10:00 AM through 5:00–6:00 PM', () => {
+  const fixture = create();
+  const buttons: HTMLButtonElement[] = Array.from(
+    fixture.nativeElement.querySelectorAll('.time-options button')
+  );
+  const labels = buttons.map((button) => button.textContent?.trim());
 
-    expect(buttons.length).toBe(9);
-    expect(labels[0]).toBe('9:00 AM – 10:00 AM');
-    expect(labels[labels.length - 1]).toBe('5:00 PM – 6:00 PM');
-    expect(labels).toContain('12:00 PM – 1:00 PM');
+  expect(buttons.length).toBe(17);
+  expect(labels[0]).toBe('9:00 AM – 10:00 AM');
+  expect(labels[labels.length - 1]).toBe('5:00 PM – 6:00 PM');
+  expect(labels).toContain('12:00 PM – 1:00 PM');
+  expect(labels).toContain('12:30 PM – 1:30 PM');
   });
 
   it('does not highlight an empty required field before publishing is attempted', () => {
