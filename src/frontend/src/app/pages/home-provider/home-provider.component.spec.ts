@@ -20,6 +20,13 @@ describe('ProviderHomeComponent', () => {
     status: 'Booked'
   };
 
+  function futureStart(): string {
+    const date = new Date();
+    date.setDate(date.getDate() + 2);
+    date.setHours(10, 30, 0, 0);
+    return date.toISOString();
+  }
+
   function createComponent(slots: Partial<SlotsService> = {}) {
     TestBed.configureTestingModule({
       imports: [ProviderHomeComponent],
@@ -71,7 +78,7 @@ describe('ProviderHomeComponent', () => {
     component['confirmDialog'] = { nativeElement: dialog } as never;
 
     component.startEdit(booked);
-    component.editStartLocal = component['toLocalInput'](new Date(Date.now() + 172800000).toISOString());
+    component.editStartLocal = component['toLocalInput'](futureStart());
     component.saveEdit(booked);
 
     expect(update).toHaveBeenCalled();
@@ -104,7 +111,7 @@ describe('ProviderHomeComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const future = new Date(Date.now() + 172800000).toISOString();
+    const future = futureStart();
     component.startEdit(booked);
     component.editStartLocal = component['toLocalInput'](future);
     component.saveEdit(booked);
@@ -131,8 +138,7 @@ describe('ProviderHomeComponent', () => {
     const component = fixture.componentInstance;
     fixture.detectChanges();
 
-    // Reschedule to 2 hours later (clearly different local time).
-    const future = '2027-01-01T12:00:00Z';
+    const future = futureStart();
     component.startEdit(openSlot);
     component.editStartLocal = component['toLocalInput'](future);
     component.saveEdit(openSlot);

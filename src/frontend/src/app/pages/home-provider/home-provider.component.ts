@@ -37,6 +37,10 @@ export class ProviderHomeComponent implements OnInit {
   now = new Date();
 
   editingId = '';
+  readonly startTimes = Array.from({ length: 17 }, (_, i) => {
+    const hour = String(9 + Math.floor(i / 2)).padStart(2, '0');
+    return hour + (i % 2 === 0 ? ':00' : ':30');
+  });
   editStartLocal = '';
   originalEditStartLocal = '';
   pendingAction: { kind: 'update' | 'delete'; appointment: Appointment; startTime?: string } | null = null;
@@ -143,7 +147,13 @@ export class ProviderHomeComponent implements OnInit {
       return;
     }
 
-    const startTime = new Date(this.editStartLocal).toISOString();
+    const start = new Date(this.editStartLocal);
+    if (!this.startTimes.includes(this.editStartLocal.slice(11)) ||
+        !Number.isFinite(start.getTime())) {
+      this.actionError = 'Choose a valid date and a time on the hour or half hour.';
+      return;
+    }
+    const startTime = start.toISOString();
 
     // Prevent saving to a time that is already in the past.
     if (new Date(startTime).getTime() <= Date.now()) {
