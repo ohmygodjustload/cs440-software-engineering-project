@@ -114,10 +114,11 @@ export class CalendarComponent implements OnInit {
       this.loading = false;
       for (const day of this.days) {
         const next = new Date(day.date.getFullYear(), day.date.getMonth(), day.date.getDate() + 1);
-        day.items = items.filter(item => item.status !== 'Canceled' && item.status !== 'Available'
-          && new Date(item.startDateTime) < next && new Date(item.endDateTime) > day.date)
-          .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
+        day.items = items.filter(item =>
+        new Date(item.startDateTime) < next && new Date(item.endDateTime) > day.date)
+        .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
       }
+
     });
     this.refresh();
   }

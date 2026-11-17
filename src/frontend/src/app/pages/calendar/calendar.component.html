@@ -45,8 +45,12 @@
       [attr.aria-label]="view === 'day' ? 'Appointments for this day' : 'Appointments'"
       [attr.aria-busy]="loading">
       @for (item of listItems; track item.id) {
-        <li class="calendar-agenda__item" [class.medical]="item.category === 'Medical'"
-          [class.beauty]="item.category === 'Beauty'" [class.fitness]="item.category === 'Fitness'">
+        <li class="calendar-agenda__item"
+          [class.medical]="item.category === 'Medical'"
+          [class.beauty]="item.category === 'Beauty'"
+          [class.fitness]="item.category === 'Fitness'"
+          [class.available]="item.status === 'Available'"
+          [class.canceled]="item.status === 'Canceled'">
           <time [attr.datetime]="item.startDateTime">{{ item.startDateTime | date:(view === 'day' ? 'h:mm a' : 'MMM d, y, h:mm a') }} – {{ item.endDateTime | date:'h:mm a' }}</time>
           <span>{{ item.title }}</span>
         </li>
@@ -71,8 +75,12 @@
               [attr.aria-label]="day.date | date:'fullDate'">
               <span class="day-number" [class.is-today]="day.isToday" [attr.aria-current]="day.isToday ? 'date' : null">{{ day.date.getDate() }}</span>
               @for (item of day.items; track item.id) {
-                <div class="appointment" [class.medical]="item.category === 'Medical'"
-                  [class.beauty]="item.category === 'Beauty'" [class.fitness]="item.category === 'Fitness'"
+                <div class="appointment"
+                  [class.medical]="item.category === 'Medical'"
+                  [class.beauty]="item.category === 'Beauty'"
+                  [class.fitness]="item.category === 'Fitness'"
+                  [class.available]="item.status === 'Available'"
+                  [class.canceled]="item.status === 'Canceled'"
                   [attr.title]="item.title + ' · ' + (item.startDateTime | date:'shortTime')">
                   <time [attr.datetime]="item.startDateTime">{{ item.startDateTime | date:'shortTime' }}</time>
                   <span>{{ item.title }}</span>
@@ -86,10 +94,13 @@
   </div>
   }
 
-  <ul class="calendar-legend" aria-label="Appointment categories">
-    <li><span class="swatch medical"></span>Medical · Physical</li>
-    <li><span class="swatch beauty"></span>Beauty · Haircut</li>
-    <li><span class="swatch fitness"></span>Fitness · Yoga</li>
+  <ul class="calendar-legend" aria-label="Appointment legend">
+    <li><span class="swatch medical"></span>Medical</li>
+    <li><span class="swatch beauty"></span>Beauty</li>
+    <li><span class="swatch fitness"></span>Fitness</li>
+    <li><span class="swatch canceled"></span>Canceled</li>
+    <li><span class="swatch available"></span>Available</li>
   </ul>
+
 </section>
 
