@@ -55,8 +55,18 @@
               }
               @if (editingId === slot.id) {
                 <label class="edit-time">
-                  <span>New start</span>
-                  <input type="datetime-local" [(ngModel)]="editStartLocal" />
+                  <span>New start date</span>
+                  <input type="date" [ngModel]="editStartLocal.slice(0, 10)"
+                    (ngModelChange)="editStartLocal = $event + 'T' + editStartLocal.slice(11)" />
+                </label>
+                <label class="edit-time">
+                  <span>New start time</span>
+                  <select [ngModel]="editStartLocal.slice(11)"
+                    (ngModelChange)="editStartLocal = editStartLocal.slice(0, 10) + 'T' + $event">
+                    @for (time of startTimes; track time) {
+                      <option [value]="time">{{ time }}</option>
+                    }
+                  </select>
                 </label>
                 <div class="row-actions">
                   <button type="button" class="primary" [disabled]="saving" (click)="saveEdit(slot)">Save</button>
@@ -74,7 +84,6 @@
         } @empty {
           <p>No future open slots. Create a slot to add availability.</p>
         }
-        <button type="button" (click)="load()">Refresh availability</button>
       </section>
     }
 
@@ -89,8 +98,18 @@
             <p>{{ appointment.location || 'Location not provided' }}</p>
             @if (editingId === appointment.id) {
               <label class="edit-time">
-                <span>New start</span>
-                <input type="datetime-local" [(ngModel)]="editStartLocal" />
+                <span>New start date</span>
+                <input type="date" [ngModel]="editStartLocal.slice(0, 10)"
+                  (ngModelChange)="editStartLocal = $event + 'T' + editStartLocal.slice(11)" />
+              </label>
+              <label class="edit-time">
+                <span>New start time</span>
+                <select [ngModel]="editStartLocal.slice(11)"
+                  (ngModelChange)="editStartLocal = editStartLocal.slice(0, 10) + 'T' + $event">
+                  @for (time of startTimes; track time) {
+                    <option [value]="time">{{ time }}</option>
+                  }
+                </select>
               </label>
               <div class="row-actions">
                 <button type="button" class="primary" [disabled]="saving" (click)="saveEdit(appointment)">Save</button>
@@ -169,7 +188,6 @@
         }
       } @empty { <p>No recent appointments.</p> }
     </section>
-    <footer><button (click)="load()">Refresh</button></footer>
   }
 </main>
 

@@ -265,6 +265,15 @@ footer {
   font: inherit;
 }
 
+.edit-time input,
+.edit-time select {
+  box-sizing: border-box;
+  width: 180px;
+  max-width: 100%;
+  background-color: rgb(255 255 255 / 30%);
+  color: #344945;
+}
+
 .action-error {
   margin: 16px 0;
   padding: 14px 18px;
