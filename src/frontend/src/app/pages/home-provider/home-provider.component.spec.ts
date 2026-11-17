@@ -79,6 +79,7 @@ describe('ProviderHomeComponent', () => {
 
     component.startEdit(booked);
     component.editStartLocal = component['toLocalInput'](futureStart());
+    component.saveEdit(booked);
 
     expect(update).toHaveBeenCalled();
     expect(component.pendingConflict).toBeNull();
