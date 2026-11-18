@@ -25,6 +25,7 @@
         <strong>{{ openSlots.length }}</strong>
         <p>{{ openSlots.length === 1 ? 'open slot' : 'open slots' }}</p>
         <button
+          class="primary"
           type="button"
           [attr.aria-expanded]="showAvailability"
           aria-controls="open-slots"
@@ -68,8 +69,8 @@
             </div>
             @if (editingId !== slot.id) {
               <div class="row-actions">
-                <button type="button" (click)="startEdit(slot)">Edit</button>
-                <button type="button" [disabled]="saving" (click)="deleteSlot(slot)">Delete</button>
+                <button type="button" class="primary" (click)="startEdit(slot)">Edit</button>
+                <button type="button" class="primary" [disabled]="saving" (click)="deleteSlot(slot)">Delete</button>
               </div>
             }
           </article>
@@ -111,8 +112,8 @@
                 {{ detailsOpen('booked:' + appointment.id) ? 'Hide details' : 'View details' }}
                 <span aria-hidden="true">{{ detailsOpen('booked:' + appointment.id) ? '▴' : '▾' }}</span>
               </button>
-              <button type="button" (click)="startEdit(appointment)">Edit</button>
-              <button type="button" [disabled]="saving" (click)="deleteSlot(appointment)">Cancel booking</button>
+              <button type="button" class="primary" (click)="startEdit(appointment)">Edit</button>
+              <button type="button" class="primary" [disabled]="saving" (click)="deleteSlot(appointment)">Cancel booking</button>
             </div>
           }
         </article>

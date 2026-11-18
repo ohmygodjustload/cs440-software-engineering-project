@@ -53,7 +53,7 @@
                 </button>
                 @if (role === 'provider' && canManageProviderAppointment(appointment) && providerEditingId !== appointment.id) {
                   <button type="button" class="secondary" [disabled]="saving"
-                    (click)="startProviderEdit(appointment)">Edit start</button>
+                    (click)="startProviderEdit(appointment)">Edit</button>
                   <button type="button" class="danger" [disabled]="saving"
                     (click)="openCancelDialog(appointment, true)">
                     {{ appointment.status === 'Available' ? 'Cancel slot' : 'Cancel booking' }}

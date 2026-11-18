@@ -36,7 +36,7 @@
             <section class="availability" aria-labelledby="availability-title">
               <h3 id="availability-title">Availability</h3>
               <p>{{ openSlots.length }} open slot{{ openSlots.length === 1 ? '' : 's' }}</p>
-              <button type="button" [attr.aria-expanded]="showAvailability" aria-controls="enhanced-open-slots"
+              <button type="button" class="primary" [attr.aria-expanded]="showAvailability" aria-controls="enhanced-open-slots"
                 (click)="showAvailability = !showAvailability">
                 {{ showAvailability ? 'Hide open slots' : 'View open slots' }}
               </button>
@@ -47,7 +47,7 @@
                       <h4>{{ slot.title || 'Appointment name not provided' }}</h4>
                       <p>{{ slot.startDateTime | date:'EEE, MMM d, h:mm a' }}–{{ slot.endDateTime | date:'h:mm a' }}</p>
                       <p>{{ slot.location || 'Location not provided' }}</p>
-                      <button type="button" [attr.aria-expanded]="detailsAreOpen(slot, summary)" (click)="showDetails(slot, summary)">
+                      <button type="button" class="primary" [attr.aria-expanded]="detailsAreOpen(slot, summary)" (click)="showDetails(slot, summary)">
                         {{ detailsAreOpen(slot, summary) ? 'Hide details' : 'View details' }}
                         <span aria-hidden="true">{{ detailsAreOpen(slot, summary) ? '▴' : '▾' }}</span>
                       </button>
