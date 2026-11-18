@@ -15,7 +15,7 @@ import { LoadingComponent } from '../../core/components/loading/loading.componen
 @Component({
   selector: 'app-provider-home',
   standalone: true,
-  imports: [DatePipe, FormsModule, NgTemplateOutlet, RouterLink, LoadingComponent],
+  imports: [DatePipe, NgTemplateOutlet, FormsModule, RouterLink, LoadingComponent],
   templateUrl: './home-provider.component.html',
   styleUrl: './home-provider.component.css'
 })

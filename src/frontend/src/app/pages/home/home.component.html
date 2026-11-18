@@ -79,8 +79,7 @@
             <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
             <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
           </dl>
-          <button type="button" (click)="selectedAppointment = null">Close details</button>
-        </section>
+          <button type="button" class="primary" (click)="selectedAppointment = null">Close details</button>        </section>
       }
     </section>
 

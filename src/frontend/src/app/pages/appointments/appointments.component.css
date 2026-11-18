@@ -280,3 +280,62 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+.role-appointments {
+  margin-top: 28px;
+}
+
+.role-appointments .upcoming-card {
+  margin-top: 12px;
+}
+
+.role-appointments h3 {
+  margin: 0 0 8px;
+}
+
+.role-appointments .appointment-group + .appointment-group {
+  margin-top: 24px;
+}
+
+.role-appointments h4 {
+  margin: 0 0 8px;
+  font-size: 1.17em;
+}
+
+.provider-editor {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.provider-editor label {
+  display: grid;
+  gap: 6px;
+  width: min(180px, 100%);
+}
+
+.provider-editor input,
+.provider-editor select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #b6beb9;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 30%);
+  color: inherit;
+  font: inherit;
+}
+
+.open-slots-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.open-slots-pagination span {
+  font-size: 14px;
+  white-space: nowrap;
+}

@@ -1,3 +1,4 @@
+import { AccountTypeComponent } from './account-type.component';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import {
@@ -48,7 +49,7 @@ export function phoneValidator(): ValidatorFn {
 }
 @Component({
   selector: 'app-settings',
-  imports: [CommonModule, ReactiveFormsModule, LoadingComponent],
+  imports: [CommonModule, ReactiveFormsModule, LoadingComponent, AccountTypeComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })

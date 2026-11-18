@@ -144,4 +144,11 @@ describe('AuthService', () => {
       isActive: true
     };
   }
+
+  it('keeps a session-only login in session storage after a capability update', () => {
+    service.updateSession({ token: 'new', expiresAt: '2099-01-01T00:00:00Z', user: userResponse('jane')});
+    expect(sessionStorage.getItem('baaam.auth.token')).toBe('new');
+    expect(localStorage.getItem('baaam.auth.token')).toBeNull();
+  })
+
 });

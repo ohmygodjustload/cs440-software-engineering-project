@@ -7,7 +7,8 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 
-import { AppointmentCategory } from '../../core/models/appointment';
+import { Appointment, AppointmentCategory } from '../../core/models/appointment';
+import { ProviderHomeService } from '../../core/services/home-provider.service';
 import { Slot } from '../../core/models/slot';
 import { CreateSlotDraft, SlotsService } from '../../core/services/slots.service';
 import { fieldErrorMessage } from '../../core/validation/field-error';
@@ -32,6 +33,7 @@ interface AppointmentForm {
 })
 export class CreateSlotsComponent implements OnInit {
   private readonly service = inject(SlotsService);
+  private readonly providerHome = inject(ProviderHomeService);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -74,7 +76,7 @@ export class CreateSlotsComponent implements OnInit {
   }
 
   draft = this.emptyDraft();
-  existingSlots: Slot[] = [];
+  existingSlots: Appointment[] = [];
   saving = false;
   validationAttempted = false;
   formError = '';
@@ -246,10 +248,12 @@ export class CreateSlotsComponent implements OnInit {
   }
 
   private loadExistingSlots(): void {
-    this.service.getMine()
+    this.providerHome.bookings()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (slots) => this.existingSlots = slots,
+        next: (appointments) => {
+          this.existingSlots = appointments.filter(item => item.status !== 'Canceled');
+        },
         error: () => this.existingSlots = []
       });
   }

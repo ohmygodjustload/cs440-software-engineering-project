@@ -147,7 +147,7 @@ describe('SettingsComponent', () => {
     const tabs = Array.from(root.querySelectorAll('[role="tab"]')).map((t) =>
       (t as HTMLElement).textContent?.trim()
     );
-    expect(tabs).toEqual(['Profile', 'Login & security', 'Preferences', 'Privacy']);
+    expect(tabs).toEqual(['Profile', 'Account type', 'Login & security', 'Preferences', 'Privacy']);
 
     // Profile panel is visible initially with the identity form.
     expect(root.querySelector('label[for="settings-fullname"]')).not.toBeNull();
@@ -185,7 +185,7 @@ describe('SettingsComponent', () => {
     const fixture = configure({ getCurrentUser: () => of(demoUser) });
     const root = fixture.nativeElement as HTMLElement;
     const items = Array.from(root.querySelectorAll('.settings-side__item'));
-    expect(items.length).toBe(4);
+    expect(items.length).toBe(5);
     expect(root.querySelector('.settings-section')).not.toBeNull();
   });
 

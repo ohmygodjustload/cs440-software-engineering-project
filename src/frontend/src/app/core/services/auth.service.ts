@@ -112,6 +112,11 @@ export class AuthService {
     return 'Something went wrong. Please try again.';
   }
 
+  updateSession(response: AuthResponse): void{
+    const remember = localStorage.getItem(TOKEN_KEY) !== null;
+    this.saveAuth(response.token, response.expiresAt, response.user, remember);
+  }
+
   private saveAuth(token: string, expiresAt: string, user: User, remember: boolean): void {
     this.clearToken();
     const storage = remember ? localStorage : sessionStorage;

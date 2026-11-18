@@ -54,7 +54,7 @@ export const CALENDAR_VIEWS: readonly CalendarViewOption[] = [
 ];
 
 /** Id of a secondary-navigation destination on the Settings page. */
-export type SettingsTabId = 'profile' | 'login' | 'preferences' | 'privacy';
+export type SettingsTabId = 'profile' | 'login' | 'preferences' | 'privacy' | 'account';
 
 /** One item in the Settings secondary navigation strip. */
 export interface SettingsTab {
@@ -76,6 +76,7 @@ export interface SettingsTab {
  */
 export const SETTINGS_TABS: readonly SettingsTab[] = [
   { id: 'profile', label: 'Profile', available: true },
+  { id: 'account', label: 'Account type', available: true },
   { id: 'login', label: 'Login & security', available: true },
   { id: 'preferences', label: 'Preferences', available: true },
   { id: 'privacy', label: 'Privacy', available: true }

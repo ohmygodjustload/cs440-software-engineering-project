@@ -4,7 +4,10 @@ import { of, throwError } from 'rxjs';
 
 import { Appointment } from '../../core/models/appointment';
 import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ProviderHomeService } from '../../core/services/home-provider.service';
 import { AppointmentsComponent } from './appointments.component';
+import { SlotsService } from '../../core/services/slots.service';
 
 describe('Appointments overview', () => {
   const booking = (id: string, start: Date, status: Appointment['status'] = 'Booked'): Appointment => ({
@@ -24,6 +27,10 @@ describe('Appointments overview', () => {
       imports: [AppointmentsComponent],
       providers: [
         provideRouter([]),
+
+        { provide: AuthService, useValue: { getCurrentUser: () => null } },
+        { provide: ProviderHomeService, useValue: { bookings: () => of([]) } },
+        { provide: SlotsService, useValue: {} },
         {
           provide: AppointmentsOverviewService,
           useValue: {

@@ -38,6 +38,12 @@
       <button type="button" class="settings-retry" (click)="retryLoad()">Try again</button>
     </div>
   } @else {
+    @if (activeTabId === 'account') {
+      <div role="tabpanel" id="settings-panel-account" aria-labelledby="settings-tab-account" tabindex="0">
+        @if (currentUser?.isAdmin) { <p>Admin account types are managed separately.</p> }
+        @else { <app-account-type (userChanged)="currentUser = $event"></app-account-type> }
+      </div>
+    } @else {
     <form [formGroup]="form" (ngSubmit)="onSave()" novalidate>
       @if (activeTabId === 'profile') {
       <div role="tabpanel" id="settings-panel-profile" aria-labelledby="settings-tab-profile" tabindex="0">
@@ -163,13 +169,15 @@
       @if (saveSuccess) {
         <div class="settings-alert settings-alert--success" role="status"><p>Settings saved.</p></div>
       }
-
-      <div class="settings-actions">
-        <button type="submit" class="settings-save" [disabled]="!canSave">
-          {{ saving ? 'Saving…' : 'Save changes' }}
-        </button>
-      </div>
+      @if (activeTabId !== 'privacy') {
+        <div class="settings-actions">
+          <button type="submit" class="settings-save" [disabled]="!canSave">
+            {{ saving ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      }
     </form>
+    }
   }
     </div>
   </div>

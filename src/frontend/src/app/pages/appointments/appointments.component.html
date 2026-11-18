@@ -1,10 +1,147 @@
 <section class="overview" aria-labelledby="appointments-title">
   <header class="page-header">
     <h1 id="appointments-title">Appointments</h1>
-    <a class="primary" routerLink="/book-appointment">+ New appointment</a>
+    <div class="card-actions">
+      @if (!isProvider || isEnhanced) {
+        <a class="primary" routerLink="/book-appointment">+ New appointment</a>
+      }
+      @if (isProvider) {
+        <a class="primary" routerLink="/create-slots">+ Add appointment slot</a>
+      }
+    </div>
   </header>
 
-  @if (loading) {
+  @if (isProvider) {
+    @if (actionError) {
+      <div class="error" role="alert"><p>{{ actionError }}</p></div>
+    }
+    @for (role of enhancedRoles; track role) {
+      <section class="role-appointments"
+      [attr.aria-labelledby]="isEnhanced ? role + '-appointments-title' : 'appointments-title'">
+      @if (isEnhanced) {
+        <h2 [id]="role + '-appointments-title'">
+          {{ role === 'client' ? 'As a client' : 'As a service provider' }}
+        </h2>
+      }
+        @if (role === 'client' ? loading : providerLoading) {
+          <app-loading label="Loading appointments…"></app-loading>
+        } @else if (role === 'client' ? error : providerError) {
+          <div class="error" role="alert">
+            <p>{{ role === 'client' ? error : providerError }}</p>
+            <button type="button" (click)="role === 'client' ? load() : loadProviderAppointments()">Try again</button>
+          </div>
+        } @else {
+          @for (group of enhancedAppointmentGroups(role); track group.title; let groupIndex = $index) {
+            <section class="appointment-group" [attr.aria-labelledby]="role + '-group-' + groupIndex">
+              <h3 [id]="role + '-group-' + groupIndex">{{ group.title }}</h3>
+              @for (appointment of group.items; track appointment.id) {            <article class="upcoming-card">
+              <div>
+                <h3>{{ appointment.title }}</h3>
+                <p class="meta">{{ appointment.category }} · {{ appointment.startDateTime | date:'EEEE, MMM d, h:mm a' }}</p>
+                <p class="provider">
+                  @if (role === 'client') {
+                    {{ appointment.providerName || appointment.providerId }}
+                  } @else if (appointment.status !== 'Available') {                    Client: {{ appointment.clientName || appointment.clientUsername || 'Name unavailable' }}                  }
+                  @if (appointment.location) { <span> · {{ appointment.location }}</span> }
+                </p>
+              </div>
+              <div class="card-actions">
+                <button type="button" class="secondary"
+                  [attr.aria-expanded]="selectedId === role + ':' + appointment.id"
+                  (click)="toggleDetails(role + ':' + appointment.id)">
+                  {{ selectedId === role + ':' + appointment.id ? 'Hide details' : 'View details' }}
+                </button>
+                @if (role === 'provider' && canManageProviderAppointment(appointment) && providerEditingId !== appointment.id) {
+                  <button type="button" class="secondary" [disabled]="saving"
+                    (click)="startProviderEdit(appointment)">Edit</button>
+                  <button type="button" class="danger" [disabled]="saving"
+                    (click)="openCancelDialog(appointment, true)">
+                    {{ appointment.status === 'Available' ? 'Cancel slot' : 'Cancel booking' }}
+                  </button>
+                }
+                @if (role === 'client' && canManageClientBooking(appointment) && editingNotesId !== appointment.id) {
+                  <button type="button" class="secondary" [disabled]="saving"
+                    (click)="startEditNotes(appointment, role + ':' + appointment.id)">Edit note</button>
+                  <button type="button" class="danger" [disabled]="saving"
+                    (click)="openCancelDialog(appointment)">Cancel appointment</button>
+                }
+              </div>
+              @if (role === 'provider' && providerEditingId === appointment.id) {
+                <div class="provider-editor">
+                  <label>
+                    New start date
+                    <input type="date" [(ngModel)]="providerStartDate" />
+                  </label>
+                  <label>
+                    New start time
+                    <select [(ngModel)]="providerStartTime">
+                      <option value="" disabled>Choose a time</option>
+                      @for (time of providerStartTimes; track time) {
+                        <option [value]="time">{{ ('2000-01-01T' + time) | date:'h:mm a' }}</option>
+                      }
+                    </select>
+                  </label>
+                  <div class="card-actions">
+                    <button type="button" class="primary" [disabled]="saving"
+                      (click)="saveProviderEdit(appointment)">Save</button>
+                    <button type="button" class="secondary" [disabled]="saving"
+                      (click)="providerEditingId = ''">Cancel edit</button>
+                  </div>
+                </div>
+              }
+              @if (selectedId === role + ':' + appointment.id) {
+                <dl class="details">
+                  <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
+                  <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
+                  <dt>Status</dt><dd>{{ appointment.status }}</dd>
+                  <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
+                  <dt>Notes</dt>
+                  <dd>
+                    @if (role === 'client' && editingNotesId === appointment.id) {
+                      <textarea [(ngModel)]="notesDraft" rows="3" aria-label="Appointment notes"></textarea>
+                      <div class="card-actions notes-actions">
+                        <button type="button" class="primary" [disabled]="saving" (click)="saveNotes(appointment)">Save note</button>
+                        <button type="button" class="secondary" [disabled]="saving" (click)="cancelEditNotes()">Cancel</button>
+                      </div>
+                    } @else {
+                      {{ appointment.notes || 'No notes' }}
+                    }
+                  </dd>
+                </dl>
+              }
+            </article>
+          } @empty {
+            @if (role === 'provider' && groupIndex === 0) {
+              <article class="upcoming-card">
+                <div>
+                  <h3>No upcoming bookings</h3>
+                </div>
+              </article>
+            } @else {
+              <p>{{ group.empty }}</p>
+            }
+          }
+          @if (group.title === 'Open slots' && upcomingOpenSlots.length > openSlotsVisible) {
+            <div class="open-slots-pagination">
+              <button type="button" class="secondary"
+                (click)="openSlotsVisible = openSlotsVisible + openSlotsPageSize">
+                Show more open slots
+              </button>
+            </div>
+          }
+          @if (group.hasMore) {
+            <div class="card-actions">
+              <button type="button" class="secondary" (click)="showMoreFinished(role)">
+                Show more finished appointments
+              </button>
+            </div>
+          }
+        </section>
+      }
+    }
+  </section>
+}
+} @else if (loading) {
     <app-loading label="Loading appointments…"></app-loading>
   } @else if (error) {
     <div class="error" role="alert">
@@ -104,7 +241,9 @@
 
 <dialog #cancelDialog class="confirm-dialog" aria-labelledby="cancel-dialog-title">
   <section class="confirm-prompt">
-    <h2 id="cancel-dialog-title">Cancel this appointment?</h2>
+    <h2 id="cancel-dialog-title">
+      {{ pendingCancel?.status === 'Available' ? 'Cancel this slot?' : 'Cancel this appointment?' }}
+    </h2>
     @if (pendingCancel; as appointment) {
       <p>{{ appointment.title }} · {{ appointment.startDateTime | date:'medium' }}</p>
     }

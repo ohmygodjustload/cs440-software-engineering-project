@@ -412,4 +412,16 @@ describe('AppComponent with native view transitions', () => {
     expect(container.textContent).toContain('login page');
     expect(container.classList.contains('route-hidden')).toBeFalse();
   }));
+
+  it('offers both bbooking and creation links for the same enhanced account', () => {
+    authService.getCurrentUser.and.returnValue({ id: 'both', firstName: 'Jane', lastName: 'Doe', username: 'jane',
+      isClient: true, isServiceProvider: true, isAdmin: false});
+      const component = TestBed.createComponent(AppComponent).componentInstance;
+      const paths = component.navLinks.map(link => link.path);
+      expect(paths).toContain('/enhanced-home');
+      expect(paths).toContain('/appointments');
+      expect(paths).toContain('/create-slots');
+      expect(component.title).toBe('BAAAM / ENHANCED');
+    });
+
 });
