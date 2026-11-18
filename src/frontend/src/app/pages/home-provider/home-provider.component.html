@@ -5,7 +5,7 @@
       <p>{{ now | date:'EEEE, MMMM d, y' }}</p>
       <p>Manage your schedule and upcoming bookings.</p>
     </div>
-    <a class="primary" routerLink="/create-slots">+ Create appointment slots</a>
+    <a class="primary" routerLink="/create-slots">+ Create slots</a>
   </header>
 
   @if (loading) {
@@ -40,7 +40,6 @@
       <section id="open-slots" class="availability-panel" aria-labelledby="availability-title">
         <div class="availability-heading">
           <h2 id="availability-title">Your open slots</h2>
-          <a class="primary" routerLink="/create-slots">+ Create slots</a>
         </div>
         <p>Future slots that have not been booked. Times use your device’s timezone.</p>
         @for (slot of openSlots; track slot.id) {
@@ -58,8 +57,17 @@
               </dl>
               @if (editingId === slot.id) {
                 <label class="edit-time">
-                  <span>New start</span>
-                  <input type="datetime-local" [(ngModel)]="editStartLocal" />
+                  <span>New start date</span>
+                  <input type="date" [ngModel]="editStartLocal.slice(0, 10)"
+                    (ngModelChange)="editStartLocal = $event + 'T' + editStartLocal.slice(11)" />
+                </label>
+                <label class="edit-time">
+                  <span>New start time</span>
+                  <select [ngModel]="editStartLocal.slice(11)"
+                    (ngModelChange)="editStartLocal = editStartLocal.slice(0, 10) + 'T' + $event">
+                    @for (time of startTimes; track time) {
+                      <option [value]="time">{{ ('2000-01-01T' + time) | date:'h:mm a' }}</option>                    }
+                  </select>
                 </label>
                 <div class="row-actions">
                   <button type="button" class="primary" [disabled]="saving" (click)="saveEdit(slot)">Save</button>
@@ -77,7 +85,6 @@
         } @empty {
           <p>No future open slots. Create a slot to add availability.</p>
         }
-        <button type="button" (click)="load()">Refresh availability</button>
       </section>
     }
 
@@ -92,8 +99,17 @@
             <p>{{ appointment.location || 'Location not provided' }}</p>
             @if (editingId === appointment.id) {
               <label class="edit-time">
-                <span>New start</span>
-                <input type="datetime-local" [(ngModel)]="editStartLocal" />
+                <span>New start date</span>
+                <input type="date" [ngModel]="editStartLocal.slice(0, 10)"
+                  (ngModelChange)="editStartLocal = $event + 'T' + editStartLocal.slice(11)" />
+              </label>
+              <label class="edit-time">
+                <span>New start time</span>
+                <select [ngModel]="editStartLocal.slice(11)"
+                  (ngModelChange)="editStartLocal = editStartLocal.slice(0, 10) + 'T' + $event">
+                  @for (time of startTimes; track time) {
+                    <option [value]="time">{{ ('2000-01-01T' + time) | date:'h:mm a' }}</option>                  }
+                </select>
               </label>
               <div class="row-actions">
                 <button type="button" class="primary" [disabled]="saving" (click)="saveEdit(appointment)">Save</button>
@@ -110,7 +126,6 @@
                 (click)="toggleDetails('booked:' + appointment.id)"
               >
                 {{ detailsOpen('booked:' + appointment.id) ? 'Hide details' : 'View details' }}
-                <span aria-hidden="true">{{ detailsOpen('booked:' + appointment.id) ? '▴' : '▾' }}</span>
               </button>
               <button type="button" class="primary" (click)="startEdit(appointment)">Edit</button>
               <button type="button" class="primary" [disabled]="saving" (click)="deleteSlot(appointment)">Cancel booking</button>
@@ -142,7 +157,6 @@
             (click)="toggleDetails('next:' + appointment.id)"
           >
             {{ detailsOpen('next:' + appointment.id) ? 'Hide details' : 'View details' }}
-            <span aria-hidden="true">{{ detailsOpen('next:' + appointment.id) ? '▴' : '▾' }}</span>
           </button>
         </article>
         @if (detailsOpen('next:' + appointment.id)) {
@@ -164,7 +178,6 @@
             (click)="toggleDetails('recent:' + appointment.id)"
           >
             {{ detailsOpen('recent:' + appointment.id) ? 'Hide details' : 'View details' }}
-            <span aria-hidden="true">{{ detailsOpen('recent:' + appointment.id) ? '▴' : '▾' }}</span>
           </button>
         </div>
         @if (detailsOpen('recent:' + appointment.id)) {
@@ -172,7 +185,6 @@
         }
       } @empty { <p>No recent appointments.</p> }
     </section>
-    <footer><button (click)="load()">Refresh</button></footer>
   }
 </main>
 

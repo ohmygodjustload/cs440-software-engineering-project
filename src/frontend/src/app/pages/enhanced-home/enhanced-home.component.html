@@ -49,7 +49,6 @@
                       <p>{{ slot.location || 'Location not provided' }}</p>
                       <button type="button" class="primary" [attr.aria-expanded]="detailsAreOpen(slot, summary)" (click)="showDetails(slot, summary)">
                         {{ detailsAreOpen(slot, summary) ? 'Hide details' : 'View details' }}
-                        <span aria-hidden="true">{{ detailsAreOpen(slot, summary) ? '▴' : '▾' }}</span>
                       </button>
                       @if (detailsAreOpen(slot, summary)) {
                         <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
@@ -69,7 +68,6 @@
               @else { <p>Client: {{ item.clientName || item.clientUsername || 'Name unavailable' }}</p> }              <p>{{ item.location || 'Location not provided' }}</p>
               <button type="button" class="primary" [attr.aria-expanded]="detailsAreOpen(item, summary)" (click)="showDetails(item, summary)">
                 {{ detailsAreOpen(item, summary) ? 'Hide details' : 'View details' }}
-                <span aria-hidden="true">{{ detailsAreOpen(item, summary) ? '▴' : '▾' }}</span>
               </button>
               @if (detailsAreOpen(item, summary)) {
                 <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
@@ -82,7 +80,6 @@
               <span>{{ item.startDateTime | date:'MMM d' }}</span><span>{{ item.title }}</span>
               <span>{{ item.status }}</span><button type="button" [attr.aria-expanded]="detailsAreOpen(item, summary)" (click)="showDetails(item, summary)">
                 {{ detailsAreOpen(item, summary) ? 'Hide details' : 'View details' }}
-                <span aria-hidden="true">{{ detailsAreOpen(item, summary) ? '▴' : '▾' }}</span>
               </button>
               @if (detailsAreOpen(item, summary)) {
                 <ng-container [ngTemplateOutlet]="appointmentDetails"></ng-container>
