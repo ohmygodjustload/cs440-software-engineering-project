@@ -274,4 +274,27 @@ describe('CalendarComponent', () => {
     fixture.detectChanges();
     expect(component.days[0].date.toDateString()).toBe(today.toDateString());
   });
+
+  it('renders canceled appointments with the canceled class', () => {
+  service.getItems.and.returnValue(
+    of([
+      {
+        id: 'canceled-1',
+        title: 'Canceled checkup',
+        category: 'Medical',
+        status: 'Canceled',
+        startDateTime: new Date(2026, 8, 10, 9).toISOString(),
+        endDateTime: new Date(2026, 8, 10, 10).toISOString()
+      }
+    ])
+  );
+
+  const fixture = TestBed.createComponent(CalendarComponent);
+  fixture.componentInstance.month = new Date(2026, 8, 1);
+  fixture.detectChanges();
+
+  const appt = fixture.nativeElement.querySelector('.appointment.canceled');
+  expect(appt).not.toBeNull();
+  expect(appt.textContent).toContain('Canceled checkup');
+  });
 });
