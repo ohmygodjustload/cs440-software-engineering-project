@@ -77,6 +77,7 @@ export class CreateSlotsComponent implements OnInit {
 
   draft = this.emptyDraft();
   existingSlots: Appointment[] = [];
+  bookedAppointments: Appointment[] = [];
   saving = false;
   validationAttempted = false;
   formError = '';
@@ -140,7 +141,7 @@ export class CreateSlotsComponent implements OnInit {
   }
 
   isTimeUnavailable(time: string): boolean {
-    return this.isPastTime(time) || this.overlapsExistingSlot(time);
+    return this.isPastTime(time) || this.overlapsExistingSlot(time) || this.overlapsClientAppointment(time);
   }
 
   fieldInvalid(control: NgModel | null): boolean {
@@ -179,6 +180,18 @@ export class CreateSlotsComponent implements OnInit {
     this.draft.providerId = this.route.snapshot.data['providerId'] ?? '';
     this.providerChanged();
     this.loadExistingSlots();
+    this.loadClientBookings();
+  }
+
+  private loadClientBookings(): void {
+    this.service.getMyBookings()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (appointments) => {
+          this.bookedAppointments = appointments.filter(item => item.status === 'Booked');
+        },
+        error: () => this.bookedAppointments = []
+      });
   }
 
   save(form: NgForm): void {
@@ -265,6 +278,16 @@ export class CreateSlotsComponent implements OnInit {
       const slotStart = Date.parse(slot.startDateTime);
       const slotEnd = Date.parse(slot.endDateTime);
       return candidateStart < slotEnd && candidateEnd > slotStart;
+    });
+  }
+
+  private overlapsClientAppointment(time: string): boolean {
+    const candidateStart = Date.parse(`${this.selectedDate}T${time}`);
+    const candidateEnd = candidateStart + this.durationMinutes * 60000;
+    return this.bookedAppointments.some((appointment) => {
+      const apptStart = Date.parse(appointment.startDateTime);
+      const apptEnd = Date.parse(appointment.endDateTime);
+      return candidateStart < apptEnd && candidateEnd > apptStart;
     });
   }
 

@@ -1,7 +1,7 @@
 import { Appointment, AppointmentCategory } from './appointment';
 
 /** An open appointment created by a provider. Status is always 'Available' and userId is null. */
-export type Slot = Appointment & { status: 'Available'; userId: null };
+export type Slot = Appointment & { status: 'Available'; userId: null; isCrossedOff?: boolean };
 
 export interface CreateSlotDto { appointmentTypeId: string; startTime: string; }
 export interface UpdateSlotDto {

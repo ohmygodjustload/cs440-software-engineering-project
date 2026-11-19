@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { BookedAppointment, Slot } from '../../core/models/slot';
 import { SlotsService } from '../../core/services/slots.service';
 import { BookAppointmentComponent } from './book-appointment.component';
+import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
 
 describe('BookAppointmentComponent', () => {
   const slot: Slot = {
@@ -41,11 +42,16 @@ describe('BookAppointmentComponent', () => {
   };
 
   let slots: jasmine.SpyObj<SlotsService>;
+  let appointments: jasmine.SpyObj<AppointmentsOverviewService>;
 
   function create() {
     TestBed.configureTestingModule({
       imports: [BookAppointmentComponent],
-      providers: [provideRouter([]), { provide: SlotsService, useValue: slots }]
+      providers: [
+        provideRouter([]),
+        { provide: SlotsService, useValue: slots },
+        { provide: AppointmentsOverviewService, useValue: appointments }
+      ]
     });
     const fixture = TestBed.createComponent(BookAppointmentComponent);
     fixture.detectChanges();
@@ -55,6 +61,8 @@ describe('BookAppointmentComponent', () => {
   beforeEach(() => {
     slots = jasmine.createSpyObj<SlotsService>('SlotsService', ['getAvailable', 'book']);
     slots.getAvailable.and.returnValue(of([slot]));
+    appointments = jasmine.createSpyObj<AppointmentsOverviewService>('AppointmentsOverviewService', ['loadAppointments']);
+    appointments.loadAppointments.and.returnValue(of([]));
   });
 
   it('lists the open slots on load', () => {

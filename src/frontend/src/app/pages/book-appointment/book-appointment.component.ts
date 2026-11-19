@@ -4,11 +4,12 @@ import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, first } from 'rxjs';
 
-import { AppointmentCategory } from '../../core/models/appointment';
+import { AppointmentCategory, Appointment } from '../../core/models/appointment';
 import { BookedAppointment, Slot } from '../../core/models/slot';
 import { SlotsService } from '../../core/services/slots.service';
+import { AppointmentsOverviewService } from '../../core/services/appointments-overview.service';
 import { LoadingComponent } from '../../core/components/loading/loading.component';
 
 interface ProviderOption {
@@ -33,6 +34,7 @@ export class BookAppointmentComponent implements OnInit {
   // Week navigation should start at today; users should not browse past ranges.
   private readonly minWeekStart = this.startOfDay(new Date());
   private readonly slotsService = inject(SlotsService);
+  private readonly appointmentsService = inject(AppointmentsOverviewService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly categories: AppointmentCategory[] = ['Medical', 'Beauty', 'Fitness'];
@@ -48,6 +50,40 @@ export class BookAppointmentComponent implements OnInit {
   loadError = '';
   formError = '';
   booked: BookedAppointment | null = null;
+  bookedAppointments: Appointment[] = [];
+
+  /** Returns true if the selected slot overlaps any of the user's existing booked appointments. */
+  private hasOverlap(slot: Slot): boolean {
+    const slotStart = Date.parse(slot.startDateTime);
+    const slotEnd = Date.parse(slot.endDateTime);
+
+    for (const appointment of this.bookedAppointments) {
+      const apptStart = Date.parse(appointment.startDateTime);
+      const apptEnd = Date.parse(appointment.endDateTime);
+
+      // Overlap: slot starts before the existing appointment ends AND slot ends after the existing appointment starts.
+      if (slotStart < apptEnd && slotEnd > apptStart) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Returns true if the given slot has a conflict with any of the user's booked appointments. */
+  private hasConflict(slot: Slot): boolean {
+    return this.hasOverlap(slot);
+  }
+
+  /**
+   * Returns a list of visible slots with conflicting appointments crossed off.
+   * Crossed off slots have the 'crossed-off' class applied for visual indication.
+   */
+  get visibleSlotsWithCrossOff(): Slot[] {
+    return this.visibleSlots.map(slot => {
+      const isCrossedOff = this.hasConflict(slot);
+      return { ...slot, isCrossedOff };
+    });
+  }
 
   get selected(): Slot | null {
     return this.slots.find((slot) => slot.id === this.selectedId) ?? null;
@@ -175,6 +211,13 @@ export class BookAppointmentComponent implements OnInit {
   book(): void {
     const slot = this.selected;
     if (!slot || this.booking) return;
+
+    // Catch overlaps early: if the slot overlaps any existing appointment, stop
+    // before calling the booking endpoint and show a clear message.
+    if (this.hasOverlap(slot)) {
+      this.formError = 'This time overlaps an existing appointment for you.';
+      return;
+    }
 
     this.booking = true;
     this.formError = '';

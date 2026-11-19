@@ -137,6 +137,8 @@ public sealed class SlotsController(
             string.Equals(userId, client.Id, StringComparison.OrdinalIgnoreCase)
             || string.Equals(userId, provider.Id, StringComparison.OrdinalIgnoreCase);
 
+        var isEnhancedUser = client.IsServiceProvider;
+
         var overlaps = appointments.GetAll().Any(a =>
         {
             if (a.IsDeleted || a.Id == slot.Id || a.Status == AppointmentStatus.Canceled
@@ -146,12 +148,54 @@ public sealed class SlotsController(
             }
 
             if (IsParticipant(a.UserId)) return true;
+
+            // Enhanced users can hold both client and provider slots; an Available
+            // slot for their own provider must not overlap a new client-side booking.
+            if (a.Status == AppointmentStatus.Available && isEnhancedUser)
+            {
+                var availableType = a.AppointmentTypeId is null ? null : types.GetById(a.AppointmentTypeId);
+                var availableOwnerId = availableType?.ProviderId ?? a.ProviderId;
+                return IsParticipant(availableOwnerId);
+            }
+
             if (a.Status != AppointmentStatus.Booked) return false;
 
             var bookedType = a.AppointmentTypeId is null ? null : types.GetById(a.AppointmentTypeId);
             return IsParticipant(bookedType?.ProviderId ?? a.ProviderId);
         });
-        if (overlaps) return Conflict("This time overlaps an existing appointment for you or the provider.");
+
+        string? conflictMessage = null;
+        if (overlaps)
+        {
+            var conflicting = appointments.GetAll().First(a =>
+            {
+                if (a.IsDeleted || a.Id == slot.Id || a.Status == AppointmentStatus.Canceled
+                    || a.StartDateTime >= slot.EndDateTime || slot.StartDateTime >= a.EndDateTime)
+                {
+                    return false;
+                }
+                if (IsParticipant(a.UserId)) return true;
+                if (a.Status == AppointmentStatus.Available && isEnhancedUser)
+                {
+                    var availableType = a.AppointmentTypeId is null ? null : types.GetById(a.AppointmentTypeId);
+                    var availableOwnerId = availableType?.ProviderId ?? a.ProviderId;
+                    return IsParticipant(availableOwnerId);
+                }
+                if (a.Status == AppointmentStatus.Booked)
+                {
+                    var bookedType = a.AppointmentTypeId is null ? null : types.GetById(a.AppointmentTypeId);
+                    return IsParticipant(bookedType?.ProviderId ?? a.ProviderId);
+                }
+                return false;
+            });
+
+            if (IsParticipant(conflicting.UserId) || (conflicting.Status == AppointmentStatus.Available && isEnhancedUser))
+                conflictMessage = "This time overlaps an existing appointment for you.";
+            else if (conflicting.ProviderId is not null && conflicting.Status == AppointmentStatus.Booked)
+                conflictMessage = "This time overlaps an existing appointment for the provider.";
+        }
+
+        if (overlaps) return Conflict(conflictMessage ?? "This time overlaps an existing appointment for you.");
 
         var notes = dto?.Notes?.Trim() ?? "";
         if (!appointments.BookSlot(slot.Id, client.Id, notes)) return Conflict("Slot is no longer available.");

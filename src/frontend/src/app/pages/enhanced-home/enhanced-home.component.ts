@@ -14,6 +14,7 @@ interface RoleSummary {
   items: Appointment[];
   loading: boolean;
   error: string;
+  greyedOut: boolean;
 }
 
 @Component({
@@ -32,8 +33,22 @@ export class EnhancedHomeComponent implements OnInit {
   selectedAppointment: Appointment | null = null;
   selectedRole: RoleSummary['role'] = 'client';
   showAvailability = false;
-  readonly client: RoleSummary = { role: 'client', heading: 'As a client', items: [], loading: false, error: '' };
-  readonly provider: RoleSummary = { role: 'provider', heading: 'As a service provider', items: [], loading: false, error: '' };
+  readonly client: RoleSummary = {
+    role: 'client',
+    heading: 'As a client',
+    items: [],
+    loading: false,
+    error: '',
+    greyedOut: false,
+  };
+  readonly provider: RoleSummary = {
+    role: 'provider',
+    heading: 'As a service provider',
+    items: [],
+    loading: false,
+    error: '',
+    greyedOut: false,
+  };
   readonly summaries = [this.client, this.provider];
 
   get greeting(): string {
@@ -50,6 +65,21 @@ export class EnhancedHomeComponent implements OnInit {
     return this.provider.items.filter(item => item.status === 'Available' && !item.userId &&
       Date.parse(item.startDateTime) > this.now.getTime())
       .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
+  }
+
+  /** Returns true if two appointments overlap in time. */
+  private overlaps(a: Appointment, b: Appointment): boolean {
+    const aStart = Date.parse(a.startDateTime);
+    const aEnd = Date.parse(a.endDateTime);
+    const bStart = Date.parse(b.startDateTime);
+    const bEnd = Date.parse(b.endDateTime);
+    return aStart < bEnd && bStart < aEnd;
+  }
+
+  /** Returns true if the appointment conflicts with any appointment in the other role's list. */
+  hasConflict(item: Appointment, summary: RoleSummary): boolean {
+    const other = summary.role === 'client' ? this.provider : this.client;
+    return other.items.some(otherItem => this.overlaps(item, otherItem));
   }
 
   ngOnInit(): void { this.refresh(); }
