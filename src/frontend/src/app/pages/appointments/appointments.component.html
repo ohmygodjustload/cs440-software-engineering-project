@@ -111,15 +111,7 @@
               }
             </article>
           } @empty {
-            @if (role === 'provider' && groupIndex === 0) {
-              <article class="upcoming-card">
-                <div>
-                  <h3>No upcoming bookings</h3>
-                </div>
-              </article>
-            } @else {
-              <p>{{ group.empty }}</p>
-            }
+            <p>{{ group.empty }}</p>
           }
           @if (group.title === 'Open slots' && upcomingOpenSlots.length > openSlotsVisible) {
             <div class="open-slots-pagination">
