@@ -207,6 +207,43 @@ h1, h2, h3, h4, .recent {
   font-size: 18px;
 }
 
+.crossed-off-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fbeaea;
+  color: #7a3d2a;
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.crossed-off {
+  opacity: 0.55;
+  position: relative;
+}
+
+.crossed-off::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #7a3d2a;
+  transform: translateY(-50%);
+  border-radius: 1px;
+}
+
+.crossed-off .open-slot h4,
+.crossed-off .appointment-card h4,
+.crossed-off .appointment-card p,
+.crossed-off .recent span,
+.crossed-off .recent button {
+  color: #9a9a94;
+  text-decoration: line-through;
+}
+
 @media (max-width: 500px) {
   .details dl { grid-template-columns: minmax(0, 1fr); }
   .details dd { margin-bottom: 12px; }

@@ -150,27 +150,47 @@
             </div>
           }
 
-          <ul class="slot-list" aria-label="Open slots">
-            @for (slot of visibleSlots; track slot.id) {
+                    <ul class="slot-list" aria-label="Open slots">
+            @for (slot of visibleSlotsWithCrossOff; track slot.id) {
               <li class="slot-card">
                 <button
                   type="button"
                   class="slot-choice"
-                  [disabled]="booking"
+                  [class.crossed-off]="slot.isCrossedOff"
+                  [disabled]="booking || slot.isCrossedOff"
                   (click)="choose(slot.id)"
                 >
                   <span class="slot-title">{{ slot.title }}</span>
+
                   <span class="slot-time">
-                    {{ slot.startDateTime | date:'EEE, MMM d, h:mm a' }} to {{ slot.endDateTime | date:'h:mm a' }}
+                    {{ slot.startDateTime | date:'EEE, MMM d, h:mm a' }}
+                    to
+                    {{ slot.endDateTime | date:'h:mm a' }}
                   </span>
+
                   <span class="slot-meta">
-                    {{ slot.category }}@if (slot.location) { · {{ slot.location }} }
+                    {{ slot.category }}
+
+                    @if (slot.location) {
+                      · {{ slot.location }}
+                    }
+
+                    @if (slot.isCrossedOff) {
+                      <span class="crossed-off-badge">Taken</span>
+                    }
                   </span>
+
+                  <span
+                    class="slot-cross"
+                    [class.hidden]="!slot.isCrossedOff"
+                    aria-hidden="true"
+                  ></span>
                 </button>
               </li>
             }
           </ul>
         }
+
 
         @if (formError) {
           <p class="error-message" role="alert">{{ formError }}</p>

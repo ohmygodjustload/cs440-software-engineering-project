@@ -173,6 +173,50 @@ button:disabled {
   font-weight: 500
 }
 
+.slot-card.crossed-off,
+.slot-choice.crossed-off,
+.slot-cross {
+  position: relative;
+  opacity: 0.55;
+}
+
+.slot-cross::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #7a3d2a;
+  transform: translateY(-50%);
+  border-radius: 1px;
+}
+
+.crossed-off-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fbeaea;
+  color: #7a3d2a;
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+.slot-choice.crossed-off {
+  border-color: #e0dcd1;
+  background: #ebe9e3;
+  color: #9a9a94;
+  cursor: not-allowed;
+}
+
+.slot-choice.crossed-off .slot-title,
+.slot-choice.crossed-off .slot-time,
+.slot-choice.crossed-off .slot-meta {
+  color: #9a9a94;
+  text-decoration: line-through;
+}
+
 .slot-meta, .booking-reminder, .empty-state, .review-summary p, .collapsed-summary span {
   color: #60736f;
   font-size: 13px

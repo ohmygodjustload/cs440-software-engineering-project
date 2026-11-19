@@ -4,13 +4,16 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { Appointment } from '../../core/models/appointment';
 import { Slot } from '../../core/models/slot';
 import { CreateSlotsComponent } from './create-slots.component';
 import { of } from 'rxjs';
 import { ProviderHomeService } from '../../core/services/home-provider.service';
+import { SlotsService } from '../../core/services/slots.service';
 
 describe('CreateSlotsComponent', () => {
   let auth: jasmine.SpyObj<AuthService>;
+  let slotsService: jasmine.SpyObj<SlotsService>;
 
   function create() {
     TestBed.configureTestingModule({
@@ -20,6 +23,7 @@ describe('CreateSlotsComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: auth },
+        { provide: SlotsService, useValue: slotsService },
         { provide: ProviderHomeService, useValue: { bookings: () => of([]) } },
         { provide: ActivatedRoute, useValue: { snapshot: { data: { providerId: 'p1' } } } }
       ]
@@ -50,6 +54,8 @@ describe('CreateSlotsComponent', () => {
       isActive: true,
       serviceTypes: ['Medical']
     });
+    slotsService = jasmine.createSpyObj<SlotsService>('SlotsService', ['getMyBookings']);
+    slotsService.getMyBookings.and.returnValue(of([]));
   });
 
   it('exposes seventeen one-hour blocks starting every 30 minutes from 9:00 AM through 5:00 PM', () => {
@@ -169,6 +175,32 @@ describe('CreateSlotsComponent', () => {
       notes: '',
       status: 'Available'
     } satisfies Slot];
+
+    expect(component.isTimeUnavailable('13:00')).toBeFalse();
+    expect(component.isTimeUnavailable('14:00')).toBeTrue();
+    expect(component.isTimeUnavailable('15:00')).toBeFalse();
+  });
+
+  it('greys out times that conflict with a booked client appointment', () => {
+    const component = create().componentInstance;
+    const date = futureDate();
+    component.chooseDate(date);
+
+    // Simulate a client booked appointment at 14:00–15:00 on the selected date
+    component.bookedAppointments = [{
+      id: 'client-appt-1',
+      title: 'Dentist visit',
+      category: 'Medical',
+      startDateTime: new Date(`${date}T14:00`).toISOString(),
+      endDateTime: new Date(`${date}T15:00`).toISOString(),
+      providerId: 'other-provider',
+      providerName: 'Dr. Other',
+      userId: 'u1',
+      appointmentTypeId: 'type-2',
+      location: 'Dental Office',
+      notes: '',
+      status: 'Booked'
+    } as Appointment];
 
     expect(component.isTimeUnavailable('13:00')).toBeFalse();
     expect(component.isTimeUnavailable('14:00')).toBeTrue();
