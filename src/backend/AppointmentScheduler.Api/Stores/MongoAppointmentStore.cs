@@ -166,12 +166,11 @@ public sealed class MongoAppointmentStore : IAppointmentStore
 
     public bool ReleaseBooking(string id, string clientId)
     {
-        var availableId = FindStatusId("Available")
-            ?? throw new InvalidOperationException("Status 'Available' not found in Status collection.");
+        var canceledId = FindStatusId("Canceled") ?? FindStatusId("Cancelled")
+            ?? throw new InvalidOperationException("Status 'Canceled' (or 'Cancelled') not found in Status collection.");
         var update = Builders<BsonDocument>.Update
-            .Set("StatusId", availableId)
-            .Set("UserId", BsonNull.Value)
-            .Set("Notes", "");
+            .Set("StatusId", canceledId)
+            .Set("CanceledAt", DateTime.UtcNow);
         return _raw.UpdateOne(BookedClientFilter(id, clientId), update).ModifiedCount == 1;
     }
 
@@ -189,9 +188,7 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             ?? throw new InvalidOperationException("Status 'Canceled' (or 'Cancelled') not found in Status collection.");
         var update = Builders<BsonDocument>.Update
             .Set("StatusId", canceledId)
-            .Set("UserId", BsonNull.Value)
-            .Set("IsDeleted", true)
-            .Set("DeletedAt", DateTime.UtcNow);
+            .Set("CanceledAt", DateTime.UtcNow);
         return _raw.UpdateOne(BookedFilter(id), update).ModifiedCount == 1;
     }
 
@@ -383,6 +380,8 @@ public sealed class MongoAppointmentStore : IAppointmentStore
             Status = NormalizeStatus(statusName),
             AppointmentTypeId = appointmentTypeId,
             IsDeleted = IsDeleted(d),
+            DeletedAt = ReadNullableDate(d, "DeletedAt"),
+            CanceledAt = ReadNullableDate(d, "CanceledAt"),
         };
     }
 
@@ -624,6 +623,28 @@ public sealed class MongoAppointmentStore : IAppointmentStore
 
         return DateTimeOffset.UtcNow;
     }
+
+    private static DateTimeOffset? ReadNullableDate(BsonDocument doc, params string[] keys)
+    {
+        foreach (var key in keys)
+        {
+            var element = FindElement(doc, key);
+            if (element is null || element.Value.Value is BsonNull)
+            {
+                continue;
+            }
+
+            return element.Value.Value switch
+            {
+                BsonDateTime dt => new DateTimeOffset(dt.ToUniversalTime(), TimeSpan.Zero),
+                BsonString s when DateTimeOffset.TryParse(s.Value, out var parsed) => parsed.ToUniversalTime(),
+                _ => null
+            };
+        }
+
+        return null;
+    }
+
 
     private static bool ToBool(BsonValue value) => value switch
     {

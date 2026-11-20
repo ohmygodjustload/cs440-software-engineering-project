@@ -92,17 +92,17 @@ public class AppointmentsControllerTests {
     }
 
     [Fact]
-    public void GetMine_ReturnsOnlyCallersBookedAppointments_SoonestFirst() {
+    public void GetMine_ReturnsCallersNonAvailableAppointments_SoonestFirst() {
         var store = new InMemoryAppointmentStore();
         var later = AddAt(store, 48, SeedIds.ClientUser, AppointmentStatus.Booked);
         var sooner = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
-        AddAt(store, 30, SeedIds.ClientUser, AppointmentStatus.Canceled);
+        var canceled = AddAt(store, 30, SeedIds.ClientUser, AppointmentStatus.Canceled);
         AddAt(store, 31, "someone-else", AppointmentStatus.Booked);
         AddAt(store, 32, null, AppointmentStatus.Available);
 
         var items = Assert.IsType<List<Appointment>>(
             Assert.IsType<OkObjectResult>(Mine(store, SeedIds.ClientUser).GetMine().Result).Value);
-        Assert.Equal([sooner.Id, later.Id], items.Select(a => a.Id));
+        Assert.Equal([sooner.Id, canceled.Id, later.Id], items.Select(a => a.Id));
     }
 
     [Fact]
@@ -319,7 +319,7 @@ public class AppointmentsControllerTests {
     }
 
     [Fact]
-    public void CancelBooking_ReleasesSlot_WritesAudit_AndNotifiesProvider() {
+    public void CancelBooking_CancelsSlot_WritesAudit_AndNotifiesProvider() {
         var (c, store, audit, notes) = ClientController();
         var booked = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
         booked.Title = "Checkup";
@@ -328,14 +328,14 @@ public class AppointmentsControllerTests {
         var released = Assert.IsType<Appointment>(
             Assert.IsType<OkObjectResult>(c.CancelBooking(booked.Id).Result).Value);
 
-        Assert.Equal(AppointmentStatus.Available, released.Status);
-        Assert.Null(released.UserId);
-        Assert.Equal("", released.Notes);
+        Assert.Equal(AppointmentStatus.Canceled, released.Status);
+        Assert.Equal(SeedIds.ClientUser, released.UserId);
+        Assert.Equal("keep me", released.Notes);
         var entry = Assert.Single(audit.Query(action: AppointmentAuditEntry.Cancelled));
         Assert.Equal(booked.Id, entry.AppointmentId);
         Assert.Equal(SeedIds.ClientUser, entry.ChangedByUserId);
         Assert.Equal(AppointmentStatus.Booked, entry.OldStatus);
-        Assert.Equal(AppointmentStatus.Available, entry.NewStatus);
+        Assert.Equal(AppointmentStatus.Canceled, entry.NewStatus);
         Assert.Contains(notes.GetAll(SeedIds.ProviderUser), n => n.Event == "appointment-cancelled");
     }
 

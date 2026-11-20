@@ -37,6 +37,7 @@ describe('Appointments overview', () => {
             loadAppointments: () => of([]),
             updateNotes: () => of({} as Appointment),
             cancelBooking: () => of({} as Appointment),
+            loadCanceledHistory: () => of([]),
             ...service
           }
         }
@@ -83,7 +84,7 @@ describe('Appointments overview', () => {
 
   it('cancels a booking after confirm', () => {
     const item = booking('a1', new Date(Date.now() + 86400000));
-    const cancelBooking = jasmine.createSpy('cancelBooking').and.returnValue(of({ ...item, status: 'Available', userId: null }));
+    const cancelBooking = jasmine.createSpy('cancelBooking').and.returnValue(of({ ...item, status: 'Canceled', userId: 'demo-user' }));
     const loadAppointments = jasmine.createSpy('loadAppointments').and.returnValue(of([]));
     const fixture = createComponent({ cancelBooking, loadAppointments });
     const component = fixture.componentInstance;

@@ -78,9 +78,8 @@ public sealed class InMemoryAppointmentStore : IAppointmentStore {
     public bool ReleaseBooking(string id, string clientId) {
         lock (_slotGate) {
             if (!TryGetBookedForClient(id, clientId, out var cur)) return false;
-            cur!.UserId = null;
-            cur.Status = AppointmentStatus.Available;
-            cur.Notes = "";
+            cur!.Status = AppointmentStatus.Canceled;
+            cur.CanceledAt = DateTimeOffset.UtcNow;
             return true;
         }
     }
@@ -99,9 +98,7 @@ public sealed class InMemoryAppointmentStore : IAppointmentStore {
             if (!_items.TryGetValue(id, out var cur) || cur.IsDeleted ||
                 cur.Status != AppointmentStatus.Booked) return false;
             cur.Status = AppointmentStatus.Canceled;
-            cur.UserId = null;
-            cur.IsDeleted = true;
-            cur.DeletedAt = DateTimeOffset.UtcNow;
+            cur.CanceledAt = DateTimeOffset.UtcNow;
             return true;
         }
     }

@@ -23,15 +23,15 @@ public interface IAppointmentStore {
     /// <summary>Updates notes on a Booked appointment owned by <paramref name="clientId"/>.</summary>
     bool UpdateBookedNotes(string id, string clientId, string notes);
 
-    /// <summary>Returns a Booked appointment to Available (UserId null, Notes empty) for the given client.</summary>
+    /// <summary>Cancels a Booked appointment owned by <paramref name="clientId"/>: the status becomes Canceled (not Available) and the client id is preserved so the appointment stays visible in live lists and the client calendar.</summary>
     bool ReleaseBooking(string id, string clientId);
 
     /// <summary>Moves a Booked appointment's times while keeping the same client.</summary>
     bool RescheduleBooked(string id, string clientId, DateTimeOffset start, DateTimeOffset end);
 
     /// <summary>
-    /// Cancels a Booked appointment: status becomes Canceled, the client is removed,
-    /// and the appointment is soft-deleted so it drops out of live lists.
+    /// Cancels a Booked appointment: the status becomes Canceled, the client is preserved, and the
+    /// appointment is NOT soft-deleted so it remains visible in the client calendar and history.
     /// </summary>
     bool CancelBooked(string id);
     /// <summary>
