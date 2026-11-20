@@ -48,15 +48,16 @@ public class InMemoryAppointmentStoreTests {
     }
 
     [Fact]
-    public void ReleaseBooking_ReturnsSlotToAvailable() {
+    public void ReleaseBooking_CancelsSlot_AndPreservesClient() {
         var store = new InMemoryAppointmentStore();
         var slot = Slot(store);
         Assert.True(store.BookSlot(slot.Id, SeedIds.ClientUser, "note"));
         Assert.True(store.ReleaseBooking(slot.Id, SeedIds.ClientUser));
         var released = store.GetById(slot.Id)!;
-        Assert.Equal(AppointmentStatus.Available, released.Status);
-        Assert.Null(released.UserId);
-        Assert.Equal("", released.Notes);
+        Assert.Equal(AppointmentStatus.Canceled, released.Status);
+        Assert.Equal(SeedIds.ClientUser, released.UserId);
+        Assert.NotNull(released.CanceledAt);
+        Assert.Equal("note", released.Notes);
         Assert.False(store.ReleaseBooking(slot.Id, SeedIds.ClientUser));
     }
 
@@ -76,13 +77,16 @@ public class InMemoryAppointmentStoreTests {
     }
 
     [Fact]
-    public void CancelBooked_SoftDeletes_AndClearsClient() {
+    public void CancelBooked_SetsCanceled_AndPreservesClient() {
         var store = new InMemoryAppointmentStore();
         var slot = Slot(store);
         Assert.False(store.CancelBooked(slot.Id));
         Assert.True(store.BookSlot(slot.Id, SeedIds.ClientUser, "note"));
         Assert.True(store.CancelBooked(slot.Id));
-        Assert.Null(store.GetById(slot.Id));
+        var cancelled = store.GetById(slot.Id)!;
+        Assert.Equal(AppointmentStatus.Canceled, cancelled.Status);
+        Assert.Equal(SeedIds.ClientUser, cancelled.UserId);
+        Assert.NotNull(cancelled.CanceledAt);
         Assert.False(store.CancelBooked(slot.Id));
     }
 }

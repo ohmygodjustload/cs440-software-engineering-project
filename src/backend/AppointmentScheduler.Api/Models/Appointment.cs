@@ -40,4 +40,6 @@ public sealed class Appointment {
 
     [System.Text.Json.Serialization.JsonIgnore]
     public DateTimeOffset? DeletedAt { get; set; }
+/// <summary>When this appointment was canceled (UTC). Null for appointments that have not been canceled.</summary>
+public DateTimeOffset? CanceledAt { get; set; }
 }

@@ -36,7 +36,9 @@ export interface Appointment {
   providerName?: string | null;
   userId: string | null;
   clientName?: string | null;
-  clientUsername?: string | null;  location?: string | null;
+  clientUsername?: string | null;
+  location?: string | null;
+  canceledAt?: string | null;
   notes?: string | null;
   status: AppointmentStatus;
 }

@@ -554,14 +554,14 @@ public class SlotsControllerTests
     }
 
     [Fact]
-    public void Delete_BookedWithConfirm_SoftDeletes_AndNotifiesClient() {
+    public void Delete_BookedWithConfirm_Cancels_AndPreservesClient() {
         var (c, appts, audit, notes) = MakeWithAudit();
         var slot = Seed(appts, 24, status: AppointmentStatus.Booked, userId: SeedIds.ClientUser);
 
         Assert.IsType<ConflictObjectResult>(c.Delete(slot.Id));
         Assert.IsType<NoContentResult>(c.Delete(slot.Id, new ConfirmDto { Confirm = true }));
-        Assert.Null(appts.GetById(slot.Id));
-        Assert.DoesNotContain(appts.GetAll(), a => a.Id == slot.Id);
+        Assert.NotNull(appts.GetById(slot.Id));
+        Assert.Contains(appts.GetAll(), a => a.Id == slot.Id);
         Assert.Contains(audit.Query(), e =>
             e.Action == AppointmentAuditEntry.Cancelled
             && e.OldStatus == AppointmentStatus.Booked

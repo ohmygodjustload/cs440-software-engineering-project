@@ -59,12 +59,17 @@ export class AppointmentsComponent implements OnInit {
   providerLoading = false;
   providerError = '';
 
+
   get isEnhanced(): boolean {
     return isEnhancedUser(this.auth.getCurrentUser());
   }
   get isProvider(): boolean {
     const user = this.auth.getCurrentUser();
     return !!user && user.isServiceProvider && user.isActive !== false && !user.isAdmin;
+  }
+  get isClient(): boolean {
+    const user = this.auth.getCurrentUser();
+    return !!user && user.isClient && !user.isAdmin;
   }
   loading = false;
   saving = false;
@@ -82,7 +87,9 @@ export class AppointmentsComponent implements OnInit {
   }
 
   get enhancedRoles(): readonly ('client' | 'provider')[] {
-    return this.isEnhanced ? ['client', 'provider'] : ['provider'];
+    if (this.isEnhanced) return ['client', 'provider'];
+    if (this.isProvider) return ['provider'];
+    return ['client'];
   }
   private readonly finishedPageSize = 5;
   private readonly finishedVisible = {
@@ -96,41 +103,64 @@ export class AppointmentsComponent implements OnInit {
 
   enhancedAppointmentGroups(role: 'client' | 'provider') {
       const appointments = role === 'client'
-      ? this.appointments.filter(item => item.status === 'Booked' || item.status === 'Completed')
+      ? this.appointments.filter(item => item.status === 'Booked' || item.status === 'Completed' || item.status === 'Canceled')
       : this.providerAppointments;
     const now = Date.now();
     const byStart = (a: Appointment, b: Appointment) =>
       Date.parse(a.startDateTime) - Date.parse(b.startDateTime);
     const upcoming: Appointment[] = [];
-    const finished: Appointment[] = [];
+    const completed: Appointment[] = [];
+    const canceled: Appointment[] = [];
 
     for (const appointment of appointments) {
-      const group = appointment.status === 'Completed' || Date.parse(appointment.endDateTime) <= now
-        ? finished
-        : upcoming;
-      group.push(appointment);
+      if (appointment.status === 'Canceled') {
+        canceled.push(appointment);
+      } else if (appointment.status === 'Completed' || Date.parse(appointment.endDateTime) <= now) {
+        completed.push(appointment);
+      } else {
+        upcoming.push(appointment);
+      }
     }
 
-    return [
+    const groups = [
       {
         title: 'Upcoming appointments',
         items: upcoming.sort(byStart),
         empty: 'No upcoming appointments.',
         hasMore: false
-      },
-      {
-        title: 'Finished appointments',
-        items: finished.sort((a, b) => byStart(b, a)).slice(0, this.finishedVisible[role]),
-        empty: 'No finished appointments.',
-        hasMore: finished.length > this.finishedVisible[role]
-      },
-      ...(role === 'provider' ? [{
+      }
+    ];
+
+    if (completed.length > 0) {
+      groups.push({
+        title: 'Completed appointments',
+        items: completed.sort((a, b) => byStart(b, a)).slice(0, this.finishedVisible[role]),
+        empty: 'No completed appointments.',
+        hasMore: completed.length > this.finishedVisible[role]
+      });
+    }
+
+    if (canceled.length > 0) {
+      groups.push({
+        title: 'Canceled appointments',
+        items: canceled.sort((a, b) => {
+          const ca = Date.parse(a.canceledAt ?? '');
+          const cb = Date.parse(b.canceledAt ?? '');
+          return cb - ca;
+        }).slice(0, this.finishedVisible[role]),
+        empty: 'No canceled appointments.',
+        hasMore: canceled.length > this.finishedVisible[role]
+      });
+    }
+
+    groups.push(...(role === 'provider' ? [{
         title: 'Open slots',
         items: this.upcomingOpenSlots.sort(byStart).slice(0, this.openSlotsVisible),
         empty: 'No upcoming open slots.',
         hasMore: false
-      }] : [])
-    ];
+      }] : []));
+
+    return groups;
   }
 
   get upcomingAppointments(): Appointment[] {
@@ -179,7 +209,7 @@ export class AppointmentsComponent implements OnInit {
       .subscribe({
         next: (items) => {
           this.providerAppointments = items
-          .filter((item) => (item.status === 'Booked' || item.status === 'Completed') && !!item.userId)            .sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
+          .filter((item) => (item.status === 'Booked' || item.status === 'Completed') && !!item.userId).sort((a, b) => Date.parse(a.startDateTime) - Date.parse(b.startDateTime));
           this.providerLoading = false;
           this.providerOpenSlots = items.filter(
             item => item.status === 'Available' && !item.userId
@@ -196,6 +226,7 @@ export class AppointmentsComponent implements OnInit {
     return (item.status === 'Booked' || item.status === 'Available') &&
       Date.parse(item.startDateTime) > Date.now();
   }
+
 
   startProviderEdit(item: Appointment): void {
     this.providerEditingId = item.id;
