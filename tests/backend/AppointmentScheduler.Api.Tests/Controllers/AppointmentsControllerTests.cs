@@ -122,19 +122,26 @@ public class AppointmentsControllerTests {
         var updated = controller.Update(id, new UpdateAppointmentDto { Title = "Renamed" });
         Assert.Equal("Renamed", Assert.IsType<Appointment>(Assert.IsType<OkObjectResult>(updated.Result).Value).Title);
 
-        // DELETE soft-deletes a Booked appointment so it drops out of live lists.
+        // DELETE cancels a Booked appointment (keeps it visible per BAAAM-171).
         Assert.IsType<NoContentResult>(controller.Delete(id));
-        Assert.IsType<NotFoundResult>(controller.GetById(id).Result);
+        var canceled = Assert.IsType<Appointment>(
+            Assert.IsType<OkObjectResult>(controller.GetById(id).Result).Value);
+        Assert.Equal(AppointmentStatus.Canceled, canceled.Status);
+        Assert.NotNull(canceled.CanceledAt);
     }
 
     [Fact]
-    public void Delete_Booked_SoftDeletes_ClearsClient_AndNotifies() {
+    public void Delete_Booked_Cancels_KeepsVisible_AndNotifies() {
         var (c, store, audit, notes) = ClientController(SeedIds.AdminUser);
         var booked = AddAt(store, 24, SeedIds.ClientUser, AppointmentStatus.Booked);
         booked.Title = "Admin cancel me";
 
         Assert.IsType<NoContentResult>(c.Delete(booked.Id));
-        Assert.Null(store.GetById(booked.Id));
+        var canceled = store.GetById(booked.Id)!;
+        Assert.NotNull(canceled);
+        Assert.Equal(AppointmentStatus.Canceled, canceled.Status);
+        Assert.Equal(SeedIds.ClientUser, canceled.UserId); // client preserved
+        Assert.NotNull(canceled.CanceledAt);
         Assert.Contains(audit.Query(action: AppointmentAuditEntry.Cancelled), e =>
             e.AppointmentId == booked.Id
             && e.ChangedByUserId == SeedIds.AdminUser
