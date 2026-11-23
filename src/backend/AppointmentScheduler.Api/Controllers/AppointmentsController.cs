@@ -185,9 +185,31 @@ public sealed class AppointmentsController(
         if (currentUser?.UserId is not { } userId) return Unauthorized();
         if (users?.GetById(userId) is not { IsClient: true, IsActive: true }) return Forbid();
         return Ok(store.GetAll()
-            .Where(a => a.UserId == userId && a.Status == AppointmentStatus.Booked)
+            .Where(a => a.UserId == userId && a.Status != AppointmentStatus.Available)
             .OrderBy(a => a.StartDateTime).ThenBy(a => a.Id, StringComparer.Ordinal)
             .ToList());
+
+    }
+    /// <summary>
+    /// List of the signed-in client's canceled appointments (by the client or by their provider),
+    /// newest cancellation first.
+    /// </summary>
+    [HttpGet("mine/history")]
+    [ProducesResponseType<IReadOnlyList<Appointment>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public ActionResult<IReadOnlyList<Appointment>> GetHistory()
+    {
+        if (currentUser?.UserId is not { } userId) return Unauthorized();
+        if (users?.GetById(userId) is not { IsClient: true, IsActive: true }) return Forbid();
+
+        var items = store.GetAll()
+            .Where(a => a.UserId == userId && a.Status == AppointmentStatus.Canceled)
+            .OrderByDescending(a => a.CanceledAt ?? DateTimeOffset.MinValue)
+            .ThenByDescending(a => a.StartDateTime)
+            .ToList();
+
+        return Ok(items);
     }
 
     /// <summary>Client updates only the notes on their own future Booked appointment.</summary>
@@ -214,8 +236,8 @@ public sealed class AppointmentsController(
     }
 
     /// <summary>
-    /// Client cancels their own future Booked appointment. The slot returns to Available
-    /// so someone else can book it.
+    /// Client cancels their own future Booked appointment. The appointment stays visible in
+    /// the client calendar as Canceled and appears in the client's canceled-appointment history.
     /// </summary>
     [HttpPost("{id}/cancel")]
     [ProducesResponseType<Appointment>(StatusCodes.Status200OK)]
@@ -238,7 +260,7 @@ public sealed class AppointmentsController(
             ChangedByUserId = currentUser.UserId!,
             Action = AppointmentAuditEntry.Cancelled,
             OldStatus = AppointmentStatus.Booked,
-            NewStatus = AppointmentStatus.Available
+            NewStatus = AppointmentStatus.Canceled
         });
         if (!string.IsNullOrWhiteSpace(ownerId))
             notificationService?.OnBookingCancelled(

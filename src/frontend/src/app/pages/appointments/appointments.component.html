@@ -11,7 +11,7 @@
     </div>
   </header>
 
-  @if (isProvider) {
+  @if (isProvider || isClient) {
     @if (actionError) {
       <div class="error" role="alert"><p>{{ actionError }}</p></div>
     }
@@ -226,6 +226,7 @@
             }
           </article>
         }
+
       </section>
     }
   }

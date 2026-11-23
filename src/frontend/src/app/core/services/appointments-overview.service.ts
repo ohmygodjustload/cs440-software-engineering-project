@@ -22,7 +22,7 @@ export class AppointmentsOverviewService {
       .pipe(tap((updated) => this.toast.showAppointmentModified(updated.title, updated.startDateTime)));
   }
 
-  /** Client cancels their booking; the slot returns to Available. */
+  /** Client cancels their booking; the slot stays Canceled and stays visible on the calendar. */
   cancelBooking(
     id: string,
     title?: string | null,
