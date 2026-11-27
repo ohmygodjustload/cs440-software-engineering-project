@@ -45,19 +45,30 @@ describe('StatisticsComponent', () => {
   it('renders the real heading and empty state', () => {
     const fixture = create();
     expect(fixture.nativeElement.textContent).toContain('Scheduling statistics');
-    expect(fixture.nativeElement.textContent).toContain('No completed appointments');
+    expect(fixture.nativeElement.textContent).toContain('No appointment history in this date range.');
   });
-  it('counts Canceled and Completed separately and charts only completed history', () => {
+  it('counts ended bookings as completed and excludes cancellations from charts', () => {
     service.loadAppointments.and.returnValue(of([
-      appointment('done', 'Completed'), appointment('cancel', 'Canceled'), appointment('booked', 'Booked')
+      appointment('done', 'Completed'),
+      appointment('cancel', 'Canceled'),
+      appointment('booked', 'Booked'),
+      appointment('missed', 'Missed')
     ]));
+
     const fixture = create();
     const component = fixture.componentInstance;
-    expect(component.completed.length).toBe(1);
+
+    expect(component.completed.map(item => item.id))
+      .toEqual(['done', 'booked']);
     expect(component.cancelledCount).toBe(1);
-    expect(component.categories.find(row => row.label === 'Medical')?.count).toBe(1);
-    expect(component.times.find(row => row.label === 'Morning')?.count).toBe(1);
-    expect(fixture.nativeElement.querySelector('.cancelled p').textContent.trim()).toBe('1');
+
+    expect(component.categories.find(row => row.label === 'Medical')?.count)
+      .toBe(3);
+    expect(component.times.find(row => row.label === 'Morning')?.count)
+      .toBe(3);
+
+    expect(fixture.nativeElement.querySelector('.cancelled p').textContent.trim())
+      .toBe('1');
   });
   it('excludes future and out-of-range appointments and updates the selected range', () => {
     service.loadAppointments.and.returnValue(of([
@@ -90,7 +101,7 @@ describe('StatisticsComponent', () => {
     fixture.componentInstance.load();
     fixture.detectChanges();
     expect(fixture.componentInstance.error).toBe('');
-    expect(fixture.nativeElement.textContent).toContain('No completed appointments');
+    expect(fixture.nativeElement.textContent).toContain('No appointment history in this date range.');
   });
   it('defaults a provider account to provider statistics', () => {
     service.availableRoles.and.returnValue(['provider']);
