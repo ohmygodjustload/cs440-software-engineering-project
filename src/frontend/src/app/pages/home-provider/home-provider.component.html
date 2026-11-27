@@ -171,7 +171,7 @@
         <div class="recent-row">
           <span>{{ appointment.startDateTime | date:'MMM d' }}</span>
           <span>{{ appointment.title }}</span>
-          <span>{{ appointment.status }}</span>
+          <span>{{ displayStatus(appointment) }}</span>
           <button
             type="button"
             [attr.aria-expanded]="detailsOpen('recent:' + appointment.id)"
@@ -195,7 +195,7 @@
       <dt>Client</dt><dd>{{ appointment.clientName || appointment.clientUsername || 'Name unavailable' }}</dd>
       <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
       <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
-      <dt>Status</dt><dd>{{ appointment.status }}</dd>
+      <dt>Status</dt><dd>{{ displayStatus(appointment) }}</dd>
       <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
       <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
     </dl>

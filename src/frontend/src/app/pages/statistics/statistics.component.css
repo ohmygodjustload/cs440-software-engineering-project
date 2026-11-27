@@ -57,7 +57,7 @@ button:disabled {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 26px;
 }
 
@@ -73,7 +73,7 @@ button:disabled {
 }
 
 .cancelled {
-  background: #e4e3bc;
+  background: #efd8d5;
 }
 
 .rescheduled {
@@ -225,3 +225,35 @@ h3, .time-grid p {
 header { flex-wrap: wrap; }
 .controls { justify-content: flex-end; }
 @media (max-width: 760px) { .controls { justify-content: flex-start; } }
+
+@media (min-width: 1000px) {
+  .statistics-page > header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .statistics-page > header > div:first-child {
+    min-width: 0;
+  }
+
+  .statistics-page > header .controls {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 999px) {
+  .statistics-page > header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .statistics-page > header .controls {
+    justify-content: flex-start;
+  }
+}

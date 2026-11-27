@@ -41,16 +41,15 @@
     <section class="metrics" aria-label="Appointment totals">
       <div class="metric completed"><h2>Completed</h2><p>{{ completed.length }}</p></div>
       <div class="metric cancelled"><h2>Cancelled</h2><p>{{ cancelledCount }}</p></div>
-      <div class="metric rescheduled">
-        <h2>Rescheduled</h2>
-        <p class="unavailable">Unavailable</p>
-        <span>No rescheduling history is stored.</span>
-      </div>
     </section>
 
-    <p class="chart-note">Charts show completed appointments, grouped by their start time in your local timezone.</p>
-    @if (completed.length === 0) {
-      <p role="status">No completed appointments in this date range.</p>
+    <p class="chart-note">
+      Charts show past booked, completed, and missed appointments,
+      grouped by their start time in your local timezone.
+    </p>
+
+    @if (chartAppointments.length === 0) {
+      <p role="status">No appointment history in this date range.</p>
     }
 
     <div class="charts">

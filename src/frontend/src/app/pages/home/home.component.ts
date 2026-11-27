@@ -112,4 +112,10 @@ export class HomeComponent implements OnInit {
         time >= start.getTime() && time < end.getTime();
     }).length;
   }
+  displayStatus(item: Appointment): string {
+    return item.status === 'Booked' &&
+      Date.parse(item.endDateTime) <= this.now.getTime()
+        ? 'Completed'
+        : item.status;
+  }
 }

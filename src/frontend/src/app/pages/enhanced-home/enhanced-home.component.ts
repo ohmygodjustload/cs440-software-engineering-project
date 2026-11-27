@@ -140,4 +140,11 @@ export class EnhancedHomeComponent implements OnInit {
     this.selectedAppointment = this.detailsAreOpen(item, summary) ? null : item;
     this.selectedRole = summary.role;
   }
+
+  displayStatus(item: Appointment): string {
+    return item.status === 'Booked' &&
+      Date.parse(item.endDateTime) <= this.now.getTime()
+        ? 'Completed'
+        : item.status;
+  }
 }

@@ -66,6 +66,7 @@ const ENHANCED_NAV: readonly NavLink[] = [
   { label: 'Book appointment', path: '/book-appointment' },
   { label: 'Create appointment', path: '/create-slots' },
   { label: 'Notifications', path: '/notifications' },
+  { label: 'Statistics', path: '/statistics' },
   { label: 'Settings', path: '/settings' }
 ];
 
