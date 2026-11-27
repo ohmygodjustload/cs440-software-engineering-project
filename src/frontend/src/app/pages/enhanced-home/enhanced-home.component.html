@@ -201,7 +201,7 @@
             <div class="recent" [class.crossed-off]="hasConflict(item, summary)">
               <span>{{ item.startDateTime | date:'MMM d' }}</span>
               <span>{{ item.title }}</span>
-              <span>{{ item.status }}</span>
+              <span>{{ displayStatus(item) }}</span>
 
               <button
                 type="button"
@@ -255,7 +255,7 @@
           }
 
           <dt>Status</dt>
-          <dd>{{ item.status }}</dd>
+          <dd>{{ displayStatus(item) }}</dd>
 
           <dt>Location</dt>
           <dd>{{ item.location || 'Not provided' }}</dd>

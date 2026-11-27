@@ -24,7 +24,7 @@ h1 {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px;
   max-width: 932px;
 }
@@ -44,9 +44,6 @@ h1 {
   background: #d5e3e8;
 }
 
-.reminder-card {
-  background: #e4e3bc;
-}
 
 h2 {
   margin: 0;
@@ -65,14 +62,10 @@ h2 {
   font-weight: 500;
 }
 
-.stat-info > span:last-child, .reminder-card > span {
+.stat-info > span:last-child {
   font-size: 12px;
 }
 
-.unavailable {
-  margin: 10px 0 6px;
-  font-size: 20px;
-}
 
 .next-appointment, .recent {
   margin-top: 38px;

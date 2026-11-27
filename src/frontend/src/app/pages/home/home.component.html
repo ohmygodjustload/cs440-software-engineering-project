@@ -35,11 +35,6 @@
           <span>appointment{{ weekCount === 1 ? '' : 's' }} this week</span>
         </div>
       </div>
-      <div class="stat-card reminder-card">
-        <h2>Reminders</h2>
-        <p class="unavailable">Unavailable</p>
-        <span>Reminders are not set up yet.</span>
-      </div>
     </section>
 
     <section class="next-appointment">
@@ -75,7 +70,7 @@
           <dl>
             <dt>Start</dt><dd>{{ appointment.startDateTime | date:'medium' }}</dd>
             <dt>End</dt><dd>{{ appointment.endDateTime | date:'medium' }}</dd>
-            <dt>Status</dt><dd>{{ appointment.status }}</dd>
+            <dt>Status</dt><dd>{{ displayStatus(appointment) }}</dd>
             <dt>Location</dt><dd>{{ appointment.location || 'Not provided' }}</dd>
             <dt>Notes</dt><dd>{{ appointment.notes || 'No notes' }}</dd>
           </dl>
@@ -89,7 +84,7 @@
         <div class="activity-row">
           <time>{{ appointment.startDateTime | date:'MMM d' }}</time>
           <span>{{ appointment.title }}</span>
-          <span>{{ appointment.status }}</span>
+          <span>{{ displayStatus(appointment) }}</span>
         </div>
       } @empty {
         <p class="empty">No recent appointments.</p>

@@ -43,17 +43,31 @@ export class StatisticsComponent implements OnInit {
   }
 
   get completed(): Appointment[] {
-    return this.rangeAppointments.filter((item) => item.status === 'Completed');
+    return this.rangeAppointments.filter(item =>
+      item.status === 'Completed' ||
+      (
+        item.status === 'Booked' &&
+        Date.parse(item.endDateTime) <= this.now.getTime()
+      )
+    );
   }
 
   get cancelledCount(): number {
     return this.rangeAppointments.filter((item) => item.status === 'Canceled').length;
   }
 
+  get chartAppointments(): Appointment[] {
+    return this.rangeAppointments.filter(item =>
+      item.status === 'Booked' ||
+      item.status === 'Completed' ||
+      item.status === 'Missed'
+    );
+  }
+
   get categories(): ChartCount[] {
     return ['Medical', 'Beauty', 'Fitness'].map((category) => ({
       label: category,
-      count: this.completed.filter((item) => item.category === category).length
+      count: this.chartAppointments.filter((item) => item.category === category).length
     }));
   }
 
@@ -62,7 +76,7 @@ export class StatisticsComponent implements OnInit {
 
     return labels.map((label, index) => ({
       label,
-      count: this.completed.filter((item) =>
+      count: this.chartAppointments.filter((item) =>
         (new Date(item.startDateTime).getDay() + 6) % 7 === index).length
     }));
   }
@@ -70,7 +84,7 @@ export class StatisticsComponent implements OnInit {
   get times(): ChartCount[] {
     return ['Morning', 'Afternoon', 'Evening'].map((label, index) => ({
       label,
-      count: this.completed.filter((item) => {
+      count: this.chartAppointments.filter((item) => {
         const hour = new Date(item.startDateTime).getHours();
         const bucket = hour < 12 ? 0 : hour < 18 ? 1 : 2;
         return bucket === index;

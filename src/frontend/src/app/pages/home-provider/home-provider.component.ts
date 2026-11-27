@@ -239,4 +239,11 @@ export class ProviderHomeComponent implements OnInit {
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
+
+  displayStatus(item: Appointment): string {
+    return item.status === 'Booked' &&
+      Date.parse(item.endDateTime) <= this.now.getTime()
+        ? 'Completed'
+        : item.status;
+  }
 }
