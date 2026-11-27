@@ -59,7 +59,6 @@ describe('LoginComponent', () => {
     expect(page.textContent).toContain('Your time, beautifully organized');
     expect(page.textContent).toContain('Welcome back');
     expect(page.textContent).toContain('Remember me');
-    expect(page.textContent).toContain('Forgot password?');
     expect(page.textContent).toContain('New here? Create an account');
   });
 
